@@ -27,10 +27,7 @@ export default function Sidebar() {
           </p>
         </div>
       </Link>
-      <p className="mb-3 mt-14 px-3 text-[10px] font-medium uppercase tracking-[0.15em] text-sidebar-muted">
-        Your workspace
-      </p>
-      <nav aria-label="Primary">
+      <nav aria-label="Primary" className="mt-14">
         <ul className="space-y-1.5">
           {navItems.map((item) => {
             const active = item.matches.includes(pathname);

@@ -1,7 +1,9 @@
 import { imageHosts } from './image-hosts.config.mjs';
+import { fileURLToPath } from 'node:url';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingRoot: fileURLToPath(new URL('.', import.meta.url)),
   devIndicators: false,
   productionBrowserSourceMaps: true,
   distDir: process.env.DIST_DIR || '.next',

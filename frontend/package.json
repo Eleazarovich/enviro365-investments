@@ -1,5 +1,5 @@
 {
-  "name": "enviro365",
+  "name": "enviro365-investments",
   "version": "0.1.0",
   "private": true,
   "rocketCritical": {
@@ -36,7 +36,7 @@
       "serve",
       "type-check"
     ],
-    "warning": "🚨 CRITICAL: DO NOT REMOVE OR MODIFY ABOVE DEPENDENCIES - Required for Next.js 15 TypeScript app functionality"
+    "warning": "\ud83d\udea8 CRITICAL: DO NOT REMOVE OR MODIFY ABOVE DEPENDENCIES - Required for Next.js 15 TypeScript app functionality"
   },
   "scripts": {
     "dev": "next dev -p 4028",

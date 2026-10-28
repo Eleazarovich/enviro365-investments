@@ -1,4 +1,4 @@
-# Enviro365 interface
+# Enviro365 Investments
 
 The existing portfolio and withdrawal workflows use the **Rosewood & Porcelain** identity: restrained rosewood accents, warm neutral backgrounds, white surfaces, neutral financial amounts, and the original leaf-and-capital mark. The existing navigation, layout structure, interactions, and responsive behaviour are preserved.
 
@@ -13,7 +13,7 @@ The existing portfolio and withdrawal workflows use the **Rosewood & Porcelain**
 
 ## Implementation
 
-Colour tokens and shared styles live in `src/styles/tailwind.css`; `tailwind.config.js` maps those tokens to reusable utilities. Channel-based colours support Tailwind opacity modifiers consistently. The in-app vector mark inherits the surrounding theme colour. Shared components include `BalanceAmount`, `Button`, `Badge`, `Select`, `Dialog`, and `WithdrawalTable`.
+Colour tokens and shared styles live in `frontend/src/styles/tailwind.css`; `frontend/tailwind.config.js` maps those tokens to reusable utilities. Channel-based colours support Tailwind opacity modifiers consistently. The in-app vector mark inherits the surrounding theme colour. Shared components include `BalanceAmount`, `Button`, `Badge`, `Select`, `Dialog`, and `WithdrawalTable`.
 
 `BalanceAmount` displays actual decimal cents and exposes the complete amount to assistive technology. Investment cards and limits use the existing precise currency formatter. The modal supports initial focus, keyboard containment, Escape, focus restoration, and disabled dismissal during submission.
 
@@ -25,7 +25,10 @@ The **How withdrawals work** panel shows the withdrawal rules: retirement withdr
 
 ## Verification
 
+Run these commands from the project root:
+
 ```sh
+cd frontend
 npm run type-check
 npm run lint
 npm run build

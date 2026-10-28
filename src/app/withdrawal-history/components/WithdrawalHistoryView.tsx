@@ -73,7 +73,7 @@ export default function WithdrawalHistoryView() {
           <p className="eyebrow mb-2">Account activity</p>
           <h1 className="page-heading">Withdrawals</h1>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            A record of your withdrawal requests, newest first.
+            Your withdrawals, newest first.
           </p>
         </div>
         <DownloadStatementButton
@@ -109,7 +109,7 @@ export default function WithdrawalHistoryView() {
                   <>
                     {' · '}
                     <span className="tabular font-semibold text-foreground">
-                      {formatRandPrecise(total)}
+                      {formatRandPrecise(-total)}
                     </span>{' '}
                     in total
                   </>
@@ -154,7 +154,7 @@ export default function WithdrawalHistoryView() {
             <EmptyState
               icon={<History className="h-6 w-6" aria-hidden="true" />}
               title="No withdrawals yet"
-              description="When you withdraw money from one of your investments, the request will be listed here."
+              description="Your withdrawals will appear here."
             />
           ) : (
             <div className={reloading ? 'opacity-60 transition-opacity' : 'transition-opacity'}>

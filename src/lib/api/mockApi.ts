@@ -80,7 +80,7 @@ export const mockApi = {
       mockControls.failNextSubmit = false;
       throw new ApiError(
         'UNEXPECTED',
-        "We couldn't submit your withdrawal. Please try again.",
+        "We couldn't record your withdrawal. Please try again.",
         500
       );
     }
@@ -150,11 +150,9 @@ export const mockApi = {
     }
     const rows = applyFilters(filters);
     const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
-    const header = 'Date,Investment,Amount,Status';
+    const header = 'Date,Investment,Amount';
     const lines = rows.map((r) =>
-      [r.submittedAt.slice(0, 10), escape(r.productName), r.amount.toFixed(2), 'Submitted'].join(
-        ','
-      )
+      [r.submittedAt.slice(0, 10), escape(r.productName), (-r.amount).toFixed(2)].join(',')
     );
     const today = new Date().toISOString().slice(0, 10);
     return {

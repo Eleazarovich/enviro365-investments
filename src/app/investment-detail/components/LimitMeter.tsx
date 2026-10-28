@@ -26,7 +26,7 @@ export default function LimitMeter({ product }: { product: InvestmentProduct }) 
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(usedPct)}
-        aria-label="Share of your withdrawal limit already requested"
+        aria-label="Share of your withdrawal limit used"
         className="mt-6 h-2 w-full overflow-hidden rounded-full bg-muted"
       >
         <div
@@ -37,7 +37,7 @@ export default function LimitMeter({ product }: { product: InvestmentProduct }) 
 
       <dl className="mt-5 grid grid-cols-1 gap-5 text-xs sm:grid-cols-3">
         <div>
-          <dt className="leading-relaxed text-muted-foreground">Already requested</dt>
+          <dt className="leading-relaxed text-muted-foreground">Limit used</dt>
           <dd className="tabular mt-2 text-lg font-medium">
             {formatRandPrecise(product.pendingWithdrawals)}
           </dd>

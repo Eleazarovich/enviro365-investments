@@ -69,7 +69,7 @@ export default function WithdrawalDialog({
       await onSubmitted(notice);
     } catch (e) {
       const message =
-        e instanceof Error ? e.message : "We couldn't submit your withdrawal. Please try again.";
+        e instanceof Error ? e.message : "We couldn't record your withdrawal. Please try again.";
       const code = (e as { code?: string }).code;
       if (
         code === 'VALIDATION_ERROR' ||
@@ -94,21 +94,17 @@ export default function WithdrawalDialog({
 
   if (confirmed) {
     return (
-      <Dialog open={open} onClose={handleClose} title="Withdrawal submitted">
+      <Dialog open={open} onClose={handleClose} title="Withdrawal recorded">
         <div className="flex flex-col items-center text-center">
           <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-success/10 text-success">
             <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
           </div>
-          <p className="text-xs text-muted-foreground">Withdrawal request received</p>
+          <p className="text-xs text-muted-foreground">{product.name}</p>
           <p className="tabular mt-2 text-4xl font-medium tracking-tight">
-            {formatRandPrecise(confirmed.amount)}
+            {formatRandPrecise(-confirmed.amount)}
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Your request has been submitted and your available balance has been updated.
-          </p>
-          <p className="mt-5 rounded-xl border border-border bg-muted/70 px-4 py-3 text-xs leading-relaxed text-muted-foreground">
-            This is a request, not a bank payment. We&apos;ll show its status in your withdrawal
-            history.
+            Your available balance has been updated.
           </p>
           <Button className="mt-6 w-full" onClick={onClose} data-autofocus>
             Done
@@ -204,10 +200,6 @@ export default function WithdrawalDialog({
           </div>
         )}
 
-        <p className="mt-5 border-t border-border pt-4 text-[11px] leading-relaxed text-muted-foreground">
-          Submitting records a request, not a bank payment. You can follow your request in
-          Withdrawals.
-        </p>
         <div className="mt-5 flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
           <Button type="button" variant="outline" onClick={handleClose} disabled={submitting}>
             Cancel
@@ -215,10 +207,10 @@ export default function WithdrawalDialog({
           <Button
             type="submit"
             loading={submitting}
-            loadingLabel="Submitting…"
+            loadingLabel="Recording…"
             className="sm:min-w-[11rem]"
           >
-            Submit withdrawal
+            Confirm withdrawal
           </Button>
         </div>
       </form>

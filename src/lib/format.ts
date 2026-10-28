@@ -28,11 +28,6 @@ export function formatDateTime(iso: string): string {
   return `${formatDate(iso)}, ${hh}:${mm}`;
 }
 
-export function statusLabel(status: string): string {
-  if (status === 'SUBMITTED') return 'Submitted';
-  return status.charAt(0) + status.slice(1).toLowerCase();
-}
-
 export function productTypeLabel(type: string): string {
   return type === 'RETIREMENT' ? 'Retirement' : 'General investment';
 }

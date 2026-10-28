@@ -9,7 +9,7 @@ The existing portfolio and withdrawal workflows use the **Rosewood & Porcelain**
 - **Spacing:** use a 4px base, 20–24px between related panels, and 24–32px inside important surfaces. The desktop sidebar is 232px. Content is bounded on wide screens; screens below 1024px use the existing two-destination bottom navigation to leave room for financial information.
 - **Surfaces:** 16px corners, subtle borders, and minimal shadows. Group related controls and information: history filters and results share a single surface. The existing withdrawal-limit meter is the only data visualisation.
 - **Actions and fields:** primary actions use rosewood with white text; secondary actions use a neutral border. Inputs share `.field` and `.field-label`, with visible rosewood focus rings and explicit validation messages. Field boundaries use a dedicated input token with at least 3:1 contrast on white; text and action colours meet WCAG AA contrast expectations.
-- **States:** skeletons follow the eventual content shape. Errors offer the existing retry action. Withdrawal confirmation emphasises the submitted amount and explains that a request is not a bank payment. Motion respects reduced-motion preferences.
+- **States:** skeletons follow the eventual content shape. Errors offer the existing retry action. Withdrawal confirmation shows the recorded deduction and confirms the available balance has updated. Motion respects reduced-motion preferences.
 
 ## Implementation
 
@@ -18,6 +18,10 @@ Colour tokens and shared styles live in `src/styles/tailwind.css`; `tailwind.con
 `BalanceAmount` displays actual decimal cents and exposes the complete amount to assistive technology. Investment cards and limits use the existing precise currency formatter. The modal supports initial focus, keyboard containment, Escape, focus restoration, and disabled dismissal during submission.
 
 The original routes, API adapter contracts, financial calculations, eligibility rule, cumulative 90% limit, filters, and CSV export remain in place. The decorative leaf outlines are original CSS and SVG, with no third-party imagery or chart data.
+
+Investment cards show the available balance and maximum withdrawal in a compact layout. Withdrawal tables use **Date**, **Investment**, and **Amount**, with right-aligned negative amounts such as `-R20,000`. Investment-specific tables omit the Investment column. Mobile rows use the same signed amounts with vertically centred content. CSV statements use the same three columns and negative amounts. API withdrawal amounts remain positive; the presentation and statement export apply the debit sign.
+
+The **How withdrawals work** panel shows the withdrawal rules: retirement withdrawals require age greater than 65, withdrawals cannot exceed the available balance, and withdrawals cannot exceed 90% of the balance. Account status and pending totals are internal data; investor-facing lists focus on the date, investment, and deduction.
 
 ## Verification
 

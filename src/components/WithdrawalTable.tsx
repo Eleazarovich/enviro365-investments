@@ -1,7 +1,6 @@
 import { ArrowUpRight } from 'lucide-react';
 import { formatDate, formatRandPrecise } from '@/lib/format';
 import type { WithdrawalNotice } from '@/lib/types';
-import WithdrawalStatusBadge from './WithdrawalStatusBadge';
 
 interface WithdrawalTableProps {
   rows: WithdrawalNotice[];
@@ -24,7 +23,7 @@ export default function WithdrawalTable({
           <thead className="bg-muted/50">
             <tr className="border-b border-border text-[11px] text-muted-foreground">
               <th scope="col" className="whitespace-nowrap px-5 py-3.5 font-medium sm:px-6">
-                Date submitted
+                Date
               </th>
               {showInvestment && (
                 <th scope="col" className="px-5 py-3.5 font-medium sm:px-6">
@@ -33,9 +32,6 @@ export default function WithdrawalTable({
               )}
               <th scope="col" className="px-5 py-3.5 text-right font-medium sm:px-6">
                 Amount
-              </th>
-              <th scope="col" className="px-5 py-3.5 font-medium sm:px-6">
-                Status
               </th>
             </tr>
           </thead>
@@ -52,10 +48,7 @@ export default function WithdrawalTable({
                   <td className="px-5 py-[18px] font-medium sm:px-6">{row.productName}</td>
                 )}
                 <td className="tabular whitespace-nowrap px-5 py-[18px] text-right font-medium sm:px-6">
-                  {formatRandPrecise(row.amount)}
-                </td>
-                <td className="px-5 py-[18px] sm:px-6">
-                  <WithdrawalStatusBadge status={row.status} />
+                  {formatRandPrecise(-row.amount)}
                 </td>
               </tr>
             ))}
@@ -66,10 +59,10 @@ export default function WithdrawalTable({
         {rows.map((row) => (
           <li
             key={`withdrawal-card-${row.id}`}
-            className={`flex items-start gap-3 px-5 py-4 ${highlightId === row.id ? 'animate-row-flash' : ''}`}
+            className={`flex items-center gap-3 px-5 py-4 ${highlightId === row.id ? 'animate-row-flash' : ''}`}
           >
             <span
-              className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-primary"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-muted text-primary"
               aria-hidden="true"
             >
               <ArrowUpRight className="h-3.5 w-3.5" />
@@ -80,10 +73,9 @@ export default function WithdrawalTable({
                 <time dateTime={row.submittedAt}>{formatDate(row.submittedAt)}</time>
               </p>
             </div>
-            <div className="shrink-0 text-right">
-              <p className="tabular mb-2 text-sm font-medium">{formatRandPrecise(row.amount)}</p>
-              <WithdrawalStatusBadge status={row.status} />
-            </div>
+            <p className="tabular shrink-0 text-right text-sm font-medium">
+              {formatRandPrecise(-row.amount)}
+            </p>
           </li>
         ))}
       </ul>

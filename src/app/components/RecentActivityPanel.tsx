@@ -59,7 +59,7 @@ export default function RecentActivityPanel() {
         <EmptyState
           icon={<History className="h-6 w-6" aria-hidden="true" />}
           title="No withdrawals yet"
-          description="When you withdraw money from an investment, your requests will be listed here."
+          description="Your withdrawals will appear here."
         />
       ) : (
         <WithdrawalTable rows={rows} caption="Your most recent withdrawals" />

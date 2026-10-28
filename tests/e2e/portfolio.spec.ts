@@ -132,10 +132,10 @@ const test = base.extend<{ api: ApiFixture }>({
           contentType: 'text/csv',
           headers: { 'Content-Disposition': 'attachment; filename="withdrawal-statement.csv"' },
           body: [
-            'Date,Investment,Amount,Status',
+            'Date,Investment,Amount',
             ...rows.map(
               (row) =>
-                `${row.submittedAt.slice(0, 10)},${row.productName},${row.amount.toFixed(2)},Submitted`
+                `${row.submittedAt.slice(0, 10)},${row.productName},${(-row.amount).toFixed(2)}`
             ),
           ].join('\r\n'),
         });
@@ -181,7 +181,7 @@ test('portfolio preserves balances and investment navigation', async ({ page, ap
 
 test('invalid amounts preserve the existing financial boundaries', async ({ page, api }) => {
   const input = await openWithdrawal(page);
-  const submit = page.getByRole('button', { name: 'Submit withdrawal', exact: true });
+  const submit = page.getByRole('button', { name: 'Confirm withdrawal', exact: true });
   for (const [amount, message] of [
     ['', 'Enter an amount to withdraw.'],
     ['0', 'Enter an amount greater than R0.'],
@@ -201,20 +201,20 @@ test('invalid amounts preserve the existing financial boundaries', async ({ page
 test('withdrawal submission updates balances and history once', async ({ page, api }) => {
   const input = await openWithdrawal(page);
   await input.fill('1,500.75');
-  await page.getByRole('button', { name: 'Submit withdrawal', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Submitting…', exact: true })).toBeDisabled();
+  await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Recording…', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(
-    page.getByRole('heading', { name: 'Withdrawal submitted', exact: true })
+    page.getByRole('heading', { name: 'Withdrawal recorded', exact: true })
   ).toBeVisible();
-  await expect(page.getByRole('dialog').getByText('R1,500.75', { exact: true })).toBeVisible();
+  await expect(page.getByRole('dialog').getByText('-R1,500.75', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Done', exact: true }).click();
   await expect(page.getByText('R78,499.25', { exact: true }).first()).toBeAttached();
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '24');
   await expect(
-    page.locator('main').getByText('R1,500.75', { exact: true }).filter({ visible: true })
+    page.locator('main').getByText('-R1,500.75', { exact: true }).filter({ visible: true })
   ).toBeVisible();
   expect(api.submitCount).toBe(1);
   await page.getByRole('link', { name: 'Back to portfolio', exact: true }).click();
@@ -225,14 +225,14 @@ test('server failure keeps the entered amount for retry', async ({ page, api }) 
   api.failSubmit = true;
   const input = await openWithdrawal(page);
   await input.fill('1000');
-  await page.getByRole('button', { name: 'Submit withdrawal', exact: true }).click();
+  await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
   await expect(page.getByRole('dialog').getByRole('alert')).toContainText(
     'Your amount has been kept.'
   );
   await expect(input).toHaveValue('1000');
-  await page.getByRole('button', { name: 'Submit withdrawal', exact: true }).click();
+  await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
   await expect(
-    page.getByRole('heading', { name: 'Withdrawal submitted', exact: true })
+    page.getByRole('heading', { name: 'Withdrawal recorded', exact: true })
   ).toBeVisible();
   expect(api.submitCount).toBe(2);
 });
@@ -241,7 +241,7 @@ test('retirement age restriction and exhausted limits still apply', async ({ pag
   api.portfolio.investor.age = 65;
   const input = await openWithdrawal(page, 2);
   await input.fill('100');
-  await page.getByRole('button', { name: 'Submit withdrawal', exact: true }).click();
+  await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
   await expect(page.getByRole('dialog').getByRole('alert')).toHaveText(
     'Retirement withdrawals are only available to investors older than 65.'
   );
@@ -257,7 +257,7 @@ test('dialog traps keyboard focus, cancels and restores the trigger', async ({ p
   const input = await openWithdrawal(page);
   await expect(input).toBeFocused();
   const close = page.getByRole('button', { name: 'Close', exact: true });
-  const submit = page.getByRole('button', { name: 'Submit withdrawal', exact: true });
+  const submit = page.getByRole('button', { name: 'Confirm withdrawal', exact: true });
   await close.focus();
   await page.keyboard.press('Shift+Tab');
   await expect(submit).toBeFocused();
@@ -312,7 +312,7 @@ test('CSV download respects investment filters and handles export errors', async
   const download = await downloadEvent;
   expect(download.suggestedFilename()).toBe('withdrawal-statement.csv');
   const content = await readFile((await download.path())!, 'utf8');
-  expect(content).toContain('Retirement Investment,7500.50,Submitted');
+  expect(content).toContain('Retirement Investment,-7500.50');
   expect(content).not.toContain('Cash Investment');
 });
 
@@ -343,7 +343,7 @@ for (const width of [320, 768, 1024, 1280]) {
       await page.goto(path);
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
       await expect(
-        page.getByText('R20,000', { exact: true }).filter({ visible: true }).first()
+        page.getByText('-R20,000', { exact: true }).filter({ visible: true }).first()
       ).toBeVisible();
       await expectNoOverflow(page);
     }

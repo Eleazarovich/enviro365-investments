@@ -17,7 +17,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: 'Enviro365 Investments — Your Portfolio and Withdrawals',
   description:
-    'View your available balance, request withdrawals and download your withdrawal statement from one place.',
+    'View your available balance, make withdrawals and download your withdrawal statement from one place.',
   icons: {
     icon: [{ url: '/enviro365-mark.svg', type: 'image/svg+xml' }],
   },

@@ -1,23 +1,23 @@
-import { Info, Landmark, ShieldCheck } from 'lucide-react';
+import { Landmark, ShieldCheck, Wallet } from 'lucide-react';
 
 const points = [
   {
     key: 'limit',
     icon: ShieldCheck,
-    title: 'Up to 90% of your investment',
-    body: 'Your limit includes withdrawals that are still waiting to be processed.',
+    title: 'Up to 90% of your balance',
+    body: 'Your maximum withdrawal is shown on each investment.',
+  },
+  {
+    key: 'balance',
+    icon: Wallet,
+    title: 'Within your available balance',
+    body: 'You cannot withdraw more than your available balance.',
   },
   {
     key: 'retirement',
     icon: Landmark,
-    title: 'A note on retirement funds',
+    title: 'Retirement investments',
     body: 'Withdrawals are available to investors older than 65.',
-  },
-  {
-    key: 'request',
-    icon: Info,
-    title: 'A request comes first',
-    body: 'Submitting a request does not mean the money has reached your bank account.',
   },
 ];
 
@@ -27,10 +27,7 @@ export default function LimitsExplainer() {
       aria-labelledby="limits-heading"
       className="rounded-2xl border border-border bg-card p-5 sm:p-6"
     >
-      <div className="flex items-center justify-between gap-3">
-        <p className="eyebrow !text-primary">Good to know</p>
-      </div>
-      <h2 id="limits-heading" className="mt-3 text-lg font-medium tracking-tight">
+      <h2 id="limits-heading" className="text-lg font-medium tracking-tight">
         How withdrawals work
       </h2>
       <ul className="mt-5 space-y-5">

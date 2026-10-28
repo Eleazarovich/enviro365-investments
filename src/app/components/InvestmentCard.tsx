@@ -10,13 +10,11 @@ export default function InvestmentCard({ product }: { product: InvestmentProduct
   return (
     <Link
       href={`/investment-detail?id=${product.id}`}
-      className="group block overflow-hidden rounded-2xl border border-border bg-card transition duration-200 hover:border-primary/30 hover:shadow-[0_6px_24px_-12px_#182e2430] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+      className="group block overflow-hidden rounded-2xl border border-border bg-card transition duration-200 hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
     >
-      <div
-        className={`relative isolate overflow-hidden px-5 pb-5 pt-5 sm:px-6 ${retirement ? 'bg-[#f0efe7]' : 'bg-[#edf2e4]'}`}
-      >
+      <div className="relative isolate overflow-hidden bg-muted/60 px-5 pb-5 pt-5 sm:px-6">
         <div
-          className="investment-art -z-10 text-primary"
+          className="investment-art -z-10 text-muted-foreground"
           data-type={product.type}
           aria-hidden="true"
         >
@@ -26,7 +24,7 @@ export default function InvestmentCard({ product }: { product: InvestmentProduct
         </div>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/10 bg-white/60 text-primary">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-primary">
               <ProductIcon className="h-[19px] w-[19px]" strokeWidth={1.5} aria-hidden="true" />
             </span>
             <div>
@@ -60,7 +58,7 @@ export default function InvestmentCard({ product }: { product: InvestmentProduct
             <dt className="leading-relaxed text-muted-foreground">Waiting to be processed</dt>
             <dd className="tabular mt-1.5 flex items-center gap-1.5 text-sm font-medium">
               {product.pendingWithdrawals > 0 && (
-                <span className="h-1.5 w-1.5 rounded-full bg-[#b18b39]" aria-hidden="true" />
+                <span className="h-1.5 w-1.5 rounded-full bg-warning" aria-hidden="true" />
               )}
               {product.pendingWithdrawals > 0
                 ? formatRandPrecise(product.pendingWithdrawals)

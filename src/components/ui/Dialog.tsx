@@ -85,7 +85,7 @@ export default function Dialog({
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-5">
       <div
-        className="absolute inset-0 animate-fade-in bg-[#13251c]/50 backdrop-blur-[3px]"
+        className="absolute inset-0 animate-fade-in bg-foreground/40 backdrop-blur-[3px]"
         onClick={() => !locked && onClose()}
         aria-hidden="true"
       />
@@ -96,7 +96,7 @@ export default function Dialog({
         aria-labelledby="dialog-title"
         aria-describedby={description ? 'dialog-description' : undefined}
         tabIndex={-1}
-        className="animate-dialog-in relative z-10 max-h-[92dvh] w-full overflow-y-auto rounded-t-[22px] border border-border bg-card p-6 text-card-foreground shadow-2xl focus:outline-none sm:max-w-[480px] sm:rounded-[22px] sm:p-8"
+        className="animate-dialog-in relative z-10 max-h-[92dvh] w-full overflow-y-auto rounded-t-[22px] border border-border bg-card p-6 text-card-foreground shadow-lg focus:outline-none sm:max-w-[480px] sm:rounded-[22px] sm:p-8"
       >
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>

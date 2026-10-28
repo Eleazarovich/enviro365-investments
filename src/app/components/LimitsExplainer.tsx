@@ -25,7 +25,7 @@ export default function LimitsExplainer() {
   return (
     <section
       aria-labelledby="limits-heading"
-      className="rounded-2xl border border-border bg-[#eef1e8] p-5 sm:p-6"
+      className="rounded-2xl border border-border bg-card p-5 sm:p-6"
     >
       <div className="flex items-center justify-between gap-3">
         <p className="eyebrow !text-primary">Good to know</p>

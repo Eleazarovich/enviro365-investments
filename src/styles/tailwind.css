@@ -3,16 +3,29 @@
 @tailwind utilities;
 
 :root {
-  --color-background: 247 248 244;
-  --color-foreground: 29 42 35;
-  --color-primary: 35 72 54;
-  --color-secondary: 238 242 233;
-  --color-accent: 224 238 205;
-  --color-muted: 242 244 239;
-  --color-border: 229 233 224;
-  --color-success: 40 106 65;
+  /* Rosewood & Porcelain — space-separated RGB supports Tailwind opacity utilities. */
+  --color-background: 248 245 240; /* #F8F5F0 */
+  --color-card: 255 255 255; /* #FFFFFF */
+  --color-foreground: 38 37 43; /* #26252B */
+  --color-primary: 102 51 68; /* #663344 */
+  --color-primary-hover: 82 42 56; /* #522A38 */
+  --color-primary-foreground: var(--color-card);
+  --color-secondary: var(--color-accent);
+  --color-secondary-foreground: var(--color-primary);
+  --color-accent: 234 221 226; /* #EADDE2 */
+  --color-accent-foreground: var(--color-primary);
+  --color-muted: var(--color-background);
+  --color-muted-foreground: 106 99 100; /* #6A6364 */
+  --color-border: 230 223 220; /* #E6DFDC */
+  --color-input: 154 144 145; /* Visible field boundaries: at least 3:1 on white. */
+  --color-ring: var(--color-primary);
+  --color-sidebar: var(--color-foreground);
+  --color-sidebar-foreground: var(--color-background);
+  --color-sidebar-muted: var(--color-accent);
+  --color-success: 20 102 73; /* #146649 */
   --color-warning: 142 95 22;
-  --color-destructive: 177 49 40;
+  --color-destructive: 180 35 24; /* #B42318 */
+  --color-status-foreground: var(--color-card);
   --background: rgb(var(--color-background));
   --foreground: rgb(var(--color-foreground));
   --primary: rgb(var(--color-primary));
@@ -20,8 +33,6 @@
   --accent: rgb(var(--color-accent));
   --radius: 0.875rem;
   --sidebar-width: 232px;
-  --lime: #d5ed9b;
-  --forest: #182e24;
 }
 
 @layer base {
@@ -58,8 +69,8 @@
     font: inherit;
   }
   ::selection {
-    background: #d5ed9b;
-    color: #182e24;
+    background: var(--accent);
+    color: var(--foreground);
   }
   :focus-visible {
     outline: 2px solid var(--primary);
@@ -81,13 +92,13 @@
     @apply flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-5 sm:px-6;
   }
   .text-link {
-    @apply inline-flex items-center gap-2 rounded text-xs font-medium text-primary transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4;
+    @apply inline-flex items-center gap-2 rounded text-xs font-medium text-primary transition-colors hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4;
   }
   .field-label {
     @apply mb-2 block text-xs font-medium text-foreground;
   }
   .field {
-    @apply h-11 w-full min-w-0 rounded-lg border border-input bg-card px-3.5 text-sm text-foreground transition-colors hover:border-primary/40 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/10 disabled:cursor-not-allowed disabled:bg-muted;
+    @apply h-11 w-full min-w-0 rounded-lg border border-input bg-card px-3.5 text-sm text-foreground transition-colors placeholder:text-muted-foreground hover:border-primary focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-muted;
   }
   .animate-dialog-in {
     animation: dialog-in 180ms ease-out both;
@@ -131,7 +142,7 @@
 .portfolio-motif span {
   position: absolute;
   inset: 0;
-  border: 1px solid #d5ed9b28;
+  border: 1px solid rgb(var(--color-primary) / 0.09);
   border-radius: 52% 0 52% 52%;
 }
 .portfolio-motif span:nth-child(2) {
@@ -145,7 +156,7 @@
 }
 .portfolio-motif span:nth-child(5) {
   inset: 100px;
-  background: #d5ed9b0a;
+  background: rgb(var(--color-accent) / 0.2);
 }
 .investment-art {
   position: absolute;

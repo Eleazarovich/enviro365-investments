@@ -96,7 +96,7 @@ export default function WithdrawalDialog({
     return (
       <Dialog open={open} onClose={handleClose} title="Withdrawal submitted">
         <div className="flex flex-col items-center text-center">
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent text-primary">
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-success/10 text-success">
             <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
           </div>
           <p className="text-xs text-muted-foreground">Withdrawal request received</p>
@@ -164,10 +164,10 @@ export default function WithdrawalDialog({
             disabled={submitting}
             aria-invalid={fieldError ? true : undefined}
             aria-describedby={fieldError ? 'amount-error' : 'amount-hint'}
-            className={`tabular h-16 w-full rounded-xl border bg-card pl-10 pr-4 text-[28px] font-medium transition-colors placeholder:font-normal placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:bg-muted ${
+            className={`tabular h-16 w-full rounded-xl border bg-card pl-10 pr-4 text-[28px] font-medium transition-colors placeholder:font-normal placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-muted ${
               fieldError
-                ? 'border-destructive focus-visible:ring-destructive/10'
-                : 'border-input focus-visible:border-primary focus-visible:ring-primary/10'
+                ? 'border-destructive focus-visible:ring-destructive'
+                : 'border-input focus-visible:border-primary focus-visible:ring-ring'
             }`}
             {...register('amount', {
               validate: (v) => validateWithdrawalAmount(v, { product, investorAge }),

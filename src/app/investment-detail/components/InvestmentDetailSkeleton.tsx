@@ -8,10 +8,10 @@ export default function InvestmentDetailSkeleton() {
         <Skeleton className="h-3 w-24" />
         <Skeleton className="mt-3 h-9 w-64 max-w-full" />
       </div>
-      <div className="rounded-2xl bg-[var(--forest)] p-6 sm:p-8">
-        <Skeleton className="h-3 w-28 !bg-white/10" />
-        <Skeleton className="mt-5 h-14 w-56 max-w-full !bg-white/10" />
-        <Skeleton className="mt-4 h-3 w-44 !bg-white/10" />
+      <div className="rounded-2xl bg-card p-6 ring-1 ring-inset ring-border sm:p-8">
+        <Skeleton className="h-3 w-28" />
+        <Skeleton className="mt-5 h-14 w-56 max-w-full" />
+        <Skeleton className="mt-4 h-3 w-44" />
       </div>
       <div className="panel p-6">
         <Skeleton className="h-4 w-36" />

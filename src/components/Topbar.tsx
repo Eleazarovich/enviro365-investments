@@ -29,7 +29,7 @@ export default function Topbar() {
           aria-label="Enviro365 Investments home"
           className="flex items-center gap-2 rounded-md lg:hidden"
         >
-          <span className="rounded-lg bg-[var(--forest)] p-1">
+          <span className="rounded-lg bg-primary p-1 text-primary-foreground">
             <AppLogo size={28} />
           </span>
           <span className="text-base font-semibold tracking-tight">
@@ -55,7 +55,7 @@ export default function Topbar() {
           </div>
           <span
             aria-hidden="true"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#dce5d1] bg-secondary text-[11px] font-medium text-primary"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-secondary text-[11px] font-medium text-primary"
           >
             {initials || '··'}
           </span>

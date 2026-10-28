@@ -24,7 +24,7 @@ export default function InvestmentSummary({ product, onWithdraw }: InvestmentSum
         </div>
         <ProductTypeTag type={product.type} />
       </div>
-      <div className="relative isolate overflow-hidden rounded-2xl bg-[var(--forest)] p-6 text-white sm:p-8">
+      <div className="relative isolate overflow-hidden rounded-2xl bg-card p-6 text-foreground ring-1 ring-inset ring-border sm:p-8">
         <div className="portfolio-motif -z-10 opacity-60" aria-hidden="true">
           <span />
           <span />
@@ -34,16 +34,16 @@ export default function InvestmentSummary({ product, onWithdraw }: InvestmentSum
         </div>
         <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-medium text-[#c2d0bd]">Available balance</p>
+            <p className="text-xs font-medium text-muted-foreground">Available balance</p>
             <BalanceAmount value={product.availableBalance} className="mt-4" />
-            <p className="mt-3 text-[11px] text-[#c2d0bd]">
+            <p className="mt-3 text-[11px] text-muted-foreground">
               Your balance after pending withdrawals
             </p>
           </div>
-          <div className="flex flex-col gap-4 border-t border-white/15 pt-5 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-stretch lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+          <div className="flex flex-col gap-4 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-stretch lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
             <div>
-              <p className="text-xs text-[#c2d0bd]">Maximum you can withdraw</p>
-              <p className="tabular mt-1.5 text-2xl font-medium text-[#d5ed9b]">
+              <p className="text-xs text-muted-foreground">Maximum you can withdraw</p>
+              <p className="tabular mt-1.5 text-2xl font-medium text-foreground">
                 {formatRandPrecise(product.maximumWithdrawable)}
               </p>
             </div>
@@ -53,7 +53,7 @@ export default function InvestmentSummary({ product, onWithdraw }: InvestmentSum
           </div>
         </div>
         {cannotWithdraw && (
-          <p className="mt-5 border-t border-white/15 pt-4 text-xs leading-relaxed text-[#d9e4d4]">
+          <p className="mt-5 border-t border-border pt-4 text-xs leading-relaxed text-muted-foreground">
             You&apos;ve reached the withdrawal limit for this investment, so new withdrawals
             aren&apos;t available right now.
           </p>

@@ -30,7 +30,7 @@ export default function PortfolioHero() {
         )}
       </div>
 
-      <div className="relative isolate overflow-hidden rounded-2xl bg-[var(--forest)] px-6 py-7 text-white sm:px-8 sm:py-8">
+      <div className="relative isolate overflow-hidden rounded-2xl bg-card px-6 py-7 text-foreground ring-1 ring-inset ring-border sm:px-8 sm:py-8">
         <div className="portfolio-motif -z-10" aria-hidden="true">
           <span />
           <span />
@@ -39,23 +39,23 @@ export default function PortfolioHero() {
           <span />
         </div>
         <div className="flex items-center justify-between gap-4">
-          <p className="text-xs font-medium text-[#c2d0bd]">Total available balance</p>
-          <span className="rounded-md border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-medium tracking-wider text-[#d9e4d4]">
+          <p className="text-xs font-medium text-muted-foreground">Total available balance</p>
+          <span className="rounded-md border border-border bg-muted px-2.5 py-1 text-[10px] font-medium tracking-wider text-muted-foreground">
             ZAR
           </span>
         </div>
         <div className="mt-4 min-h-[62px]">
           {loading && !portfolio ? (
-            <Skeleton className="h-14 w-56 !bg-white/10" />
+            <Skeleton className="h-14 w-56" />
           ) : error && !portfolio ? (
-            <p className="py-3 text-sm text-[#d9e4d4]">Balance unavailable right now.</p>
+            <p className="py-3 text-sm text-muted-foreground">Balance unavailable right now.</p>
           ) : (
             portfolio && <BalanceAmount value={portfolio.totalAvailable} />
           )}
         </div>
-        <div className="mt-5 flex flex-col gap-3 border-t border-white/15 pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-[#c2d0bd]">Across your investments</p>
-          <p className="flex items-start gap-2 text-[11px] leading-relaxed text-[#c2d0bd]">
+        <div className="mt-5 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-muted-foreground">Across your investments</p>
+          <p className="flex items-start gap-2 text-[11px] leading-relaxed text-muted-foreground">
             <RefreshCw className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
             Balances update when you submit a withdrawal
           </p>

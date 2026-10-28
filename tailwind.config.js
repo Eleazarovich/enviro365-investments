@@ -8,22 +8,46 @@ module.exports = {
       colors: {
         background: 'rgb(var(--color-background) / <alpha-value>)',
         foreground: 'rgb(var(--color-foreground) / <alpha-value>)',
-        primary: { DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)', foreground: '#ffffff' },
+        primary: {
+          DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+          hover: 'rgb(var(--color-primary-hover) / <alpha-value>)',
+          foreground: 'rgb(var(--color-primary-foreground) / <alpha-value>)',
+        },
         secondary: {
           DEFAULT: 'rgb(var(--color-secondary) / <alpha-value>)',
-          foreground: '#234536',
+          foreground: 'rgb(var(--color-secondary-foreground) / <alpha-value>)',
         },
-        accent: { DEFAULT: 'rgb(var(--color-accent) / <alpha-value>)', foreground: '#254331' },
-        muted: { DEFAULT: 'rgb(var(--color-muted) / <alpha-value>)', foreground: '#69716c' },
-        card: { DEFAULT: '#ffffff', foreground: 'rgb(var(--color-foreground) / <alpha-value>)' },
+        accent: {
+          DEFAULT: 'rgb(var(--color-accent) / <alpha-value>)',
+          foreground: 'rgb(var(--color-accent-foreground) / <alpha-value>)',
+        },
+        muted: {
+          DEFAULT: 'rgb(var(--color-muted) / <alpha-value>)',
+          foreground: 'rgb(var(--color-muted-foreground) / <alpha-value>)',
+        },
+        card: {
+          DEFAULT: 'rgb(var(--color-card) / <alpha-value>)',
+          foreground: 'rgb(var(--color-foreground) / <alpha-value>)',
+        },
+        sidebar: {
+          DEFAULT: 'rgb(var(--color-sidebar) / <alpha-value>)',
+          foreground: 'rgb(var(--color-sidebar-foreground) / <alpha-value>)',
+          muted: 'rgb(var(--color-sidebar-muted) / <alpha-value>)',
+        },
         border: 'rgb(var(--color-border) / <alpha-value>)',
-        input: '#d6dbd4',
-        ring: 'rgb(var(--color-primary) / <alpha-value>)',
-        success: { DEFAULT: 'rgb(var(--color-success) / <alpha-value>)', foreground: '#ffffff' },
-        warning: { DEFAULT: 'rgb(var(--color-warning) / <alpha-value>)', foreground: '#ffffff' },
+        input: 'rgb(var(--color-input) / <alpha-value>)',
+        ring: 'rgb(var(--color-ring) / <alpha-value>)',
+        success: {
+          DEFAULT: 'rgb(var(--color-success) / <alpha-value>)',
+          foreground: 'rgb(var(--color-status-foreground) / <alpha-value>)',
+        },
+        warning: {
+          DEFAULT: 'rgb(var(--color-warning) / <alpha-value>)',
+          foreground: 'rgb(var(--color-status-foreground) / <alpha-value>)',
+        },
         destructive: {
           DEFAULT: 'rgb(var(--color-destructive) / <alpha-value>)',
-          foreground: '#ffffff',
+          foreground: 'rgb(var(--color-status-foreground) / <alpha-value>)',
         },
       },
       borderRadius: {

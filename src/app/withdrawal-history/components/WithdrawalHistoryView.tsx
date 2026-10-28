@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { History, Info, SearchX } from 'lucide-react';
+import { History, SearchX } from 'lucide-react';
 import { api } from '@/lib/api';
 import { usePortfolio } from '@/lib/PortfolioProvider';
 import type { WithdrawalFilters, WithdrawalNotice } from '@/lib/types';
@@ -163,12 +163,6 @@ export default function WithdrawalHistoryView() {
           )}
         </section>
       </div>
-      <p className="flex max-w-2xl items-start gap-2 text-xs leading-relaxed text-muted-foreground">
-        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-        Submitted records a request. It is not confirmation that money has reached your bank
-        account.
-      </p>
-
       <Toast toast={toast} onDismiss={() => setToast(null)} />
     </div>
   );

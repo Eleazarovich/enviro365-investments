@@ -206,7 +206,7 @@ export default function WithdrawalDialog({
 
         <p className="mt-5 border-t border-border pt-4 text-[11px] leading-relaxed text-muted-foreground">
           Submitting records a request, not a bank payment. You can follow your request in
-          withdrawal history.
+          Withdrawals.
         </p>
         <div className="mt-5 flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
           <Button type="button" variant="outline" onClick={handleClose} disabled={submitting}>

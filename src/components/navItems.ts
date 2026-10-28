@@ -10,7 +10,7 @@ export const navItems = [
   },
   {
     key: 'nav-withdrawal-history',
-    label: 'Withdrawal history',
+    label: 'Withdrawals',
     href: '/withdrawal-history',
     icon: History,
     matches: ['/withdrawal-history'],

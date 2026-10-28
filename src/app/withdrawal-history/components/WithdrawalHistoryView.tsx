@@ -71,7 +71,7 @@ export default function WithdrawalHistoryView() {
       <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="eyebrow mb-2">Account activity</p>
-          <h1 className="page-heading">Withdrawal history</h1>
+          <h1 className="page-heading">Withdrawals</h1>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
             A record of your withdrawal requests, newest first.
           </p>
@@ -158,7 +158,7 @@ export default function WithdrawalHistoryView() {
             />
           ) : (
             <div className={reloading ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
-              <WithdrawalTable rows={rows} caption="Your withdrawal history, newest first" />
+              <WithdrawalTable rows={rows} caption="Your withdrawals, newest first" />
             </div>
           )}
         </section>

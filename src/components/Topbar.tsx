@@ -16,7 +16,7 @@ export default function Topbar() {
     .slice(0, 2);
   const page =
     pathname === '/withdrawal-history'
-      ? 'Withdrawal history'
+      ? 'Withdrawals'
       : pathname === '/investment-detail'
         ? 'Investment details'
         : 'Overview';

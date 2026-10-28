@@ -1,13 +1,6 @@
 'use client';
 
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { api } from './api';
 import type { Portfolio } from './types';
 
@@ -36,7 +29,9 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
       const data = await api.getPortfolio();
       setPortfolio(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "We couldn't load your portfolio. Please try again.");
+      setError(
+        e instanceof Error ? e.message : "We couldn't load your portfolio. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -50,7 +45,7 @@ export function PortfolioProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(
     () => ({ portfolio, loading, error, refresh: load, historyVersion, bumpHistory }),
-    [portfolio, loading, error, load, historyVersion, bumpHistory],
+    [portfolio, loading, error, load, historyVersion, bumpHistory]
   );
 
   return <PortfolioContext.Provider value={value}>{children}</PortfolioContext.Provider>;

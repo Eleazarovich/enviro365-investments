@@ -25,7 +25,8 @@ async function toApiError(res: Response): Promise<ApiError> {
   } catch {
     // Response had no JSON body
   }
-  const code = res.status === 404 ? 'NOT_FOUND' : res.status >= 500 ? 'UNEXPECTED' : 'VALIDATION_ERROR';
+  const code =
+    res.status === 404 ? 'NOT_FOUND' : res.status >= 500 ? 'UNEXPECTED' : 'VALIDATION_ERROR';
   return new ApiError(code, message, res.status);
 }
 

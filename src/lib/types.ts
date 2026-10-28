@@ -49,7 +49,12 @@ export interface CsvExport {
 }
 
 export type ApiErrorCode =
-  | 'VALIDATION_ERROR' |'NOT_FOUND' |'NOT_ELIGIBLE' |'LIMIT_EXCEEDED' |'INSUFFICIENT_BALANCE' |'UNEXPECTED';
+  | 'VALIDATION_ERROR'
+  | 'NOT_FOUND'
+  | 'NOT_ELIGIBLE'
+  | 'LIMIT_EXCEEDED'
+  | 'INSUFFICIENT_BALANCE'
+  | 'UNEXPECTED';
 
 export class ApiError extends Error {
   code: ApiErrorCode;

@@ -8,7 +8,11 @@ interface ErrorStateProps {
   onRetry?: () => void;
 }
 
-export default function ErrorState({ title = 'Something went wrong', message, onRetry }: ErrorStateProps) {
+export default function ErrorState({
+  title = 'Something went wrong',
+  message,
+  onRetry,
+}: ErrorStateProps) {
   return (
     <div
       role="alert"

@@ -6,13 +6,7 @@ import {
   type WithdrawalFilters,
   type WithdrawalNotice,
 } from '../types';
-import {
-  computeProduct,
-  mockInvestor,
-  mockProductRecords,
-  mockState,
-  round2,
-} from './mockStore';
+import { computeProduct, mockInvestor, mockProductRecords, mockState, round2 } from './mockStore';
 import { formatRandPrecise } from '../format';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -55,7 +49,7 @@ export const mockApi = {
     await delay(650);
     if (mockControls.failNextPortfolio) {
       mockControls.failNextPortfolio = false;
-      throw new ApiError('UNEXPECTED', "We couldn\'t load your portfolio. Please try again.", 500);
+      throw new ApiError('UNEXPECTED', "We couldn't load your portfolio. Please try again.", 500);
     }
     const products = mockProductRecords.map(computeProduct);
     return {
@@ -73,7 +67,7 @@ export const mockApi = {
       throw new ApiError(
         'UNEXPECTED',
         "We couldn't load your withdrawal history. Please try again.",
-        500,
+        500
       );
     }
     return applyFilters(filters);
@@ -87,7 +81,7 @@ export const mockApi = {
       throw new ApiError(
         'UNEXPECTED',
         "We couldn't submit your withdrawal. Please try again.",
-        500,
+        500
       );
     }
     const record = mockProductRecords.find((p) => p.id === request.productId);
@@ -98,14 +92,21 @@ export const mockApi = {
     if (!Number.isFinite(amount) || amount <= 0) {
       throw new ApiError('VALIDATION_ERROR', 'Enter an amount greater than R0.', 400);
     }
-    if (Math.round(amount * 100) !== amount * 100 && Math.abs(Math.round(amount * 100) - amount * 100) > 1e-6) {
-      throw new ApiError('VALIDATION_ERROR', 'Enter an amount with no more than two decimal places.', 400);
+    if (
+      Math.round(amount * 100) !== amount * 100 &&
+      Math.abs(Math.round(amount * 100) - amount * 100) > 1e-6
+    ) {
+      throw new ApiError(
+        'VALIDATION_ERROR',
+        'Enter an amount with no more than two decimal places.',
+        400
+      );
     }
     if (record.type === 'RETIREMENT' && mockInvestor.age <= 65) {
       throw new ApiError(
         'NOT_ELIGIBLE',
         'Retirement withdrawals are only available to investors older than 65.',
-        422,
+        422
       );
     }
     const product = computeProduct(record);
@@ -113,14 +114,14 @@ export const mockApi = {
       throw new ApiError(
         'INSUFFICIENT_BALANCE',
         `Your available balance for this investment is ${formatRandPrecise(product.availableBalance)}.`,
-        422,
+        422
       );
     }
     if (amount > product.maximumWithdrawable) {
       throw new ApiError(
         'LIMIT_EXCEEDED',
         `You can withdraw up to ${formatRandPrecise(product.maximumWithdrawable)} from this investment.`,
-        422,
+        422
       );
     }
     const notice = {
@@ -141,18 +142,19 @@ export const mockApi = {
     await delay(700);
     if (mockControls.failNextExport) {
       mockControls.failNextExport = false;
-      throw new ApiError('UNEXPECTED', "We couldn't prepare your statement. Please try again.", 500);
+      throw new ApiError(
+        'UNEXPECTED',
+        "We couldn't prepare your statement. Please try again.",
+        500
+      );
     }
     const rows = applyFilters(filters);
     const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
     const header = 'Date,Investment,Amount,Status';
     const lines = rows.map((r) =>
-      [
-        r.submittedAt.slice(0, 10),
-        escape(r.productName),
-        r.amount.toFixed(2),
-        'Submitted',
-      ].join(','),
+      [r.submittedAt.slice(0, 10), escape(r.productName), r.amount.toFixed(2), 'Submitted'].join(
+        ','
+      )
     );
     const today = new Date().toISOString().slice(0, 10);
     return {

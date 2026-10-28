@@ -30,9 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={geist.variable}>
-      <body className={geist.className}>
-        {children}
-      </body>
+      <body className={geist.className}>{children}</body>
     </html>
   );
 }

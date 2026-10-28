@@ -8,10 +8,7 @@ export interface ValidationContext {
 
 // Client-side pre-checks for fast feedback.
 // The backend remains the final authority for all business validation.
-export function validateWithdrawalAmount(
-  raw: string,
-  ctx: ValidationContext,
-): string | true {
+export function validateWithdrawalAmount(raw: string, ctx: ValidationContext): string | true {
   const value = (raw ?? '').trim().replace(/,/g, '');
   if (value === '') return 'Enter an amount to withdraw.';
   if (!/^\d+(\.\d+)?$/.test(value)) return 'Enter a valid amount, for example 1500.00.';

@@ -1,0 +1,141 @@
+import type { InvestmentProduct, Investor, WithdrawalNotice } from '../types';
+
+interface MockProductRecord {
+  id: number;
+  name: string;
+  type: 'GENERAL' | 'RETIREMENT';
+  recordedBalance: number;
+}
+
+// Demonstration data only. Not information about a real investor.
+export const mockInvestor: Investor = {
+  id: 1,
+  name: 'Thandiwe Mokoena',
+  age: 68,
+};
+
+export const mockProductRecords: MockProductRecord[] = [
+  { id: 1, name: 'Cash Investment', type: 'GENERAL', recordedBalance: 100000 },
+  { id: 2, name: 'Retirement Investment', type: 'RETIREMENT', recordedBalance: 60000 },
+];
+
+// Seed history. R20,000 on Cash is the existing submitted withdrawal.
+// The remaining historical rows are settled entries kept as SUBMITTED records
+// that are excluded from the pending total (see isPending flag below).
+interface SeedNotice extends WithdrawalNotice {
+  pending: boolean;
+}
+
+const seed: SeedNotice[] = [
+  {
+    id: 1001,
+    productId: 1,
+    productName: 'Cash Investment',
+    amount: 20000,
+    status: 'SUBMITTED',
+    submittedAt: '2026-10-21T09:12:00Z',
+    pending: true,
+  },
+  {
+    id: 1000,
+    productId: 1,
+    productName: 'Cash Investment',
+    amount: 4500,
+    status: 'SUBMITTED',
+    submittedAt: '2026-09-30T13:40:00Z',
+    pending: false,
+  },
+  {
+    id: 999,
+    productId: 2,
+    productName: 'Retirement Investment',
+    amount: 7500.5,
+    status: 'SUBMITTED',
+    submittedAt: '2026-09-12T08:05:00Z',
+    pending: false,
+  },
+  {
+    id: 998,
+    productId: 1,
+    productName: 'Cash Investment',
+    amount: 12000,
+    status: 'SUBMITTED',
+    submittedAt: '2026-08-26T15:22:00Z',
+    pending: false,
+  },
+  {
+    id: 997,
+    productId: 2,
+    productName: 'Retirement Investment',
+    amount: 3200,
+    status: 'SUBMITTED',
+    submittedAt: '2026-08-04T10:18:00Z',
+    pending: false,
+  },
+  {
+    id: 996,
+    productId: 1,
+    productName: 'Cash Investment',
+    amount: 1850.75,
+    status: 'SUBMITTED',
+    submittedAt: '2026-07-17T07:55:00Z',
+    pending: false,
+  },
+  {
+    id: 995,
+    productId: 2,
+    productName: 'Retirement Investment',
+    amount: 9000,
+    status: 'SUBMITTED',
+    submittedAt: '2026-06-23T12:30:00Z',
+    pending: false,
+  },
+  {
+    id: 994,
+    productId: 1,
+    productName: 'Cash Investment',
+    amount: 6000,
+    status: 'SUBMITTED',
+    submittedAt: '2026-05-14T14:02:00Z',
+    pending: false,
+  },
+  {
+    id: 993,
+    productId: 1,
+    productName: 'Cash Investment',
+    amount: 2750,
+    status: 'SUBMITTED',
+    submittedAt: '2026-04-02T09:47:00Z',
+    pending: false,
+  },
+];
+
+// In-memory state, replaced by the Spring Boot backend later.
+export const mockState = {
+  notices: seed.map((n) => ({ ...n })) as SeedNotice[],
+  nextId: 1002,
+};
+
+const MAX_RATIO = 0.9;
+
+export function computeProduct(record: MockProductRecord): InvestmentProduct {
+  const pending = mockState.notices
+    .filter((n) => n.productId === record.id && n.pending)
+    .reduce((sum, n) => sum + n.amount, 0);
+  const available = record.recordedBalance - pending;
+  // Cumulative 90% rule including pending withdrawals
+  const maxTotal = record.recordedBalance * MAX_RATIO;
+  const maximumWithdrawable = Math.max(0, Math.min(available, maxTotal - pending));
+  return {
+    id: record.id,
+    name: record.name,
+    type: record.type,
+    availableBalance: round2(available),
+    maximumWithdrawable: round2(maximumWithdrawable),
+    pendingWithdrawals: round2(pending),
+  };
+}
+
+export function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}

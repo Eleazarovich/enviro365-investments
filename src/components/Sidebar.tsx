@@ -11,7 +11,7 @@ export default function Sidebar() {
   const { portfolio } = usePortfolio();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden w-[var(--sidebar-width)] flex-col bg-[var(--forest)] px-5 py-7 text-white md:flex">
+    <aside className="fixed inset-y-0 left-0 z-40 hidden w-[var(--sidebar-width)] flex-col bg-[var(--forest)] px-5 py-7 text-white lg:flex">
       <Link
         href="/"
         aria-label="Enviro365 Investments home"

@@ -27,7 +27,7 @@ export default function Topbar() {
         <Link
           href="/"
           aria-label="Enviro365 Investments home"
-          className="flex items-center gap-2 rounded-md md:hidden"
+          className="flex items-center gap-2 rounded-md lg:hidden"
         >
           <span className="rounded-lg bg-[var(--forest)] p-1">
             <AppLogo size={28} />
@@ -36,7 +36,7 @@ export default function Topbar() {
             enviro<span className="font-normal text-primary">365</span>
           </span>
         </Link>
-        <nav aria-label="Breadcrumb" className="hidden items-center gap-3 text-xs md:flex">
+        <nav aria-label="Breadcrumb" className="hidden items-center gap-3 text-xs lg:flex">
           <Link
             href="/"
             className="rounded text-muted-foreground transition-colors hover:text-foreground"

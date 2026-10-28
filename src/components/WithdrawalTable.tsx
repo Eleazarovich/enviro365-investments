@@ -19,10 +19,10 @@ export default function WithdrawalTable({
   return (
     <>
       <div className="hidden overflow-x-auto sm:block">
-        <table className="w-full text-left text-xs">
+        <table className="w-full text-left text-[13px]">
           <caption className="sr-only">{caption}</caption>
           <thead className="bg-muted/50">
-            <tr className="border-b border-border text-[10px] text-muted-foreground">
+            <tr className="border-b border-border text-[11px] text-muted-foreground">
               <th scope="col" className="whitespace-nowrap px-5 py-3.5 font-medium sm:px-6">
                 Date submitted
               </th>

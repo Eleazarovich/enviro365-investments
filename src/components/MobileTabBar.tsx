@@ -10,7 +10,7 @@ export default function MobileTabBar() {
   return (
     <nav
       aria-label="Primary"
-      className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-md md:hidden"
+      className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-md lg:hidden"
     >
       <ul className="mx-auto grid max-w-md grid-cols-2">
         {navItems?.map((item) => {

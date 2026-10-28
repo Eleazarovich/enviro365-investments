@@ -25,7 +25,7 @@ export default function Toast({ toast, onDismiss }: ToastProps) {
   const isError = toast.tone === 'error';
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex justify-center px-4 md:bottom-6 md:justify-end md:px-8">
+    <div className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex justify-center px-4 lg:bottom-6 lg:justify-end lg:px-8">
       <div
         role={isError ? 'alert' : 'status'}
         className="animate-toast-in pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-lg border border-border bg-card p-4 text-card-foreground shadow-lg"

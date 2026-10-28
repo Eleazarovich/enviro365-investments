@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowUpRight, Landmark, Wallet } from 'lucide-react';
 import type { InvestmentProduct } from '@/lib/types';
-import { formatRand, productTypeLabel } from '@/lib/format';
+import { formatRandPrecise, productTypeLabel } from '@/lib/format';
 
 export default function InvestmentCard({ product }: { product: InvestmentProduct }) {
   const retirement = product.type === 'RETIREMENT';
@@ -44,7 +44,7 @@ export default function InvestmentCard({ product }: { product: InvestmentProduct
         <div className="mt-6">
           <p className="text-[11px] text-muted-foreground">Available balance</p>
           <p className="tabular mt-1 text-[32px] font-medium leading-tight tracking-[-0.045em]">
-            {formatRand(product.availableBalance)}
+            {formatRandPrecise(product.availableBalance)}
           </p>
         </div>
       </div>
@@ -53,7 +53,7 @@ export default function InvestmentCard({ product }: { product: InvestmentProduct
           <div>
             <dt className="leading-relaxed text-muted-foreground">Maximum you can withdraw</dt>
             <dd className="tabular mt-1.5 text-sm font-medium">
-              {formatRand(product.maximumWithdrawable)}
+              {formatRandPrecise(product.maximumWithdrawable)}
             </dd>
           </div>
           <div className="border-l border-border pl-4">
@@ -62,7 +62,9 @@ export default function InvestmentCard({ product }: { product: InvestmentProduct
               {product.pendingWithdrawals > 0 && (
                 <span className="h-1.5 w-1.5 rounded-full bg-[#b18b39]" aria-hidden="true" />
               )}
-              {product.pendingWithdrawals > 0 ? formatRand(product.pendingWithdrawals) : 'None'}
+              {product.pendingWithdrawals > 0
+                ? formatRandPrecise(product.pendingWithdrawals)
+                : 'None'}
             </dd>
           </div>
         </dl>

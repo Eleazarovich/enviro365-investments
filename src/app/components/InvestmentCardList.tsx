@@ -24,7 +24,7 @@ export default function InvestmentCardList() {
         )}
       </div>
       {loading && !portfolio ? (
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <InvestmentCardSkeleton />
           <InvestmentCardSkeleton />
         </div>
@@ -39,7 +39,7 @@ export default function InvestmentCardList() {
           />
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {portfolio?.products?.map((product) => (
             <InvestmentCard key={`product-${product?.id}`} product={product} />
           ))}

@@ -131,13 +131,13 @@ export default function WithdrawalDialog({
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <dl className="mb-6 grid grid-cols-2 gap-4 rounded-xl border border-border bg-muted/60 p-4 text-xs">
           <div>
-            <dt className="text-muted-foreground">Available balance</dt>
+            <dt className="min-h-8 text-muted-foreground sm:min-h-0">Available balance</dt>
             <dd className="tabular mt-2 text-lg font-medium">
               {formatRandPrecise(product.availableBalance)}
             </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground">Maximum you can withdraw</dt>
+            <dt className="min-h-8 text-muted-foreground sm:min-h-0">Maximum you can withdraw</dt>
             <dd className="tabular mt-2 text-lg font-medium">
               {formatRandPrecise(product.maximumWithdrawable)}
             </dd>

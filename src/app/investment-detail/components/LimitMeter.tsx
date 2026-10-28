@@ -1,6 +1,6 @@
 import React from 'react';
 import type { InvestmentProduct } from '@/lib/types';
-import { formatRand } from '@/lib/format';
+import { formatRandPrecise } from '@/lib/format';
 
 export default function LimitMeter({ product }: { product: InvestmentProduct }) {
   // The recorded balance is derived only for this visual. The server-provided
@@ -39,18 +39,18 @@ export default function LimitMeter({ product }: { product: InvestmentProduct }) 
         <div>
           <dt className="leading-relaxed text-muted-foreground">Already requested</dt>
           <dd className="tabular mt-2 text-lg font-medium">
-            {formatRand(product.pendingWithdrawals)}
+            {formatRandPrecise(product.pendingWithdrawals)}
           </dd>
         </div>
         <div>
           <dt className="leading-relaxed text-muted-foreground">Still available to withdraw</dt>
           <dd className="tabular mt-2 text-lg font-medium">
-            {formatRand(product.maximumWithdrawable)}
+            {formatRandPrecise(product.maximumWithdrawable)}
           </dd>
         </div>
         <div>
           <dt className="leading-relaxed text-muted-foreground">Total limit for this investment</dt>
-          <dd className="tabular mt-2 text-lg font-medium">{formatRand(limitTotal)}</dd>
+          <dd className="tabular mt-2 text-lg font-medium">{formatRandPrecise(limitTotal)}</dd>
         </div>
       </dl>
     </section>

@@ -13,11 +13,18 @@ export default function InvestmentCardList() {
 
   return (
     <section aria-labelledby="investments-heading">
-      <h2 id="investments-heading" className="mb-4 text-lg font-semibold tracking-tight">
-        Your investments
-      </h2>
+      <div className="mb-4 flex items-center gap-2.5">
+        <h2 id="investments-heading" className="text-base font-semibold tracking-tight">
+          Your investments
+        </h2>
+        {portfolio && (
+          <span className="flex h-5 min-w-5 items-center justify-center rounded-md border border-border bg-card px-1 text-[10px] font-medium text-muted-foreground">
+            {portfolio.products.length}
+          </span>
+        )}
+      </div>
       {loading && !portfolio ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <InvestmentCardSkeleton />
           <InvestmentCardSkeleton />
         </div>
@@ -32,7 +39,7 @@ export default function InvestmentCardList() {
           />
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           {portfolio?.products?.map((product) => (
             <InvestmentCard key={`product-${product?.id}`} product={product} />
           ))}

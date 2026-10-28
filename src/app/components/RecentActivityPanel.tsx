@@ -31,19 +31,13 @@ export default function RecentActivityPanel() {
   }, [load, historyVersion]);
 
   return (
-    <section
-      aria-labelledby="recent-heading"
-      className="overflow-hidden rounded-2xl border border-border bg-card"
-    >
-      <div className="flex items-center justify-between border-b border-border px-6 py-4">
-        <h2 id="recent-heading" className="text-base font-semibold tracking-tight">
+    <section aria-labelledby="recent-heading" className="panel">
+      <div className="panel-heading">
+        <h2 id="recent-heading" className="text-sm font-semibold tracking-tight">
           Recent withdrawals
         </h2>
-        <Link
-          href="/withdrawal-history"
-          className="group flex items-center gap-1 rounded-md text-sm font-semibold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          See all
+        <Link href="/withdrawal-history" className="text-link group">
+          View all
           <ArrowRight
             className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
             aria-hidden="true"

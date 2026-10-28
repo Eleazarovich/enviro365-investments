@@ -1,53 +1,74 @@
-import React from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowUpRight, Landmark, Wallet } from 'lucide-react';
 import type { InvestmentProduct } from '@/lib/types';
-import { formatRand } from '@/lib/format';
-import ProductTypeTag from '@/components/ProductTypeTag';
+import { formatRand, productTypeLabel } from '@/lib/format';
 
 export default function InvestmentCard({ product }: { product: InvestmentProduct }) {
+  const retirement = product.type === 'RETIREMENT';
+  const ProductIcon = retirement ? Landmark : Wallet;
+
   return (
     <Link
       href={`/investment-detail?id=${product.id}`}
-      className="group block rounded-2xl border border-border bg-card p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group block overflow-hidden rounded-2xl border border-border bg-card transition duration-200 hover:border-primary/30 hover:shadow-[0_6px_24px_-12px_#182e2430] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="text-lg font-semibold tracking-tight">{product.name}</h3>
-          <div className="mt-2">
-            <ProductTypeTag type={product.type} />
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-7">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Available balance
-        </p>
-        <p className="tabular mt-1 text-3xl font-bold tracking-tight">
-          {formatRand(product.availableBalance)}
-        </p>
-      </div>
-
-      <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-4 text-sm">
-        <div>
-          <dt className="text-muted-foreground">Maximum you can withdraw</dt>
-          <dd className="tabular mt-0.5 font-semibold">{formatRand(product.maximumWithdrawable)}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Waiting to be processed</dt>
-          <dd className="tabular mt-0.5 font-semibold">
-            {product.pendingWithdrawals > 0 ? formatRand(product.pendingWithdrawals) : 'None'}
-          </dd>
-        </div>
-      </dl>
-
-      <div className="mt-6 flex items-center gap-1.5 text-sm font-semibold text-primary">
-        View investment
-        <ArrowRight
-          className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
+      <div
+        className={`relative isolate overflow-hidden px-5 pb-5 pt-5 sm:px-6 ${retirement ? 'bg-[#f0efe7]' : 'bg-[#edf2e4]'}`}
+      >
+        <div
+          className="investment-art -z-10 text-primary"
+          data-type={product.type}
           aria-hidden="true"
-        />
+        >
+          <span />
+          <span />
+          <span />
+        </div>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/10 bg-white/60 text-primary">
+              <ProductIcon className="h-[19px] w-[19px]" strokeWidth={1.5} aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-[10px] font-medium text-muted-foreground">
+                {productTypeLabel(product.type)}
+              </p>
+              <h3 className="mt-0.5 text-[15px] font-semibold tracking-tight">{product.name}</h3>
+            </div>
+          </div>
+          <ArrowUpRight
+            className="mt-1 h-4 w-4 shrink-0 text-primary transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            aria-hidden="true"
+          />
+        </div>
+        <div className="mt-6">
+          <p className="text-[11px] text-muted-foreground">Available balance</p>
+          <p className="tabular mt-1 text-[32px] font-medium leading-tight tracking-[-0.045em]">
+            {formatRand(product.availableBalance)}
+          </p>
+        </div>
+      </div>
+      <div className="px-5 py-5 sm:px-6">
+        <dl className="grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <dt className="leading-relaxed text-muted-foreground">Maximum you can withdraw</dt>
+            <dd className="tabular mt-1.5 text-sm font-medium">
+              {formatRand(product.maximumWithdrawable)}
+            </dd>
+          </div>
+          <div className="border-l border-border pl-4">
+            <dt className="leading-relaxed text-muted-foreground">Waiting to be processed</dt>
+            <dd className="tabular mt-1.5 flex items-center gap-1.5 text-sm font-medium">
+              {product.pendingWithdrawals > 0 && (
+                <span className="h-1.5 w-1.5 rounded-full bg-[#b18b39]" aria-hidden="true" />
+              )}
+              {product.pendingWithdrawals > 0 ? formatRand(product.pendingWithdrawals) : 'None'}
+            </dd>
+          </div>
+        </dl>
+        <div className="mt-5 flex items-center justify-between border-t border-border pt-3.5 text-xs font-medium text-primary">
+          View investment <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+        </div>
       </div>
     </Link>
   );

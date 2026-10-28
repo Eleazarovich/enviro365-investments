@@ -1,53 +1,52 @@
-import React from 'react';
-import { Info, ShieldCheck, Landmark } from 'lucide-react';
-import Icon from '@/components/ui/AppIcon';
+import { Info, Landmark, ShieldCheck } from 'lucide-react';
 
+const points = [
+  {
+    key: 'limit',
+    icon: ShieldCheck,
+    title: 'Up to 90% of your investment',
+    body: 'Your limit includes withdrawals that are still waiting to be processed.',
+  },
+  {
+    key: 'retirement',
+    icon: Landmark,
+    title: 'A note on retirement funds',
+    body: 'Withdrawals are available to investors older than 65.',
+  },
+  {
+    key: 'request',
+    icon: Info,
+    title: 'A request comes first',
+    body: 'Submitting a request does not mean the money has reached your bank account.',
+  },
+];
 
 export default function LimitsExplainer() {
-  const points = [
-    {
-      key: 'explain-limit',
-      icon: ShieldCheck,
-      title: 'A withdrawal limit applies',
-      body: 'You can withdraw up to 90% of an investment in total, including any withdrawals that are still waiting to be processed.',
-    },
-    {
-      key: 'explain-retirement',
-      icon: Landmark,
-      title: 'Retirement withdrawals',
-      body: 'These are only available to investors older than 65.',
-    },
-    {
-      key: 'explain-request',
-      icon: Info,
-      title: 'A request is not a payment',
-      body: 'Submitting a withdrawal records your request. It does not mean the money has reached your bank account.',
-    },
-  ];
-
   return (
     <section
       aria-labelledby="limits-heading"
-      className="rounded-2xl border border-border bg-secondary/60 p-6"
+      className="rounded-2xl border border-border bg-[#eef1e8] p-5 sm:p-6"
     >
-      <h2 id="limits-heading" className="text-base font-semibold tracking-tight">
+      <div className="flex items-center justify-between gap-3">
+        <p className="eyebrow !text-primary">Good to know</p>
+      </div>
+      <h2 id="limits-heading" className="mt-3 text-lg font-medium tracking-tight">
         How withdrawals work
       </h2>
       <ul className="mt-5 space-y-5">
-        {points?.map((p) => {
-          const Icon = p?.icon;
-          return (
-            <li key={p?.key} className="flex gap-3">
-              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-card text-primary">
-                <Icon className="h-4 w-4" aria-hidden="true" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">{p?.title}</p>
-                <p className="mt-0.5 text-sm text-muted-foreground">{p?.body}</p>
-              </div>
-            </li>
-          );
-        })}
+        {points.map(({ key, icon: Icon, title, body }) => (
+          <li key={key} className="flex gap-3">
+            <Icon
+              className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+              strokeWidth={1.6}
+              aria-hidden="true"
+            />
+            <div>
+              <p className="text-xs font-medium leading-relaxed">{title}</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{body}</p>
+            </div>
+          </li>
+        ))}
       </ul>
     </section>
   );

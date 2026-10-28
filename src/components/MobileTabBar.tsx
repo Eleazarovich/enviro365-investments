@@ -4,15 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { navItems } from './navItems';
-import Icon from '@/components/ui/AppIcon';
-
 
 export default function MobileTabBar() {
   const pathname = usePathname();
   return (
     <nav
       aria-label="Primary"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card md:hidden"
+      className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-md md:hidden"
     >
       <ul className="mx-auto grid max-w-md grid-cols-2">
         {navItems?.map((item) => {
@@ -23,8 +21,8 @@ export default function MobileTabBar() {
               <Link
                 href={item?.href}
                 aria-current={active ? 'page' : undefined}
-                className={`flex flex-col items-center gap-1 py-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${
-                  active ? 'text-primary' : 'text-muted-foreground'
+                className={`flex min-h-16 flex-col items-center gap-1.5 py-3 text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${
+                  active ? 'bg-secondary/70 text-primary' : 'text-muted-foreground'
                 }`}
               >
                 <Icon className="h-5 w-5" aria-hidden="true" />

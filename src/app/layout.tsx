@@ -1,12 +1,11 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Geist } from 'next/font/google';
 import '../styles/tailwind.css';
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const geist = Geist({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-plus-jakarta-sans',
+  variable: '--font-geist-sans',
   display: 'swap',
 });
 
@@ -20,7 +19,7 @@ export const metadata: Metadata = {
   description:
     'View your available balance, request withdrawals and download your withdrawal statement from one place.',
   icons: {
-    icon: [{ url: '/favicon.ico', type: 'image/x-icon' }],
+    icon: [{ url: '/enviro365-mark.svg', type: 'image/svg+xml' }],
   },
 };
 
@@ -30,11 +29,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={plusJakartaSans.variable}>
-      <body className={plusJakartaSans.className}>{children}
+    <html lang="en" className={geist.variable}>
+      <body className={geist.className}>
+        {children}
 
-        <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fenviro3659371back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.21" />
-        <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.3" /></body>
+        <script
+          type="module"
+          async
+          src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Fenviro3659371back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.21"
+        />
+        <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.3" />
+      </body>
     </html>
   );
 }

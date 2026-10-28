@@ -1,66 +1,64 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import AppLogo from '@/components/ui/AppLogo';
-import { navItems } from './navItems';
+import { ChevronRight } from 'lucide-react';
+import AppLogo from './ui/AppLogo';
 import { usePortfolio } from '@/lib/PortfolioProvider';
-import Icon from '@/components/ui/AppIcon';
-
 
 export default function Topbar() {
   const pathname = usePathname();
   const { portfolio } = usePortfolio();
-  const initials = portfolio
-    ? portfolio?.investor?.name?.split(' ')?.map((p) => p?.charAt(0))?.join('')?.slice(0, 2)
-    : '';
+  const initials = portfolio?.investor.name
+    .split(' ')
+    .map((part) => part.charAt(0))
+    .join('')
+    .slice(0, 2);
+  const page =
+    pathname === '/withdrawal-history'
+      ? 'Withdrawal history'
+      : pathname === '/investment-detail'
+        ? 'Investment details'
+        : 'Overview';
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-16 w-full max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-16">
-        <div className="flex items-center gap-8">
+    <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md">
+      <div className="mx-auto flex h-[73px] max-w-[1440px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-10">
+        <Link
+          href="/"
+          aria-label="Enviro365 Investments home"
+          className="flex items-center gap-2 rounded-md md:hidden"
+        >
+          <span className="rounded-lg bg-[var(--forest)] p-1">
+            <AppLogo size={28} />
+          </span>
+          <span className="text-base font-semibold tracking-tight">
+            enviro<span className="font-normal text-primary">365</span>
+          </span>
+        </Link>
+        <nav aria-label="Breadcrumb" className="hidden items-center gap-3 text-xs md:flex">
           <Link
             href="/"
-            className="flex items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded text-muted-foreground transition-colors hover:text-foreground"
           >
-            <AppLogo size={36} />
-            <span className="text-base font-bold tracking-tight">Enviro365 Investments</span>
+            Workspace
           </Link>
-          <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
-            {navItems?.map((item) => {
-              const active = item?.matches?.includes(pathname);
-              const Icon = item?.icon;
-              return (
-                <Link
-                  key={item?.key}
-                  href={item?.href}
-                  aria-current={active ? 'page' : undefined}
-                  className={`flex items-center gap-2 rounded-md px-3.5 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                    active
-                      ? 'bg-primary/10 text-primary' :'text-muted-foreground hover:bg-muted hover:text-foreground'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                  {item?.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+          <ChevronRight className="h-3 w-3 text-muted-foreground/60" aria-hidden="true" />
+          <span aria-current="page" className="font-medium">
+            {page}
+          </span>
+        </nav>
         <div className="flex items-center gap-3">
-          {portfolio && (
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold leading-tight">{portfolio?.investor?.name}</p>
-              <p className="text-xs text-muted-foreground">Investor</p>
-            </div>
-          )}
-          <div
+          <div className="hidden text-right sm:block">
+            <p className="text-xs font-medium">{portfolio?.investor.name || 'Investor account'}</p>
+            <p className="mt-0.5 text-[10px] text-muted-foreground">Personal portfolio</p>
+          </div>
+          <span
             aria-hidden="true"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#dce5d1] bg-secondary text-[11px] font-medium text-primary"
           >
             {initials || '··'}
-          </div>
+          </span>
         </div>
       </div>
     </header>

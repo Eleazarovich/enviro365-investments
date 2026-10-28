@@ -47,22 +47,11 @@ export default function InvestmentCard({ product }: { product: InvestmentProduct
         </div>
       </div>
       <div className="px-5 py-5 sm:px-6">
-        <dl className="grid grid-cols-2 gap-4 text-xs">
-          <div>
+        <dl className="text-xs">
+          <div className="flex items-baseline justify-between gap-4">
             <dt className="leading-relaxed text-muted-foreground">Maximum you can withdraw</dt>
-            <dd className="tabular mt-1.5 text-sm font-medium">
+            <dd className="tabular shrink-0 text-sm font-medium">
               {formatRandPrecise(product.maximumWithdrawable)}
-            </dd>
-          </div>
-          <div className="border-l border-border pl-4">
-            <dt className="leading-relaxed text-muted-foreground">Waiting to be processed</dt>
-            <dd className="tabular mt-1.5 flex items-center gap-1.5 text-sm font-medium">
-              {product.pendingWithdrawals > 0 && (
-                <span className="h-1.5 w-1.5 rounded-full bg-warning" aria-hidden="true" />
-              )}
-              {product.pendingWithdrawals > 0
-                ? formatRandPrecise(product.pendingWithdrawals)
-                : 'None'}
             </dd>
           </div>
         </dl>

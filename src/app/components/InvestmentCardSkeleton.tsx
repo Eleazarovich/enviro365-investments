@@ -15,9 +15,9 @@ export default function InvestmentCardSkeleton() {
         <Skeleton className="mt-2 h-10 w-44" />
       </div>
       <div className="p-5 sm:px-6">
-        <div className="grid grid-cols-2 gap-4">
-          <Skeleton className="h-11 w-full" />
-          <Skeleton className="h-11 w-full" />
+        <div className="flex items-center justify-between gap-4">
+          <Skeleton className="h-4 w-36" />
+          <Skeleton className="h-5 w-20" />
         </div>
         <div className="mt-5 border-t border-border pt-4">
           <Skeleton className="h-4 w-28" />

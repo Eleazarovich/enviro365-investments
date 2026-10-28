@@ -36,9 +36,6 @@ export default function InvestmentSummary({ product, onWithdraw }: InvestmentSum
           <div>
             <p className="text-xs font-medium text-muted-foreground">Available balance</p>
             <BalanceAmount value={product.availableBalance} className="mt-4" />
-            <p className="mt-3 text-[11px] text-muted-foreground">
-              Your balance after pending withdrawals
-            </p>
           </div>
           <div className="flex flex-col gap-4 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-stretch lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
             <div>

@@ -26,10 +26,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           >
             {children}
           </main>
-          <footer className="mx-auto hidden max-w-[1440px] items-center justify-between px-8 pb-6 text-[10px] text-muted-foreground lg:flex lg:px-10">
-            <p>Enviro365 Investments</p>
-            <p>All amounts in South African rand (ZAR)</p>
-          </footer>
         </div>
         <MobileTabBar />
       </div>

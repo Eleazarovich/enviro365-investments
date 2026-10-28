@@ -89,3 +89,9 @@ You can check out the [Next.js GitHub repository](https://github.com/vercel/next
 - Styled with Tailwind CSS
 
 Built with ❤️ on Rocket.new
+
+## Interface and regression checks
+
+The Enviro365 visual system, component conventions, and verification scope are documented in [docs/design-system.md](docs/design-system.md).
+
+Run `npm run type-check`, `npm run lint`, and `npm run build` for static and production checks. For the desktop and mobile interaction suite, install Chromium with `npx playwright install chromium`, then run `npm run test:e2e`. These tests use isolated API fixtures and never send real withdrawal requests.

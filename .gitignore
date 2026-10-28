@@ -35,3 +35,7 @@ jest-test-results.json
 
 # Optional: if using TurboRepo or monorepo
 turbo/
+# Browser verification
+.next-e2e/
+test-results/
+playwright-report/

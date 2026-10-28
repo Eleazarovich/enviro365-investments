@@ -15,20 +15,20 @@ interface Props {
   productName: string;
 }
 
-export default function InvestmentHistoryPreview({ rows, error, onRetry, highlightId, productName }: Props) {
+export default function InvestmentHistoryPreview({
+  rows,
+  error,
+  onRetry,
+  highlightId,
+  productName,
+}: Props) {
   return (
-    <section
-      aria-labelledby="investment-history-heading"
-      className="overflow-hidden rounded-2xl border border-border bg-card"
-    >
-      <div className="flex items-center justify-between border-b border-border px-6 py-4">
-        <h2 id="investment-history-heading" className="text-base font-semibold tracking-tight">
+    <section aria-labelledby="investment-history-heading" className="panel">
+      <div className="panel-heading">
+        <h2 id="investment-history-heading" className="text-sm font-semibold tracking-tight">
           Withdrawals from this investment
         </h2>
-        <Link
-          href="/withdrawal-history"
-          className="group flex items-center gap-1 rounded-md text-sm font-semibold text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
+        <Link href="/withdrawal-history" className="text-link group">
           Full history
           <ArrowRight
             className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"

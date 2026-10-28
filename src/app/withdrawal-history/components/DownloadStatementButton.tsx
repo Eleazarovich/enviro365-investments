@@ -38,7 +38,8 @@ export default function DownloadStatementButton({
     } catch (e) {
       onResult({
         tone: 'error',
-        text: e instanceof Error ? e.message : "We couldn't download your statement. Please try again.",
+        text:
+          e instanceof Error ? e.message : "We couldn't download your statement. Please try again.",
       });
     } finally {
       setBusy(false);
@@ -47,15 +48,15 @@ export default function DownloadStatementButton({
 
   return (
     <Button
-      variant="primary"
-      size="lg"
+      variant="outline"
+      size="md"
       onClick={handleDownload}
       disabled={disabled}
       loading={busy}
       loadingLabel="Preparing statement…"
       className="w-full sm:w-auto"
     >
-      <Download className="h-5 w-5" aria-hidden="true" />
+      <Download className="h-4 w-4" aria-hidden="true" />
       Download statement
     </Button>
   );

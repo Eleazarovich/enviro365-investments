@@ -12,7 +12,7 @@ export default function InvestmentCardList() {
   const { portfolio, loading, error, refresh } = usePortfolio();
 
   return (
-    <section aria-labelledby="investments-heading">
+    <section aria-labelledby="investments-heading" aria-busy={loading}>
       <div className="mb-4 flex items-center gap-2.5">
         <h2 id="investments-heading" className="text-base font-semibold tracking-tight">
           Your investments

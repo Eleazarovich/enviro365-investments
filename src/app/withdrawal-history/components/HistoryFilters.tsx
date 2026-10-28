@@ -36,7 +36,7 @@ function DateField({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-foreground">
+      <label htmlFor={id} className="field-label">
         {label}
       </label>
       <input
@@ -45,9 +45,11 @@ function DateField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-invalid={invalid || undefined}
-        className={`tabular h-11 w-full rounded-md border bg-card px-3.5 text-sm text-foreground transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 ${
+        aria-describedby={invalid ? 'date-range-error' : undefined}
+        className={`field tabular ${
           invalid
-            ? 'border-warning focus-visible:ring-warning/30' :'border-input focus-visible:border-primary focus-visible:ring-ring/30'
+            ? 'border-warning focus-visible:ring-warning/10'
+            : 'border-input focus-visible:border-primary focus-visible:ring-primary/10'
         }`}
       />
     </div>
@@ -70,7 +72,7 @@ export default function HistoryFilters({
   return (
     <section
       aria-label="Filter your withdrawals"
-      className="rounded-2xl border border-border bg-card p-5"
+      className="border-b border-border bg-muted/30 p-5 sm:p-6"
     >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_auto] lg:items-end">
         <Select

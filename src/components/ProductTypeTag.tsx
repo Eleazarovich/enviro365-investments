@@ -3,8 +3,6 @@ import { Landmark, Wallet } from 'lucide-react';
 import Badge from './ui/Badge';
 import { productTypeLabel } from '@/lib/format';
 import type { ProductType } from '@/lib/types';
-import Icon from '@/components/ui/AppIcon';
-
 
 export default function ProductTypeTag({ type }: { type: ProductType }) {
   const Icon = type === 'RETIREMENT' ? Landmark : Wallet;

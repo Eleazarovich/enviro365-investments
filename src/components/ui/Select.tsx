@@ -10,15 +10,11 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 export default function Select({ id, label, options, className = '', ...rest }: SelectProps) {
   return (
     <div className={className}>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-foreground">
+      <label htmlFor={id} className="field-label">
         {label}
       </label>
       <div className="relative">
-        <select
-          id={id}
-          className="h-11 w-full appearance-none rounded-md border border-input bg-card pl-3.5 pr-10 text-sm text-foreground transition-colors hover:border-primary/40 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
-          {...rest}
-        >
+        <select id={id} className="field appearance-none pr-10" {...rest}>
           {options.map((o) => (
             <option key={`${id}-${o.value}`} value={o.value}>
               {o.label}

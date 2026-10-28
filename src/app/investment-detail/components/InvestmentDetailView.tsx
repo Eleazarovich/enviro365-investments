@@ -35,7 +35,7 @@ export default function InvestmentDetailView() {
       setHistory(data);
     } catch (e) {
       setHistoryError(
-        e instanceof Error ? e.message : "We couldn't load your withdrawals for this investment.",
+        e instanceof Error ? e.message : "We couldn't load your withdrawals for this investment."
       );
     }
   }, [productId]);
@@ -54,7 +54,7 @@ export default function InvestmentDetailView() {
       await refresh();
       bumpHistory();
     },
-    [refresh, bumpHistory],
+    [refresh, bumpHistory]
   );
 
   if (loading && !portfolio) return <InvestmentDetailSkeleton />;
@@ -91,7 +91,7 @@ export default function InvestmentDetailView() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <BackLink />
       <InvestmentSummary product={product} onWithdraw={() => setDialogOpen(true)} />
       <LimitMeter product={product} />
@@ -120,7 +120,7 @@ function BackLink() {
   return (
     <Link
       href="/"
-      className="group inline-flex items-center gap-2 rounded-md text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group inline-flex items-center gap-2 rounded-md text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <ArrowLeft
         className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-0.5"

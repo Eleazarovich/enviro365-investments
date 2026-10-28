@@ -6,7 +6,7 @@ import { CheckCircle2, Info, AlertCircle } from 'lucide-react';
 import Dialog from '@/components/ui/Dialog';
 import Button from '@/components/ui/Button';
 import { api } from '@/lib/api';
-import { formatRand, formatRandPrecise } from '@/lib/format';
+import { formatRandPrecise } from '@/lib/format';
 import { parseAmount, validateWithdrawalAmount } from '@/lib/withdrawalValidation';
 import type { InvestmentProduct, WithdrawalNotice } from '@/lib/types';
 
@@ -37,7 +37,7 @@ export default function WithdrawalDialog({
     reset,
     setError,
     formState: { errors },
-  } = useForm<FormValues>({ defaultValues: { amount: '' }, mode: 'onSubmit', reCriteriaMode: 'all' } as never);
+  } = useForm<FormValues>({ defaultValues: { amount: '' }, mode: 'onSubmit', criteriaMode: 'all' });
 
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -68,9 +68,15 @@ export default function WithdrawalDialog({
       setConfirmed({ amount: notice.amount });
       await onSubmitted(notice);
     } catch (e) {
-      const message = e instanceof Error ? e.message : "We couldn't submit your withdrawal. Please try again.";
+      const message =
+        e instanceof Error ? e.message : "We couldn't submit your withdrawal. Please try again.";
       const code = (e as { code?: string }).code;
-      if (code === 'VALIDATION_ERROR' || code === 'LIMIT_EXCEEDED' || code === 'INSUFFICIENT_BALANCE' || code === 'NOT_ELIGIBLE') {
+      if (
+        code === 'VALIDATION_ERROR' ||
+        code === 'LIMIT_EXCEEDED' ||
+        code === 'INSUFFICIENT_BALANCE' ||
+        code === 'NOT_ELIGIBLE'
+      ) {
         setError('amount', { type: 'server', message });
       } else {
         setServerError(message);
@@ -90,16 +96,19 @@ export default function WithdrawalDialog({
     return (
       <Dialog open={open} onClose={handleClose} title="Withdrawal submitted">
         <div className="flex flex-col items-center text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-success/10 text-success">
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent text-primary">
             <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
           </div>
-          <p className="text-sm text-foreground">
-            Your withdrawal request of{' '}
-            <span className="tabular font-bold">{formatRandPrecise(confirmed.amount)}</span> has been
-            submitted. Your available balance has been updated.
+          <p className="text-xs text-muted-foreground">Withdrawal request received</p>
+          <p className="tabular mt-2 text-4xl font-medium tracking-tight">
+            {formatRandPrecise(confirmed.amount)}
           </p>
-          <p className="mt-3 rounded-lg bg-muted px-3.5 py-2.5 text-xs text-muted-foreground">
-            This is a request, not a bank payment. We&apos;ll show its status in your withdrawal history.
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Your request has been submitted and your available balance has been updated.
+          </p>
+          <p className="mt-5 rounded-xl border border-border bg-muted/70 px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+            This is a request, not a bank payment. We&apos;ll show its status in your withdrawal
+            history.
           </p>
           <Button className="mt-6 w-full" onClick={onClose} data-autofocus>
             Done
@@ -120,23 +129,27 @@ export default function WithdrawalDialog({
       description={`From ${product.name}`}
     >
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <dl className="mb-5 grid grid-cols-2 gap-3 rounded-xl bg-secondary/60 p-4 text-sm">
+        <dl className="mb-6 grid grid-cols-2 gap-4 rounded-xl border border-border bg-muted/60 p-4 text-xs">
           <div>
             <dt className="text-muted-foreground">Available balance</dt>
-            <dd className="tabular mt-0.5 font-bold">{formatRand(product.availableBalance)}</dd>
+            <dd className="tabular mt-2 text-lg font-medium">
+              {formatRandPrecise(product.availableBalance)}
+            </dd>
           </div>
           <div>
             <dt className="text-muted-foreground">Maximum you can withdraw</dt>
-            <dd className="tabular mt-0.5 font-bold">{formatRand(product.maximumWithdrawable)}</dd>
+            <dd className="tabular mt-2 text-lg font-medium">
+              {formatRandPrecise(product.maximumWithdrawable)}
+            </dd>
           </div>
         </dl>
 
-        <label htmlFor="withdrawal-amount" className="mb-1.5 block text-sm font-medium">
+        <label htmlFor="withdrawal-amount" className="field-label">
           Amount
         </label>
         <div className="relative">
           <span
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground"
+            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xl font-medium text-muted-foreground"
             aria-hidden="true"
           >
             R
@@ -151,9 +164,10 @@ export default function WithdrawalDialog({
             disabled={submitting}
             aria-invalid={fieldError ? true : undefined}
             aria-describedby={fieldError ? 'amount-error' : 'amount-hint'}
-            className={`tabular h-12 w-full rounded-md border bg-card pl-8 pr-3.5 text-base font-semibold transition-colors placeholder:font-normal placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:bg-muted ${
+            className={`tabular h-16 w-full rounded-xl border bg-card pl-10 pr-4 text-[28px] font-medium transition-colors placeholder:font-normal placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:bg-muted ${
               fieldError
-                ? 'border-destructive focus-visible:ring-destructive/30' :'border-input focus-visible:border-primary focus-visible:ring-ring/30'
+                ? 'border-destructive focus-visible:ring-destructive/10'
+                : 'border-input focus-visible:border-primary focus-visible:ring-primary/10'
             }`}
             {...register('amount', {
               validate: (v) => validateWithdrawalAmount(v, { product, investorAge }),
@@ -161,14 +175,22 @@ export default function WithdrawalDialog({
           />
         </div>
         {fieldError ? (
-          <p id="amount-error" role="alert" className="mt-2 flex items-start gap-1.5 text-sm text-destructive">
+          <p
+            id="amount-error"
+            role="alert"
+            className="mt-2.5 flex items-start gap-1.5 text-xs leading-relaxed text-destructive"
+          >
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
             {fieldError}
           </p>
         ) : (
-          <p id="amount-hint" className="mt-2 flex items-start gap-1.5 text-sm text-muted-foreground">
+          <p
+            id="amount-hint"
+            className="mt-2.5 flex items-start gap-1.5 text-xs leading-relaxed text-muted-foreground"
+          >
             <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            You can withdraw up to {formatRandPrecise(product.maximumWithdrawable)} from this investment.
+            You can withdraw up to {formatRandPrecise(product.maximumWithdrawable)} from this
+            investment.
           </p>
         )}
 
@@ -182,11 +204,20 @@ export default function WithdrawalDialog({
           </div>
         )}
 
-        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <p className="mt-5 border-t border-border pt-4 text-[11px] leading-relaxed text-muted-foreground">
+          Submitting records a request, not a bank payment. You can follow your request in
+          withdrawal history.
+        </p>
+        <div className="mt-5 flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
           <Button type="button" variant="outline" onClick={handleClose} disabled={submitting}>
             Cancel
           </Button>
-          <Button type="submit" loading={submitting} loadingLabel="Submitting…" className="sm:min-w-[11rem]">
+          <Button
+            type="submit"
+            loading={submitting}
+            loadingLabel="Submitting…"
+            className="sm:min-w-[11rem]"
+          >
             Submit withdrawal
           </Button>
         </div>

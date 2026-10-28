@@ -1,6 +1,5 @@
 'use client';
 
-import { RefreshCw } from 'lucide-react';
 import { usePortfolio } from '@/lib/PortfolioProvider';
 import Skeleton from '@/components/ui/Skeleton';
 import BalanceAmount from '@/components/ui/BalanceAmount';
@@ -10,22 +9,20 @@ export default function PortfolioHero() {
 
   return (
     <section aria-labelledby="portfolio-heading">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow mb-2">Your investment overview</p>
-          <h1 id="portfolio-heading" className="page-heading">
-            Your portfolio
-          </h1>
+      <div className="mb-6">
+        <h1 id="portfolio-heading" className="page-heading">
+          Portfolio value
+        </h1>
+        {portfolio?.investor.investorSince && (
           <p className="mt-2 text-sm text-muted-foreground">
-            A clear view of where you stand, and what comes next.
-          </p>
-        </div>
-        {portfolio && (
-          <p className="mb-0.5 text-xs text-muted-foreground">
-            Welcome back,{' '}
-            <span className="font-medium text-foreground">
-              {portfolio.investor.name.split(' ')[0]}.
-            </span>
+            Investor since{' '}
+            <time dateTime={portfolio.investor.investorSince}>
+              {new Date(portfolio.investor.investorSince).toLocaleDateString('en-ZA', {
+                month: 'long',
+                year: 'numeric',
+                timeZone: 'UTC',
+              })}
+            </time>
           </p>
         )}
       </div>
@@ -38,12 +35,7 @@ export default function PortfolioHero() {
           <span />
           <span />
         </div>
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-xs font-medium text-muted-foreground">Total available balance</p>
-          <span className="rounded-md border border-border bg-muted px-2.5 py-1 text-[10px] font-medium tracking-wider text-muted-foreground">
-            ZAR
-          </span>
-        </div>
+        <p className="text-xs font-medium text-muted-foreground">Total available balance</p>
         <div className="mt-4 min-h-[62px]">
           {loading && !portfolio ? (
             <Skeleton className="h-14 w-56" />
@@ -52,13 +44,6 @@ export default function PortfolioHero() {
           ) : (
             portfolio && <BalanceAmount value={portfolio.totalAvailable} />
           )}
-        </div>
-        <div className="mt-5 flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-muted-foreground">Across your investments</p>
-          <p className="flex items-start gap-2 text-[11px] leading-relaxed text-muted-foreground">
-            <RefreshCw className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
-            Balances update when you submit a withdrawal
-          </p>
         </div>
       </div>
     </section>

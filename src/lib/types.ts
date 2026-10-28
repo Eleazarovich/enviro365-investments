@@ -5,6 +5,7 @@ export interface Investor {
   id: number;
   name: string;
   age: number;
+  investorSince?: string; // ISO date (yyyy-mm-dd)
 }
 
 export interface InvestmentProduct {

@@ -44,12 +44,6 @@ export default function Sidebar() {
                 >
                   <Icon className="h-[18px] w-[18px]" strokeWidth={1.6} aria-hidden="true" />
                   {item.label}
-                  {active && (
-                    <span
-                      className="ml-auto h-1.5 w-1.5 rounded-full bg-current"
-                      aria-hidden="true"
-                    />
-                  )}
                 </Link>
               </li>
             );
@@ -57,16 +51,6 @@ export default function Sidebar() {
         </ul>
       </nav>
       <div className="mt-auto">
-        <div className="mb-6 border-b border-sidebar-foreground/15 px-3 pb-6">
-          <AppLogo size={28} className="mb-4 text-accent" />
-          <p className="text-sm font-medium leading-relaxed text-sidebar-foreground">
-            A clear view.
-            <br />A considered future.
-          </p>
-          <p className="mt-2 text-[11px] leading-relaxed text-sidebar-muted">
-            Your investments, all in one place.
-          </p>
-        </div>
         <div className="flex items-center gap-2.5 px-2">
           <span
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-sidebar-foreground/20 text-[10px] font-medium text-accent"
@@ -82,7 +66,6 @@ export default function Sidebar() {
             <p className="truncate text-xs font-medium text-sidebar-foreground">
               {portfolio?.investor.name || 'Your account'}
             </p>
-            <p className="mt-0.5 text-[10px] text-sidebar-muted">Investor account</p>
           </div>
         </div>
       </div>

@@ -50,8 +50,7 @@ export default function Topbar() {
         </nav>
         <div className="flex items-center gap-3">
           <div className="hidden text-right sm:block">
-            <p className="text-xs font-medium">{portfolio?.investor.name || 'Investor account'}</p>
-            <p className="mt-0.5 text-[10px] text-muted-foreground">Personal portfolio</p>
+            <p className="text-xs font-medium">{portfolio?.investor.name || 'Your account'}</p>
           </div>
           <span
             aria-hidden="true"

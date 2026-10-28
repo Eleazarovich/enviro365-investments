@@ -16,7 +16,7 @@ const test = base.extend<{ api: ApiFixture }>({
   api: async ({ page }, use) => {
     const state: ApiFixture = {
       portfolio: {
-        investor: { id: 1, name: 'Thandiwe Mokoena', age: 68 },
+        investor: { id: 1, name: 'Eleazarovich', age: 68, investorSince: '2026-10-01' },
         totalAvailable: 140000,
         products: [
           {

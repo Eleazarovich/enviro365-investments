@@ -10,8 +10,9 @@ interface MockProductRecord {
 // Demonstration data only. Not information about a real investor.
 export const mockInvestor: Investor = {
   id: 1,
-  name: 'Thandiwe Mokoena',
+  name: 'Eleazarovich',
   age: 68,
+  investorSince: '2026-10-01',
 };
 
 export const mockProductRecords: MockProductRecord[] = [

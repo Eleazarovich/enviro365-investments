@@ -183,9 +183,72 @@ test('portfolio preserves balances and investment navigation', async ({ page, ap
   await expect(page.getByText('R140,000.00', { exact: true }).first()).toBeAttached();
   await page.locator('a[href="/investment-detail?id=1"]').click();
   await expect(page.getByRole('heading', { name: 'Cash Investment', exact: true })).toBeVisible();
+  await expect(page.getByText('Standard investment', { exact: true })).toBeVisible();
+  await expect(page.getByText('Your investment', { exact: true })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Your withdrawal limit' })).toHaveCount(0);
   await expect(page.getByText('R70,000', { exact: true }).first()).toBeVisible();
-  await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '22');
   await expectNoOverflow(page);
+});
+
+test('withdrawal amount groups rands and limits cents while typing', async ({ page, api }) => {
+  const input = await openWithdrawal(page);
+  await input.pressSequentially('80000');
+  await expect(input).toHaveValue('80,000');
+  await input.pressSequentially('.5');
+  await expect(input).toHaveValue('80,000.5');
+  await input.pressSequentially('01');
+  await expect(input).toHaveValue('80,000.50');
+  await input.fill('800000');
+  await expect(input).toHaveValue('800,000');
+  await input.press('Tab');
+  await expect(input).toHaveValue('800,000.00');
+  await input.fill('.5');
+  await expect(input).toHaveValue('0.5');
+  await input.press('Tab');
+  await expect(input).toHaveValue('0.50');
+  await input.fill('R 1,234.56');
+  await expect(input).toHaveValue('1,234.56');
+  for (const invalid of ['abc', '-100', '1e3', '1.001', '1.2.3']) {
+    await input.fill(invalid);
+    await expect(input).toHaveValue('1,234.56');
+  }
+  expect(api.submitCount).toBe(0);
+  await expectNoOverflow(page);
+  await input.fill('100.');
+  await input.press('Enter');
+  await expect(
+    page.getByRole('heading', { name: 'Withdrawal submitted successfully', exact: true })
+  ).toBeVisible();
+  expect(api.notices[0].amount).toBe(100);
+});
+
+test('formatted amounts support editing and deleting beside grouping commas', async ({
+  page,
+  api,
+}) => {
+  void api;
+  const input = await openWithdrawal(page);
+  await input.fill('1234');
+  await input.evaluate((element: HTMLInputElement) => element.setSelectionRange(3, 3));
+  await input.pressSequentially('9');
+  await expect(input).toHaveValue('12,934');
+  expect(await input.evaluate((element: HTMLInputElement) => element.selectionStart)).toBe(4);
+  await input.fill('1234');
+  await input.evaluate((element: HTMLInputElement) => element.setSelectionRange(2, 2));
+  await input.press('Backspace');
+  await expect(input).toHaveValue('234');
+  await input.fill('1234');
+  await input.evaluate((element: HTMLInputElement) => element.setSelectionRange(1, 1));
+  await input.press('Delete');
+  await expect(input).toHaveValue('134');
+  await input.fill('1234.56');
+  await input.evaluate((element: HTMLInputElement) => element.setSelectionRange(6, 8));
+  await input.pressSequentially('9');
+  await expect(input).toHaveValue('1,234.9');
+  await input.press('Tab');
+  await expect(input).toHaveValue('1,234.90');
+  await input.fill('');
+  await expect(input).toHaveValue('');
 });
 
 test('invalid amounts preserve the existing financial boundaries', async ({ page, api }) => {
@@ -194,8 +257,6 @@ test('invalid amounts preserve the existing financial boundaries', async ({ page
   for (const [amount, message] of [
     ['', 'Enter an amount to withdraw.'],
     ['0', 'Enter an amount greater than R0.'],
-    ['abc', 'Enter a valid amount, for example 1500.00.'],
-    ['1.001', 'Enter an amount with no more than two decimal places.'],
     ['99.99', 'Minimum withdrawal is R100.'],
     ['80001', 'Your available balance for this investment is R80,000.'],
     ['70000.01', 'You can withdraw up to R70,000 from this investment.'],
@@ -340,7 +401,7 @@ test('server failure keeps the entered amount for retry', async ({ page, api }) 
   await expect(page.getByRole('dialog').getByRole('alert')).toContainText(
     'Your amount has been kept.'
   );
-  await expect(input).toHaveValue('1000');
+  await expect(input).toHaveValue('1,000.00');
   await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'Withdrawal submitted successfully', exact: true })

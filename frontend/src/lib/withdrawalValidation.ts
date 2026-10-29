@@ -11,7 +11,7 @@ export interface ValidationContext {
 export function validateWithdrawalAmount(raw: string, ctx: ValidationContext): string | true {
   const value = (raw ?? '').trim().replace(/,/g, '');
   if (value === '') return 'Enter an amount to withdraw.';
-  if (!/^\d+(\.\d+)?$/.test(value)) return 'Enter a valid amount, for example 1500.00.';
+  if (!/^\d+(\.\d*)?$/.test(value)) return 'Enter a valid amount, for example 1500.00.';
   const amount = Number(value);
   if (!(amount > 0)) return 'Enter an amount greater than R0.';
   if (/\.\d{3,}$/.test(value)) return 'Enter an amount with no more than two decimal places.';

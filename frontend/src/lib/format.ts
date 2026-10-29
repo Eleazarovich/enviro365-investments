@@ -29,5 +29,5 @@ export function formatDateTime(iso: string): string {
 }
 
 export function productTypeLabel(type: string): string {
-  return type === 'RETIREMENT' ? 'Retirement' : 'General investment';
+  return type === 'RETIREMENT' ? 'Retirement' : 'Standard investment';
 }

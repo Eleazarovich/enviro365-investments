@@ -133,10 +133,10 @@ from the live Spring Boot backend after another client reserves the available li
 - [x] Java package follows `com.enviro.assessment.junior.yourname`.
 - [x] APIs follow REST best practices.
 - [x] Frontend communicates with actual backend APIs.
-- [ ] GitHub repository includes backend and frontend. (Both are committed locally; no push was requested.)
+- [x] GitHub repository includes backend and frontend.
 - [x] README includes frontend setup, verified with a clean `npm ci` installation.
 - [x] README includes API documentation.
-- [x] README includes current frontend screenshots.
+- [ ] README includes current frontend screenshots.
 - [x] README discloses AI tool usage.
 - [ ] Review and understand all AI-assisted code.
 - [x] Application can be started and tested using README instructions.

@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { CheckCircle2, Info, AlertCircle } from 'lucide-react';
 import Dialog from '@/components/ui/Dialog';
 import Button from '@/components/ui/Button';
+import CurrencyInput from '@/components/ui/CurrencyInput';
 import { api } from '@/lib/api';
 import { formatRandPrecise } from '@/lib/format';
 import { parseAmount, validateWithdrawalAmount } from '@/lib/withdrawalValidation';
@@ -32,7 +33,7 @@ export default function WithdrawalDialog({
   onNotify,
 }: WithdrawalDialogProps) {
   const {
-    register,
+    control,
     handleSubmit,
     reset,
     setError,
@@ -147,24 +148,28 @@ export default function WithdrawalDialog({
           >
             R
           </span>
-          <input
-            id="withdrawal-amount"
-            type="text"
-            inputMode="decimal"
-            autoComplete="off"
-            placeholder="0.00"
-            data-autofocus
-            disabled={submitting}
-            aria-invalid={fieldError ? true : undefined}
-            aria-describedby={fieldError ? 'amount-error' : 'amount-hint'}
-            className={`tabular h-16 w-full rounded-xl border bg-card pl-10 pr-4 text-[28px] font-medium transition-colors placeholder:font-normal placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-muted ${
-              fieldError
-                ? 'border-destructive focus-visible:ring-destructive'
-                : 'border-input focus-visible:border-primary focus-visible:ring-ring'
-            }`}
-            {...register('amount', {
-              validate: (v) => validateWithdrawalAmount(v, { product, investorAge }),
-            })}
+          <Controller
+            name="amount"
+            control={control}
+            rules={{ validate: (v) => validateWithdrawalAmount(v, { product, investorAge }) }}
+            render={({ field: { onChange, ...field } }) => (
+              <CurrencyInput
+                {...field}
+                onValueChange={onChange}
+                id="withdrawal-amount"
+                autoComplete="off"
+                placeholder="0.00"
+                data-autofocus
+                disabled={submitting}
+                aria-invalid={fieldError ? true : undefined}
+                aria-describedby={fieldError ? 'amount-error' : 'amount-hint'}
+                className={`tabular h-16 w-full rounded-xl border bg-card pl-10 pr-4 text-[28px] font-medium transition-colors placeholder:font-normal placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-muted ${
+                  fieldError
+                    ? 'border-destructive focus-visible:ring-destructive'
+                    : 'border-input focus-visible:border-primary focus-visible:ring-ring'
+                }`}
+              />
+            )}
           />
         </div>
         {fieldError ? (

@@ -20,13 +20,10 @@ export default function InvestmentSummary({
 
   return (
     <section aria-labelledby="investment-heading">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="eyebrow mb-2">Your investment</p>
-          <h1 id="investment-heading" className="page-heading">
-            {product.name}
-          </h1>
-        </div>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 sm:mb-6">
+        <h1 id="investment-heading" className="page-heading">
+          {product.name}
+        </h1>
         <ProductTypeTag type={product.type} />
       </div>
       <div className="relative isolate overflow-hidden rounded-2xl bg-card p-6 text-foreground ring-1 ring-inset ring-border sm:p-8">

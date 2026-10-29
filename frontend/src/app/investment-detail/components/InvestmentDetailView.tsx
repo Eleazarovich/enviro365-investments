@@ -13,7 +13,6 @@ import Button from '@/components/ui/Button';
 import Toast, { type ToastMessage } from '@/components/ui/Toast';
 import InvestmentDetailSkeleton from './InvestmentDetailSkeleton';
 import InvestmentSummary from './InvestmentSummary';
-import LimitMeter from './LimitMeter';
 import InvestmentHistoryPreview from './InvestmentHistoryPreview';
 import WithdrawalDialog from './WithdrawalDialog';
 
@@ -106,7 +105,6 @@ export default function InvestmentDetailView() {
           withdrawalDisabled={loading}
         />
       )}
-      {!error && <LimitMeter product={product} />}
       <InvestmentHistoryPreview
         rows={history}
         error={historyError}

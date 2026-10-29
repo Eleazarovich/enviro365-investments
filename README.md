@@ -45,7 +45,8 @@ withdrawal calculations.
 
 These endpoints have a frontend HTTP adapter but no running backend yet. Monetary
 API amounts are positive; history and CSV display withdrawals as negative deductions.
-See [openapi.yaml](openapi.yaml) for the complete frontend API contract, including
+See [openapi.yaml](openapi.yaml), using [OpenAPI 3.2.1](https://spec.openapis.org/oas/v3.2.1.html),
+for the complete frontend API contract, including
 request/response schemas, filters, CSV format, errors, and authentication requirements
 (none in the current contract). See the [specification](_docs/SPEC.md) for implementation scope.
 

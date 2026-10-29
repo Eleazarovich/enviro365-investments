@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.2.1
 info:
   title: Enviro365 Investments API
   version: 0.1.0
@@ -278,7 +278,7 @@ components:
       description: Investor identifier. The current frontend always sends 1.
       schema:
         type: integer
-        example: 1
+        examples: [1]
     ProductIdFilter:
       name: productId
       in: query
@@ -286,7 +286,7 @@ components:
       description: Restrict results to this investment product; omit for all investments.
       schema:
         type: integer
-        example: 1
+        examples: [1]
     FromDate:
       name: fromDate
       in: query
@@ -295,7 +295,7 @@ components:
       schema:
         type: string
         format: date
-        example: '2026-09-01'
+        examples: ['2026-09-01']
     ToDate:
       name: toDate
       in: query
@@ -304,33 +304,33 @@ components:
       schema:
         type: string
         format: date
-        example: '2026-10-29'
+        examples: ['2026-10-29']
   schemas:
     Money:
       type: number
       minimum: 0
       multipleOf: 0.01
       description: Non-negative amount in ZAR, encoded as a JSON number with at most two decimal places.
-      example: 1500.75
+      examples: [1500.75]
     Investor:
       type: object
       required: [id, name, age]
       properties:
         id:
           type: integer
-          example: 1
+          examples: [1]
         name:
           type: string
-          example: Eleazarovich
+          examples: [Eleazarovich]
         age:
           type: integer
           description: Investor age in years; retirement withdrawals require age greater than 65.
-          example: 68
+          examples: [68]
         investorSince:
           type: string
           format: date
           description: Optional investment start date; omit when unavailable.
-          example: '2026-10-01'
+          examples: ['2026-10-01']
     InvestmentProduct:
       type: object
       required:
@@ -344,10 +344,10 @@ components:
       properties:
         id:
           type: integer
-          example: 1
+          examples: [1]
         name:
           type: string
-          example: Cash Investment
+          examples: [Cash Investment]
         type:
           type: string
           enum: [GENERAL, RETIREMENT]
@@ -356,12 +356,12 @@ components:
           allOf:
             - $ref: '#/components/schemas/Money'
           description: Remaining balance after active pending withdrawals have been deducted once.
-          example: 80000
+          examples: [80000]
         minimumWithdrawable:
           allOf:
             - $ref: '#/components/schemas/Money'
           description: Minimum amount per request; currently R100, even when the maximum is zero.
-          example: 100
+          examples: [100]
         maximumWithdrawable:
           allOf:
             - $ref: '#/components/schemas/Money'
@@ -369,12 +369,12 @@ components:
             90% of availableBalance rounded down to cents, or zero if that result
             is below minimumWithdrawable. Recalculated for each request. This
             numerical limit is separate from the investor's retirement age check.
-          example: 72000
+          examples: [72000]
         pendingWithdrawals:
           allOf:
             - $ref: '#/components/schemas/Money'
           description: Active pending total already excluded from availableBalance; an internal API field.
-          example: 20000
+          examples: [20000]
     Portfolio:
       type: object
       required: [investor, totalAvailable, products]
@@ -385,7 +385,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/Money'
           description: Sum of availableBalance across all returned products.
-          example: 140000
+          examples: [140000]
         products:
           type: array
           items:
@@ -397,33 +397,32 @@ components:
         productId:
           type: integer
           description: Identifier of the selected product in this investor's portfolio.
-          example: 1
+          examples: [1]
         amount:
           type: number
           minimum: 100
           multipleOf: 0.01
           description: Positive JSON number in ZAR, at least R100 and within the current balance and maximum.
-          example: 1500.75
+          examples: [1500.75]
     WithdrawalNotice:
       type: object
       required: [id, productId, productName, amount, status, submittedAt]
       properties:
         id:
           type: integer
-          example: 1002
+          examples: [1002]
         productId:
           type: integer
-          example: 1
+          examples: [1]
         productName:
           type: string
-          example: Cash Investment
+          examples: [Cash Investment]
         amount:
           type: number
-          minimum: 0
-          exclusiveMinimum: true
+          exclusiveMinimum: 0
           multipleOf: 0.01
           description: Positive withdrawal amount in ZAR; only display and CSV apply a negative sign.
-          example: 1500.75
+          examples: [1500.75]
         status:
           type: string
           enum: [SUBMITTED]
@@ -432,7 +431,7 @@ components:
           type: string
           format: date-time
           description: ISO 8601 submission timestamp; the mock emits UTC timestamps.
-          example: '2026-10-29T12:00:00Z'
+          examples: ['2026-10-29T12:00:00Z']
     ErrorResponse:
       type: object
       required: [message]
@@ -440,7 +439,7 @@ components:
         message:
           type: string
           description: Human-readable error text displayed directly by the frontend.
-          example: Minimum withdrawal is R100.
+          examples: [Minimum withdrawal is R100.]
       additionalProperties: true
       description: Only message is consumed by the frontend; additional error fields are ignored.
   responses:

@@ -7,7 +7,7 @@ and make regular local commits as work is completed.
 ## Read before working
 
 - Read [`_docs/SPEC.md`](_docs/SPEC.md) for scope, workflows, financial behaviour, and the
-  proposed API contract; [`_docs/TASKS.md`](_docs/TASKS.md) for implementation and delivery
+  API contract; [`_docs/TASKS.md`](_docs/TASKS.md) for implementation and delivery
   requirements; and [`_docs/design-system.md`](_docs/design-system.md) for current UI decisions.
 - Inspect `README.md`, the relevant source and dependency manifests, `git status --short`,
   and recent Git history before editing. Follow established patterns and inspect relevant
@@ -77,16 +77,17 @@ and make regular local commits as work is completed.
 - Retirement withdrawals require **age greater than 65**; an investor aged exactly 65 is
   ineligible. Amounts must be positive, have at most two decimal places, and stay within
   both the available balance and the permitted 90% maximum.
-- Apply the **90% limit to the remaining available balance on each request**, for both
-  cash and retirement products. Normal withdrawals have a **R100 minimum** and may include
-  cents. Pending notices reduce the available balance once; there is no cumulative cap
-  against the original balance. Keep mock and backend behaviour aligned:
+- Apply the **cumulative per-product 90% cap** requested during backend implementation,
+  superseding the earlier per-request policy, for both cash and retirement products.
+  Normal withdrawals have a **R100 minimum** and may include cents. Keep mock and
+  backend behaviour aligned:
 
   ```text
-  available = recorded balance - pending
+  available = max(0, recorded balance - active submitted reservations)
   minimum = 100.00
-  percentageMaximum = floorToCents(max(0, available) * 0.9)
-  maximum = percentageMaximum >= minimum ? percentageMaximum : 0
+  remainingCap = floorToCents(recorded balance * 0.9) - active submitted reservations
+  candidate = max(0, min(available, remainingCap))
+  maximum = candidate >= minimum ? candidate : 0
   ```
 
 - Round the maximum **down** to cents. If the percentage maximum is below R100, disable
@@ -96,7 +97,7 @@ and make regular local commits as work is completed.
   deliberately across the API. Verify boundaries, fractional amounts, and repeated requests.
 - A valid request creates a notice and immediately reduces the available balance. Invalid
   requests must leave data unchanged. Persist the notice and balance effect atomically;
-  concurrent requests must not overdraw or bypass the current per-request limit or minimum.
+  concurrent requests must not overdraw or bypass the cumulative limit or minimum.
 - API withdrawal amounts remain positive and notices retain their internal `SUBMITTED`
   status. User-facing tables and CSV statements show deductions with a negative sign.
   A submitted notice does not mean a bank payment has completed.

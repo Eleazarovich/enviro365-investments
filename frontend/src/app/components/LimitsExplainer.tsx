@@ -4,8 +4,8 @@ const points = [
   {
     key: 'limit',
     icon: ShieldCheck,
-    title: 'Up to 90% per withdrawal',
-    body: 'R100 minimum, based on your remaining balance.',
+    title: 'Up to 90% of your investment',
+    body: 'Submitted withdrawals count toward this limit. R100 minimum.',
   },
   {
     key: 'balance',

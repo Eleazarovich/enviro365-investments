@@ -1,72 +1,65 @@
 # Withdrawal business rules
 
+Updated on 29 October 2026 for backend implementation. The latest explicit backend
+request supersedes the earlier frontend decision to apply 90% separately to each
+remaining balance. API paths and response structures remain unchanged.
+
 ## Withdrawal rules
 
-| Rule | Applies to |
-| --- | --- |
-| Investor age must be greater than 65 for retirement withdrawals. Age 65 is ineligible. | Retirement investments |
-| A withdrawal must not exceed the balance. | Both cash and retirement investments |
-| "Withdrawal must not exceed 90% of balance" | Both cash and retirement investments |
-| Provide proper error handling and user feedback. | Both products |
+- Withdrawal amounts must be positive.
+- Retirement withdrawals require an investor **older than 65**; age 65 is ineligible.
+- An amount cannot exceed the available product balance or the 90% restriction.
+- Notices persist; invalid requests leave balances and records unchanged.
+- Responses provide meaningful errors the frontend can display.
 
-## Confirmed project policy
+## Reservation calculations
 
-On 29 October 2026 the user selected:
-
-- Apply the 90% limit to the **remaining available balance on each request**, for
-  both cash and retirement products. Replace the former cumulative cap.
-- Require at least **R100** per request. Larger amounts can still include cents,
-  such as R1,500.75.
-- Keep the 90% rule and **disable withdrawals below the minimum**. Do not allow a
-  special final-cent payment or a full-remainder withdrawal. This supersedes the
-  earlier proposal to allow a final R0.01 request.
-- Preserve the actual remaining balance. An unavailable withdrawal is not a zero
-  investment balance, a fee, or money lost by the investor.
-
-Pending notices reduce the available balance once. Recalculating 90% of that
-available balance must not subtract pending amounts a second time. Round the
-percentage maximum **down** to cents so rounding never permits more than 90%.
+- All **active submitted notices share a cumulative cap** of 90% of the underlying
+  recorded balance for that product. They do not each receive a fresh 90% allowance.
+- A submission inserts an active notice, which is itself the reservation, without
+  changing the underlying balance.
+- Available funds exclude active reservations once. The cap also starts from the
+  underlying balance, avoiding a second deduction from already-reduced available funds.
+- Retain the established **R100 minimum**, with up to two decimals. No exception clears
+  a final small balance. Keep the actual balance visible when no request fits.
+- Imported historical notices may have inactive reservations already reflected in
+  recorded balances. They remain visible as `SUBMITTED` without reserving funds again.
+- This application records requests. It executes no bank payments and exposes no
+  endpoint to settle, cancel or release reservations.
 
 ```text
-availableCents = max(0, recordedCents - pendingCents)
-minimumCents = 10000
-percentageMaximumCents = floor(availableCents * 9 / 10)
-maximumCents = percentageMaximumCents >= minimumCents ? percentageMaximumCents : 0
+available = max(0, underlyingBalance - activeReservations)
+remainingCap = floorToCents(underlyingBalance * 0.90) - activeReservations
+candidateMaximum = max(0, min(available, remainingCap))
+maximumWithdrawable = candidateMaximum >= 100.00 ? candidateMaximum : 0.00
 ```
 
-The mock adapter uses integer cents in
-[`computeProduct`](../frontend/src/lib/api/mockStore.ts). The future Java backend
-must implement the same rule with `BigDecimal` and downward rounding, recheck the
-limits inside its transaction, and return the current `minimumWithdrawable` and
-`maximumWithdrawable` amounts. Frontend validation consumes those API amounts;
-it does not calculate an authoritative limit.
+Java uses `BigDecimal` and decimal database columns; the optional mock uses integer
+cents. The frontend validates against API-provided minimum and maximum amounts.
 
 ## Examples
 
-| Available before a request | Maximum request | Available after that maximum | Next maximum |
-| --- | --- | --- | --- |
-| R80,000 (demo cash, after R20,000 pending) | R72,000 | R8,000 | R7,200 |
-| R60,000 (demo retirement) | R54,000 | R6,000 | R5,400 |
-| R10,000 | R9,000 | R1,000 | R900 |
-| R111.12 | R100 | R11.12 | R0 |
-| R111.11 | R0 | R111.11 (no request permitted) | R0 |
-| R0 | R0 | R0 (no request permitted) | R0 |
+| Underlying | Reserved before | Available before | Maximum new request | Available after maximum | Next maximum |
+| --- | --- | --- | --- | --- | --- |
+| R100,000 | R20,000 | R80,000 | R70,000 | R10,000 | R0 |
+| R60,000 | R0 | R60,000 | R54,000 | R6,000 | R0 |
+| R1,000 | R600 | R400 | R300 | R100 | R0 |
+| R111.12 | R0 | R111.12 | R100 | R11.12 | R0 |
+| R111.11 | R0 | R111.11 | R0 | R111.11 | R0 |
+| R0 | R0 | R0 | R0 | R0 | R0 |
 
-A balance slightly above R100 can also be unavailable: 90% of R111.11 rounds down
-to R99.99, which is below the R100 minimum. Do not permit R100 in that case or
-silently clear the balance. The API returns a maximum of R0. The UI shows the
-actual balance, **Minimum you can withdraw: R100**, and a disabled action without
-an additional explanatory paragraph. Portfolio cards use the same minimum label.
+A R1,500.75 cash request leaves **R78,499.25 available** and a **R68,499.25 maximum**,
+with R21,500.75 reserved against the R100,000 underlying balance. The total available
+portfolio becomes R138,499.25.
 
-## Verification
+## Atomicity and verification
 
-[`mock-api.spec.ts`](../frontend/tests/e2e/mock-api.spec.ts) exercises the actual
-mock API: repeated maximum requests on both products, unchanged records after
-rejection, R99.99/R100 boundaries, fractional amounts, downward cent rounding,
-concurrent requests, and retirement ages 64/65/66. The browser suite checks the
-HTTP adapter contract, balance and history refresh, repeated withdrawals, the
-minimum hint and validation, and disabled actions below the minimum and at zero.
+The service uses `PESSIMISTIC_WRITE` on the investor-scoped product before reading
+active reservation totals. `READ_COMMITTED` lets a waiting writer see the preceding
+transaction's committed notices. Validation and insertion share a transaction. Invalid
+requests and rollbacks leave both history and derived available funds unchanged.
 
-These checks verify the frontend and mock implementation. They do not establish
-live Spring Boot/H2 persistence or concurrent database transaction correctness;
-that backend has not yet been implemented.
+Backend tests cover monetary boundaries, ages 64/65/66, birthdays, repeated requests,
+rollback, ten concurrent transactions, filters, CSV and restart persistence. Browser
+suites cover mock/HTTP fixtures and actual cross-origin Spring Boot calls. See
+[backend verification](backend-verification.md) and [backend README](../backend/README.md).

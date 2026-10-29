@@ -28,7 +28,8 @@ The application must feel like polished, production-quality financial software: 
 
 Use mock data initially, but structure the application so that mock services can be replaced with real REST API calls without rewriting the UI.
 
-Do not implement a backend or database during this frontend phase.
+The frontend phase is complete. The backend implementation phase uses Java 21,
+Spring Boot 4.1 and H2 in `backend/`; see its [README](../backend/README.md).
 
 ## Visual design direction
 
@@ -230,7 +231,7 @@ Examples:
 
 - "Enter an amount to withdraw."
 - "Enter an amount greater than R0."
-- "You can withdraw up to R72,000 from this investment."
+- "You can withdraw up to R70,000 from this investment."
 - "Minimum withdrawal is R100."
 - "Retirement withdrawals are only available to investors older than 65."
 - "We couldn't submit your withdrawal. Please try again."
@@ -337,14 +338,14 @@ Do not add PDF downloads or complex reporting features.
 
 These rules reflect the selected implementation design and must remain consistent with the Spring Boot backend.
 
-Apply 90% of the remaining available balance per request, with a R100 minimum
-and no final-balance exception. See [business rules](business-rules.md) for
+Apply a cumulative 90% cap per product against its underlying balance, with a R100
+minimum and no final-balance exception. See [business rules](business-rules.md) for
 the calculations and worked examples.
 
 1. Each investment product has its own balance and withdrawal limits.
 2. A withdrawal must be greater than zero.
 3. The investor cannot withdraw more than their available balance.
-4. Each request is limited to 90% of the remaining available balance, rounded down to cents. Active pending notices have already reduced that balance and must not be subtracted again from the limit.
+4. Active submitted notices share a cumulative 90% cap per product. Available funds equal the underlying balance less active reservations. The remaining cap equals 90% of the underlying balance, rounded down to cents, less active reservations. Calculate both from the underlying balance so reservations are subtracted exactly once.
 5. Retirement-product withdrawals are permitted only if the investor is older than 65.
 6. A successful withdrawal request creates a notice with status `SUBMITTED`.
 7. The requested amount is immediately excluded from the investor's available balance.
@@ -352,7 +353,7 @@ the calculations and worked examples.
 9. Invalid submissions must not change the available balance or create successful notices.
 10. Withdrawals must be at least R100 and may include cents above that minimum. If the rounded percentage maximum is below R100, return a maximum of R0 and disable withdrawals. Keep the actual remaining balance visible; do not waive the 90% rule to clear it.
 
-The Spring Boot backend will enforce these rules. The frontend should display the server-provided available balance and maximum withdrawal amount instead of maintaining its own authoritative financial calculations.
+The Spring Boot backend enforces these rules. The frontend displays the server-provided available balance and maximum withdrawal amount instead of maintaining its own authoritative financial calculations.
 
 Do not create artificial fees, returns, or interest calculations.
 
@@ -369,8 +370,8 @@ Use internally consistent fictional data, for example:
 - Recorded investment balance: R100,000.
 - Existing submitted withdrawal: R20,000.
 - Available balance: R80,000.
-- Maximum additional withdrawal: R72,000 (90% of the R80,000 available balance).
-- After requesting R72,000: R8,000 available, with a new maximum of R7,200.
+- Maximum additional withdrawal: R70,000 (90% of R100,000 less R20,000 reserved).
+- After requesting R70,000: R10,000 available, with a new maximum of R0.
 - Minimum withdrawal: R100.
 
 **Retirement Investment**
@@ -420,7 +421,7 @@ Each product should expose:
 - type
 - availableBalance
 - minimumWithdrawable (R100 under the current policy)
-- maximumWithdrawable (90% of available balance, rounded down to cents; R0 when below the minimum)
+- maximumWithdrawable (remaining cumulative 90% cap after active reservations; R0 when below the minimum)
 
 `GET /api/investors/1/withdrawal-notices`
 
@@ -450,7 +451,7 @@ Success:
 
 Supports the same filters and returns a downloadable CSV.
 
-These are proposed API contracts and should remain in one configurable service layer.
+These implemented API contracts remain in one configurable service layer and are defined in [openapi.yaml](../openapi.yaml).
 
 Handle HTTP errors consistently, including validation errors, missing resources, and unexpected failures.
 

@@ -26,23 +26,19 @@ for (const [productId, states] of [
   [
     1,
     [
-      [80000, 72000],
-      [8000, 7200],
-      [800, 720],
-      [80, 0],
+      [80000, 70000],
+      [10000, 0],
     ],
   ],
   [
     2,
     [
       [60000, 54000],
-      [6000, 5400],
-      [600, 540],
-      [60, 0],
+      [6000, 0],
     ],
   ],
 ] as const) {
-  test(`mock investment ${productId} permits repeated maximum withdrawals until below the minimum`, async () => {
+  test(`mock investment ${productId} preserves ten percent after reaching the cumulative maximum`, async () => {
     const record = mockProductRecords.find((product) => product.id === productId)!;
     const before = structuredClone(mockState);
     await expect(
@@ -59,24 +55,25 @@ for (const [productId, states] of [
       const notice = await mockApi.createWithdrawal({ productId, amount: maximum });
       expect(notice).toMatchObject({ productId, amount: maximum, status: 'SUBMITTED' });
     }
-    expect(mockState.notices).toHaveLength(before.notices.length + 3);
+    expect(mockState.notices).toHaveLength(before.notices.length + 1);
     expect(new Set(mockState.notices.map((notice) => notice.id)).size).toBe(
       mockState.notices.length
     );
     const after = structuredClone(mockState);
     await expect(mockApi.createWithdrawal({ productId, amount: 100 })).rejects.toMatchObject({
-      code: 'INSUFFICIENT_BALANCE',
+      code: 'LIMIT_EXCEEDED',
     });
     expect(mockState).toEqual(after);
     const portfolio = await mockApi.getPortfolio();
-    expect(portfolio.totalAvailable).toBe(productId === 1 ? 60080 : 80060);
+    expect(portfolio.totalAvailable).toBe(productId === 1 ? 70000 : 86000);
     const statement = await mockApi.exportWithdrawals({ productId });
-    expect(statement.content).toContain(productId === 1 ? ',-720.00' : ',-540.00');
+    expect(statement.content).toContain(productId === 1 ? ',-70000.00' : ',-54000.00');
   });
 }
 
 test('mock maximum floors cents and returns zero when no R100 request fits', () => {
   const record = mockProductRecords[0];
+  mockState.notices = [];
   for (const [availableCents, maximumCents] of [
     [0, 0],
     [1, 0],
@@ -87,8 +84,7 @@ test('mock maximum floors cents and returns zero when no R100 request fits', () 
     [123456, 111110],
     [7849925, 7064932],
   ]) {
-    // The existing R20,000 notice must be subtracted before the percentage is applied.
-    record.recordedBalance = (2000000 + availableCents) / 100;
+    record.recordedBalance = availableCents / 100;
     expect(computeProduct(record)).toMatchObject({
       availableBalance: availableCents / 100,
       minimumWithdrawable: 100,
@@ -107,7 +103,7 @@ test('mock minimum boundary and fractional withdrawals preserve cents', async ()
   await mockApi.createWithdrawal({ productId: 1, amount: 1500.75 });
   expect(computeProduct(mockProductRecords[0])).toMatchObject({
     availableBalance: 78499.25,
-    maximumWithdrawable: 70649.32,
+    maximumWithdrawable: 68499.25,
   });
   mockState.notices = [];
   mockProductRecords[0].recordedBalance = 111.12;
@@ -135,7 +131,7 @@ test('concurrent mock requests recheck the remaining balance and percentage limi
   expect(mockState.notices).toHaveLength(1);
   expect(computeProduct(mockProductRecords[0])).toMatchObject({
     availableBalance: 400,
-    maximumWithdrawable: 360,
+    maximumWithdrawable: 300,
   });
 });
 

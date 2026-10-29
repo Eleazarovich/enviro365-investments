@@ -19,7 +19,7 @@ Colour tokens and shared styles live in `frontend/src/styles/tailwind.css`; `fro
 
 Investment details use the investment name as the heading without an extra eyebrow. General products carry the **Standard investment** label; retirement products retain **Retirement**. API product types remain unchanged. `CurrencyInput` adds grouping commas during entry, permits up to two decimal places, completes cents on blur, and preserves cursor editing. Invalid edits and pastes retain the previous amount. The separate withdrawal-limit meter and its skeleton are removed; the maximum withdrawal and financial validation remain available.
 
-The routes, eligibility rule, filters, and CSV export remain in place. Each withdrawal is limited to 90% of the remaining available balance, rounded down to cents, with a R100 minimum. The API supplies both `minimumWithdrawable` and `maximumWithdrawable`; visual components do not calculate the limits. The decorative leaf outlines are original CSS and SVG, with no third-party imagery or chart data.
+The routes, eligibility rule, filters, and CSV export remain in place. Active submitted withdrawals share a cumulative cap of 90% of the underlying investment balance, rounded down to cents, with a R100 minimum. This follows the latest backend request. The API supplies both `minimumWithdrawable` and `maximumWithdrawable`; visual components do not calculate the limits. The decorative leaf outlines are original CSS and SVG, with no third-party imagery or chart data.
 
 History displays results for the current filter selection only, and keeps statement
 download unavailable until those results load. Late responses cannot replace newer
@@ -31,7 +31,7 @@ When no request of at least R100 fits within the 90% limit, show **Minimum you c
 
 Investment cards show the available balance and maximum withdrawal in a compact layout. Withdrawal tables use **Date**, **Investment**, and **Amount**, with right-aligned negative amounts such as `-R20,000`. Investment-specific tables omit the Investment column. Mobile rows use the same signed amounts with vertically centred content. CSV statements use the same three columns and negative amounts. API withdrawal amounts remain positive; the presentation and statement export apply the debit sign.
 
-The **How withdrawals work** panel shows the confirmed rules: retirement withdrawals require age greater than 65, withdrawals cannot exceed the available balance, and each withdrawal is limited to 90% of the remaining balance with a R100 minimum. Account status and pending totals are internal data; investor-facing lists focus on the date, investment, and deduction.
+The **How withdrawals work** panel shows the confirmed rules: retirement withdrawals require age greater than 65, withdrawals cannot exceed the available balance, and submitted withdrawals count toward a 90% investment limit with a R100 minimum. Account status and pending totals are internal data; investor-facing lists focus on the date, investment, and deduction.
 
 ## Verification
 
@@ -59,7 +59,7 @@ refresh recovery, and a clean installation from the committed lockfile.
 
 ## Previews
 
-Captured from the current frontend in mock mode on 29 October 2026. Desktop previews
+Captured from the earlier frontend in mock mode on 29 October 2026. Desktop previews
 use 1440px width; mobile previews use a 390 × 844px viewport. These show the current
 R72,000 cash maximum, signed deductions, three-column statements, and simplified
 investment details.

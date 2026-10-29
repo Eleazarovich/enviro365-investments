@@ -12,7 +12,7 @@ export const mockInvestor: Investor = {
   id: 1,
   name: 'Eleazarovich',
   age: 68,
-  investorSince: '2026-10-01',
+  investorSince: '2026-04-01',
 };
 
 export const mockProductRecords: MockProductRecord[] = [
@@ -21,8 +21,8 @@ export const mockProductRecords: MockProductRecord[] = [
 ];
 
 // Seed history. R20,000 on Cash is the existing submitted withdrawal.
-// The remaining historical rows are settled entries kept as SUBMITTED records
-// that are excluded from the pending total (see isPending flag below).
+// The remaining rows are imported historical records whose reservations are
+// inactive and already reflected in recorded balances. This app executes no payments.
 interface SeedNotice extends WithdrawalNotice {
   pending: boolean;
 }
@@ -125,8 +125,14 @@ export function computeProduct(record: MockProductRecord): InvestmentProduct {
     .filter((n) => n.productId === record.id && n.pending)
     .reduce((sum, n) => sum + Math.round(n.amount * 100), 0);
   const availableCents = Math.max(0, Math.round(record.recordedBalance * 100) - pendingCents);
-  // Each request allows 90% of the remaining balance, rounded down to a whole cent.
-  const maximumCents = Math.floor((availableCents * 9) / 10);
+  // All active notices share 90% of the underlying balance, rounded down to cents.
+  const maximumCents = Math.max(
+    0,
+    Math.min(
+      availableCents,
+      Math.floor((Math.round(record.recordedBalance * 100) * 9) / 10) - pendingCents
+    )
+  );
   return {
     id: record.id,
     name: record.name,

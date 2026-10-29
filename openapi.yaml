@@ -1,15 +1,18 @@
 openapi: 3.2.1
 info:
   title: Enviro365 Investments API
-  version: 0.1.0
+  version: 1.0.0
   description: |
-    Backend contract expected by the existing frontend HTTP adapter. The backend
-    is not implemented yet; this specification describes the frontend types,
-    mock behavior, HTTP fixtures, and agreed API contract.
+    Contract implemented by the Java 21 / Spring Boot 4.1 / H2 backend and consumed
+    by the existing frontend HTTP adapter. The cumulative per-product 90% cap
+    below supersedes the earlier per-request interpretation, as explicitly
+    requested for backend implementation. Endpoint paths and DTO shapes are preserved.
 
     Set NEXT_PUBLIC_USE_MOCK_API=false to use HTTP. NEXT_PUBLIC_API_BASE_URL is
-    the backend origin/base URL, without the /api suffix; it defaults to an
-    empty string for same-origin requests. The frontend currently always uses
+    the backend origin/base URL, without the /api suffix; it defaults to
+    http://localhost:8080. Set it to an empty string for same-origin requests.
+    HTTP is the default adapter; set NEXT_PUBLIC_USE_MOCK_API=true to opt into
+    the optional mock. The frontend currently always uses
     investorId=1. The path parameter documents the intended investor-scoped API.
 
     None of these operations requires authentication in the current frontend
@@ -68,7 +71,7 @@ paths:
                   id: 1
                   name: Eleazarovich
                   age: 68
-                  investorSince: '2026-10-01'
+                  investorSince: '2026-04-01'
                 totalAvailable: 140000
                 products:
                   - id: 1
@@ -76,7 +79,7 @@ paths:
                     type: GENERAL
                     availableBalance: 80000
                     minimumWithdrawable: 100
-                    maximumWithdrawable: 72000
+                    maximumWithdrawable: 70000
                     pendingWithdrawals: 20000
                   - id: 2
                     name: Retirement Investment
@@ -151,15 +154,20 @@ paths:
         additionally require an investor age strictly greater than 65; age 65
         is ineligible. Investor age and product type come from backend records.
 
-        For every request, calculate percentageMaximum by rounding 90% of the
-        remaining available balance down to cents. maximumWithdrawable is that
-        amount if it is at least R100, otherwise zero. Pending withdrawals have
-        already reduced the available balance and must not be subtracted again.
-        There is no exception to withdraw the final balance below the minimum.
+        Cumulative reservation assumption: let B be the underlying recorded product
+        balance, and R the sum of active submitted notices for that product.
+        availableBalance = max(0, B - R). The remaining cumulative cap is
+        floorToCents(B * 0.90) - R. maximumWithdrawable is the lesser of available
+        funds and that remaining cap, or zero when less than R100. This preserves
+        at least 10% of the underlying balance across repeated requests. The
+        underlying balance is not itself debited on submission. Inactive imported
+        historical reservations do not count again; their effect is already in B.
+        No endpoint releases reservations or executes payments.
 
         Success creates a SUBMITTED notice and immediately reserves its amount,
         reducing the available balance exactly once. Persist the notice and
-        balance effect atomically, including for concurrent requests. Invalid
+        balance effect atomically, using a pessimistic product row lock before
+        reading reservations, including for concurrent requests. Invalid
         requests leave both unchanged. The response is only the created notice;
         the frontend separately reloads portfolio and history. Submission does
         not mean a bank payment has completed.
@@ -191,6 +199,12 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          description: A competing database transaction exceeded the lock wait timeout; refresh and retry.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '422':
           description: |
             Business rule rejection: retirement investor age is 65 or younger,
@@ -212,7 +226,7 @@ paths:
                     message: Your available balance for this investment is R80,000.
                 limitExceeded:
                   value:
-                    message: You can withdraw up to R72,000 from this investment.
+                    message: You can withdraw up to R70,000.00 from this investment.
         '500':
           $ref: '#/components/responses/InternalServerError'
         default:
@@ -278,6 +292,7 @@ components:
       description: Investor identifier. The current frontend always sends 1.
       schema:
         type: integer
+        minimum: 1
         examples: [1]
     ProductIdFilter:
       name: productId
@@ -286,6 +301,7 @@ components:
       description: Restrict results to this investment product; omit for all investments.
       schema:
         type: integer
+        minimum: 1
         examples: [1]
     FromDate:
       name: fromDate
@@ -330,7 +346,7 @@ components:
           type: string
           format: date
           description: Optional investment start date; omit when unavailable.
-          examples: ['2026-10-01']
+          examples: ['2026-04-01']
     InvestmentProduct:
       type: object
       required:
@@ -366,10 +382,11 @@ components:
           allOf:
             - $ref: '#/components/schemas/Money'
           description: |
-            90% of availableBalance rounded down to cents, or zero if that result
-            is below minimumWithdrawable. Recalculated for each request. This
-            numerical limit is separate from the investor's retirement age check.
-          examples: [72000]
+            Remaining cumulative cap: floorToCents(underlyingBalance * 0.90)
+            minus active submitted reservations, bounded by availableBalance.
+            Zero if less than minimumWithdrawable. This numerical limit is
+            separate from the investor's retirement age check.
+          examples: [70000]
         pendingWithdrawals:
           allOf:
             - $ref: '#/components/schemas/Money'
@@ -392,17 +409,20 @@ components:
             $ref: '#/components/schemas/InvestmentProduct'
     CreateWithdrawalRequest:
       type: object
+      additionalProperties: false
       required: [productId, amount]
       properties:
         productId:
           type: integer
+          minimum: 1
           description: Identifier of the selected product in this investor's portfolio.
           examples: [1]
         amount:
           type: number
           minimum: 100
+          maximum: 99999999999999999.99
           multipleOf: 0.01
-          description: Positive JSON number in ZAR, at least R100 and within the current balance and maximum.
+          description: Positive JSON number (not a string) in ZAR, at least R100, at most 17 whole digits and two decimals, within the available balance and cumulative cap.
           examples: [1500.75]
     WithdrawalNotice:
       type: object
@@ -444,7 +464,7 @@ components:
       description: Only message is consumed by the frontend; additional error fields are ignored.
   responses:
     BadRequest:
-      description: Invalid input, such as malformed JSON, missing fields, invalid amount precision, amount below R100, or invalid filters.
+      description: Invalid input, such as malformed JSON, unknown body fields, missing fields, nonnumeric values, fractional IDs, invalid amount precision, amount below R100, or invalid filters.
       content:
         application/json:
           schema:

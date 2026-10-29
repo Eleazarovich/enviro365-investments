@@ -1,58 +1,72 @@
 # Enviro365 Investments
 
-Investor portfolio, withdrawal notices, history, and filtered CSV statements.
-The Next.js frontend currently runs against an in-memory mock adapter. The Java
-Spring Boot/H2 backend has not yet been implemented; mock notices are not persisted
-across a full browser reload.
+An investor portfolio and withdrawal application with a Next.js/React frontend and
+**Java 21 / Spring Boot 4.1.2 / Spring Data JPA / H2** backend. It records withdrawal
+notices and reservations, with no authentication or payment processing.
 
-## Run the frontend
+## Run locally
 
-With Node.js and npm installed, run:
+Install a Java **21 JDK** and Node.js/npm. From `backend/`:
 
 ```sh
-cd frontend
+./mvnw spring-boot:run
+```
+
+In a second terminal, from `frontend/`:
+
+```sh
 npm ci
+cp .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:4028. Mock mode is enabled unless
-`NEXT_PUBLIC_USE_MOCK_API=false` is set. To connect the future backend, configure
-`NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_USE_MOCK_API=false` in
-`frontend/.env.local`. Do not place secrets in public environment variables.
+Open http://localhost:4028. The frontend defaults to HTTP at http://localhost:8080.
+Configure `NEXT_PUBLIC_API_BASE_URL` (without `/api`) and
+`NEXT_PUBLIC_USE_MOCK_API=false` in `.env.local`; restart Next.js after changing them.
+The optional mock requires `NEXT_PUBLIC_USE_MOCK_API=true`. Do not place secrets in
+public environment variables.
 
-The committed `frontend/package-lock.json` pins the existing dependency versions
-for `npm ci`. A clean installation, type check, lint and build have been verified.
+The [backend README](backend/README.md) covers structure, configuration, H2 inspection,
+seed data, endpoints, locking and assumptions. The Maven Wrapper pins Maven 3.9.16;
+npm dependencies use the existing lockfile.
 
-## Withdrawal rules
+## Data and withdrawal rules
 
-Both products allow up to 90% of the **remaining available balance per request**,
-rounded down to cents, with a **R100 minimum**. Recalculate after every accepted
-request. If the percentage maximum is below R100, disable withdrawals and keep
-the remaining balance visible. There is no final-balance exception. Retirement
-withdrawals additionally require age greater than 65.
+A fresh database seeds investor **1**, fictional **Eleazarovich**, and two investments.
+Cash has R100,000 underlying, R20,000 reserved, R80,000 available and a R70,000 maximum.
+Retirement has R60,000 available and a R54,000 maximum. Nine existing notices provide
+filterable history. File-backed H2 in `backend/data/` retains notices across restarts.
 
-See the [confirmed business rules](_docs/business-rules.md) for examples and
-withdrawal calculations.
+Active submitted notices share a **cumulative cap of 90% of the underlying product
+balance**, rounded down to cents. This follows the latest backend request and supersedes
+the earlier frontend policy. Reservations reduce available funds immediately and exactly
+once. Keep at least R100 per request; cents are allowed above the minimum. A zero maximum
+means no request fits; the actual balance remains visible. Retirement requires age
+**strictly greater than 65**. See [business-rule assumptions](_docs/business-rules.md).
 
-## Proposed backend API
+## API
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
-| GET | `/api/investors/{investorId}/portfolio` | Investor and products, including `availableBalance`, `minimumWithdrawable`, and `maximumWithdrawable` |
-| POST | `/api/investors/{investorId}/withdrawal-notices` | Create a notice using `{ "productId": 1, "amount": 1500.75 }` |
-| GET | `/api/investors/{investorId}/withdrawal-notices` | History with optional `productId`, `fromDate`, and `toDate` filters |
-| GET | `/api/investors/{investorId}/withdrawal-notices/export` | CSV using the same filters |
+| GET | `/api/investors/{investorId}/portfolio` | Investor and products with current balances and limits |
+| POST | `/api/investors/{investorId}/withdrawal-notices` | Create a notice with `{ "productId": 1, "amount": 1500.75 }` |
+| GET | `/api/investors/{investorId}/withdrawal-notices` | History with optional `productId`, `fromDate`, `toDate` filters |
+| GET | `/api/investors/{investorId}/withdrawal-notices/export` | CSV with the same filters |
 
-These endpoints have a frontend HTTP adapter but no running backend yet. Monetary
-API amounts are positive; history and CSV display withdrawals as negative deductions.
-See [openapi.yaml](openapi.yaml), using [OpenAPI 3.2.1](https://spec.openapis.org/oas/v3.2.1.html),
-for the complete frontend API contract, including
-request/response schemas, filters, CSV format, errors, and authentication requirements
-(none in the current contract). See the [specification](_docs/SPEC.md) for implementation scope.
+See [openapi.yaml](openapi.yaml) for complete schemas, inclusive UTC date filters and
+errors. JSON withdrawal amounts are positive; the UI and CSV show negative deductions.
+CSV columns are `Date,Investment,Amount`. Configure local CORS through
+`CORS_ALLOWED_ORIGINS`; the backend exposes `Content-Disposition` to the browser.
 
 ## Verification
 
-Run from `frontend/`:
+From `backend/`:
+
+```sh
+./mvnw clean verify
+```
+
+From `frontend/`:
 
 ```sh
 npm run type-check
@@ -60,13 +74,18 @@ npm run lint
 npm run build
 npx playwright install chromium
 npm run test:e2e
+npx playwright test --config=playwright.live.config.ts
 ```
 
-Playwright uses port 4029 and `.next-e2e`. It tests the browser with HTTP fixtures
-and tests the real mock adapter directly. It does not prove Spring Boot/H2 integration.
+JUnit 5, Mockito and full Boot/H2 integration tests cover rules, concurrency, rollback,
+errors, filtering, CSV and restart persistence. Spring 7's test extension requires JUnit
+6, so JUnit 5 integration tests start Boot contexts explicitly.
 
-See the [frontend verification report](_docs/frontend-verification.md) for the
-completed frontend requirements, regression checks and remaining lint warnings.
+The normal Playwright suite uses HTTP fixtures and the real mock adapter on port
+4029 with `.next-e2e`. The live suite starts Spring Boot/H2 on **8081** and Next.js
+on **4030** with `.next-live`, uses actual browser HTTP calls and downloads CSVs.
+See the [backend and integration verification report](_docs/backend-verification.md)
+and earlier [frontend report](_docs/frontend-verification.md).
 
 ## Design previews and AI use
 
@@ -74,6 +93,9 @@ completed frontend requirements, regression checks and remaining lint warnings.
 [Mobile portfolio](_docs/previews/rosewood-porcelain/portfolio-mobile.png) ·
 [Design system and other previews](_docs/design-system.md)
 
-OpenAI Codex assisted with frontend code, mock financial calculations, tests, and
-documentation. The repository records implementation assumptions and verification
-so the developer can review and explain the AI-assisted work.
+Existing screenshots document the earlier frontend phase and its previous numerical
+limits. The live application uses the current cumulative cap.
+
+OpenAI Codex assisted with frontend and backend implementation, financial calculations,
+tests and documentation. Assumptions and verification are recorded so the developer can
+review and explain the AI-assisted work.

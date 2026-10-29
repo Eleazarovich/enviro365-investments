@@ -1,10 +1,9 @@
-// Base URL is configurable so the mock layer can be swapped for Spring Boot.
-// Set NEXT_PUBLIC_API_BASE_URL (e.g. https://api.enviro365.example) and
-// NEXT_PUBLIC_USE_MOCK_API=false to call real endpoints under /api/investors/1/.
+// HTTP is the default; set NEXT_PUBLIC_USE_MOCK_API=true for the optional demo adapter.
+// Override NEXT_PUBLIC_API_BASE_URL for another origin, or use '' for same-origin hosting.
 export const API_CONFIG = {
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL ?? '',
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080',
   investorId: 1,
-  useMock: process.env.NEXT_PUBLIC_USE_MOCK_API !== 'false',
+  useMock: process.env.NEXT_PUBLIC_USE_MOCK_API === 'true',
 };
 
 export const endpoints = {

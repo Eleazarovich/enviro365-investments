@@ -321,6 +321,9 @@ Do not add PDF downloads or complex reporting features.
 
 These rules reflect the selected implementation design and must remain consistent with the Spring Boot backend.
 
+Active submitted notices share a cumulative 90% cap per product. See
+[business rules](business-rules.md) for the calculations and worked examples.
+
 1. Each investment product has its own balance and withdrawal limits.
 2. A withdrawal must be greater than zero.
 3. The investor cannot withdraw more than their available balance.

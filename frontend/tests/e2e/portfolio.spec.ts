@@ -272,16 +272,21 @@ test('dialog traps keyboard focus, cancels and restores the trigger', async ({ p
 test('history filters, invalid dates, empty results and reset work', async ({ page, api }) => {
   void api;
   await page.goto('/withdrawal-history');
-  const results = page.getByRole('region', { name: 'All withdrawals', exact: true });
-  await expect(results).toContainText('3 withdrawals');
+  const results = page.getByRole('region', { name: 'Withdrawal history', exact: true });
+  const entries = results.locator('tbody tr, li').filter({ visible: true });
+  const clearSelection = page.getByRole('button', { name: 'Clear selection', exact: true });
+  await expect(entries).toHaveCount(3);
+  await expect(clearSelection).toBeDisabled();
   await page.getByLabel('Investment', { exact: true }).selectOption('2');
-  await expect(
-    page.getByRole('region', { name: 'Filtered withdrawals', exact: true })
-  ).toContainText('1 withdrawal');
+  await expect(entries).toHaveCount(1);
+  await expect(entries.first()).toContainText('Retirement Investment');
   await page.getByLabel('Start date', { exact: true }).fill('2026-10-01');
   await expect(
     page.getByRole('heading', { name: 'No withdrawals match these filters' })
   ).toBeVisible();
+  await results.getByRole('button', { name: 'Clear selection', exact: true }).click();
+  await expect(entries).toHaveCount(3);
+  await page.getByLabel('Start date', { exact: true }).fill('2026-10-01');
   await page.getByLabel('End date', { exact: true }).fill('2026-09-01');
   await expect(page.locator('#date-range-error')).toContainText(
     'The start date is after the end date.'
@@ -289,10 +294,12 @@ test('history filters, invalid dates, empty results and reset work', async ({ pa
   await expect(
     page.getByRole('button', { name: 'Download statement', exact: true })
   ).toBeDisabled();
-  await page.getByRole('button', { name: 'Reset filters', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'All withdrawals', exact: true })).toContainText(
-    '3 withdrawals'
-  );
+  await clearSelection.click();
+  await expect(entries).toHaveCount(3);
+  await expect(page.getByLabel('Investment', { exact: true })).toHaveValue('');
+  await expect(page.getByLabel('Start date', { exact: true })).toHaveValue('');
+  await expect(page.getByLabel('End date', { exact: true })).toHaveValue('');
+  await expect(clearSelection).toBeDisabled();
   await expectNoOverflow(page);
 });
 
@@ -330,9 +337,12 @@ test('portfolio and history errors recover with retry', async ({ page, api }) =>
     page.getByRole('heading', { name: "We couldn't load your withdrawal history", exact: true })
   ).toBeVisible();
   await page.getByRole('button', { name: 'Try again', exact: true }).click();
-  await expect(page.getByRole('region', { name: 'All withdrawals', exact: true })).toContainText(
-    '3 withdrawals'
-  );
+  await expect(
+    page
+      .getByRole('region', { name: 'Withdrawal history', exact: true })
+      .locator('tbody tr, li')
+      .filter({ visible: true })
+  ).toHaveCount(3);
 });
 
 for (const width of [320, 768, 1024, 1280]) {

@@ -35,7 +35,11 @@ export default function Topbar() {
             enviro<span className="font-normal text-primary">365</span>
           </span>
         </Link>
-        <p className="hidden text-xs font-medium lg:block">{page}</p>
+        {pathname === '/withdrawal-history' ? (
+          <h1 className="text-xs font-medium">{page}</h1>
+        ) : (
+          <p className="hidden text-xs font-medium lg:block">{page}</p>
+        )}
         <div className="flex items-center gap-3">
           <div className="hidden text-right sm:block">
             <p className="text-xs font-medium">{portfolio?.investor.name || 'Your account'}</p>

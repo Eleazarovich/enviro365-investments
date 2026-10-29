@@ -5,7 +5,6 @@ import { History, SearchX } from 'lucide-react';
 import { api } from '@/lib/api';
 import { usePortfolio } from '@/lib/PortfolioProvider';
 import type { WithdrawalFilters, WithdrawalNotice } from '@/lib/types';
-import { formatRandPrecise } from '@/lib/format';
 import WithdrawalTable from '@/components/WithdrawalTable';
 import Skeleton from '@/components/ui/Skeleton';
 import ErrorState from '@/components/ui/ErrorState';
@@ -62,27 +61,10 @@ export default function WithdrawalHistoryView() {
     void load();
   }, [load, historyVersion]);
 
-  const total = useMemo(() => (rows ?? []).reduce((sum, r) => sum + r.amount, 0), [rows]);
-
   const handleReset = () => setFilters(EMPTY_FILTERS);
 
   return (
-    <div className="space-y-7">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="eyebrow mb-2">Account activity</p>
-          <h1 className="page-heading">Withdrawals</h1>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            Your withdrawals, newest first.
-          </p>
-        </div>
-        <DownloadStatementButton
-          filters={apiFilters}
-          disabled={rows === null || reloading || invalidRange || Boolean(error)}
-          onResult={(m) => setToast({ id: Date.now(), ...m })}
-        />
-      </header>
-
+    <>
       <div className="panel">
         <HistoryFilters
           products={portfolio?.products ?? []}
@@ -91,33 +73,16 @@ export default function WithdrawalHistoryView() {
           onReset={handleReset}
           canReset={hasActiveFilters}
           invalidRange={invalidRange}
+          statementAction={
+            <DownloadStatementButton
+              filters={apiFilters}
+              disabled={rows === null || reloading || invalidRange || Boolean(error)}
+              onResult={(m) => setToast({ id: Date.now(), ...m })}
+            />
+          }
         />
 
-        <section
-          aria-labelledby="history-results-heading"
-          aria-busy={reloading}
-          className="overflow-hidden"
-        >
-          <div className="panel-heading">
-            <h2 id="history-results-heading" className="text-sm font-semibold tracking-tight">
-              {hasActiveFilters ? 'Filtered withdrawals' : 'All withdrawals'}
-            </h2>
-            {rows !== null && !error && !invalidRange && (
-              <p className="text-xs text-muted-foreground" aria-live="polite">
-                {rows.length} {rows.length === 1 ? 'withdrawal' : 'withdrawals'}
-                {rows.length > 0 && (
-                  <>
-                    {' · '}
-                    <span className="tabular font-semibold text-foreground">
-                      {formatRandPrecise(-total)}
-                    </span>{' '}
-                    in total
-                  </>
-                )}
-              </p>
-            )}
-          </div>
-
+        <section aria-label="Withdrawal history" aria-busy={reloading} className="overflow-hidden">
           {invalidRange ? (
             <div className="p-6">
               <div
@@ -143,10 +108,10 @@ export default function WithdrawalHistoryView() {
             <EmptyState
               icon={<SearchX className="h-6 w-6" aria-hidden="true" />}
               title="No withdrawals match these filters"
-              description="Try a different investment or a wider date range, or reset the filters to see everything."
+              description="Try a different investment or a wider date range, or clear your selection to view all withdrawals."
               action={
                 <Button variant="outline" size="sm" onClick={handleReset}>
-                  Reset filters
+                  Clear selection
                 </Button>
               }
             />
@@ -164,7 +129,7 @@ export default function WithdrawalHistoryView() {
         </section>
       </div>
       <Toast toast={toast} onDismiss={() => setToast(null)} />
-    </div>
+    </>
   );
 }
 

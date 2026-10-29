@@ -6,7 +6,26 @@ notices and reservations, with no authentication or payment processing.
 
 ## Run locally
 
-Install a Java **21 JDK** and Node.js/npm. From `backend/`:
+Install a Java **21 JDK**, Node.js/npm, GNU Make and Bash **4.3+** (Linux or WSL).
+From the project root:
+
+```sh
+make run
+```
+
+This installs frontend dependencies when needed, creates `frontend/.env.local` if
+missing, and starts both services. Open http://localhost:4028; press **Ctrl+C** to
+stop both. If either service exits, the other is stopped too. Existing local
+configuration is preserved. Stop any separately running development servers first
+so ports 4028 and 8080 are available.
+
+Run `make help` for all commands. `make backend` and `make frontend` start services
+separately; `make test` runs backend tests, `make check` checks frontend types and lint,
+`make build` builds both applications, and `make test-live` runs the live browser suite.
+`make clean` removes build output while retaining H2 data and local configuration.
+Browser targets require Chromium (`cd frontend && npx playwright install chromium`).
+
+To start services manually, from `backend/`:
 
 ```sh
 ./mvnw spring-boot:run

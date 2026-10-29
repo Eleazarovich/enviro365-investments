@@ -65,6 +65,13 @@ export default function WithdrawalHistoryView() {
 
   return (
     <>
+      <div className="mb-4 flex">
+        <DownloadStatementButton
+          filters={apiFilters}
+          disabled={rows === null || reloading || invalidRange || Boolean(error)}
+          onResult={(m) => setToast({ id: Date.now(), ...m })}
+        />
+      </div>
       <div className="panel">
         <HistoryFilters
           products={portfolio?.products ?? []}
@@ -73,13 +80,6 @@ export default function WithdrawalHistoryView() {
           onReset={handleReset}
           canReset={hasActiveFilters}
           invalidRange={invalidRange}
-          statementAction={
-            <DownloadStatementButton
-              filters={apiFilters}
-              disabled={rows === null || reloading || invalidRange || Boolean(error)}
-              onResult={(m) => setToast({ id: Date.now(), ...m })}
-            />
-          }
         />
 
         <section aria-label="Withdrawal history" aria-busy={reloading} className="overflow-hidden">

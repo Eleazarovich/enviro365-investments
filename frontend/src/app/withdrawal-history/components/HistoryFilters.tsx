@@ -19,7 +19,6 @@ interface HistoryFiltersProps {
   onReset: () => void;
   canReset: boolean;
   invalidRange: boolean;
-  statementAction: React.ReactNode;
 }
 
 function DateField({
@@ -64,7 +63,6 @@ export default function HistoryFilters({
   onReset,
   canReset,
   invalidRange,
-  statementAction,
 }: HistoryFiltersProps) {
   const options = [
     { value: '', label: 'All investments' },
@@ -105,7 +103,6 @@ export default function HistoryFilters({
             <RotateCcw className="h-4 w-4" aria-hidden="true" />
             Clear selection
           </Button>
-          {statementAction}
         </div>
       </div>
     </section>

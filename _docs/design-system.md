@@ -19,6 +19,8 @@ Colour tokens and shared styles live in `frontend/src/styles/tailwind.css`; `fro
 
 The original routes, API adapter contracts, financial calculations, eligibility rule, cumulative 90% limit, filters, and CSV export remain in place. The decorative leaf outlines are original CSS and SVG, with no third-party imagery or chart data.
 
+When the withdrawal allowance is exhausted, show **Maximum you can withdraw: R0** and disable **Withdraw money**, without an additional limit explanation. Keep the available balance accurate: the retained 10% is still part of the investment balance and must not be replaced with zero.
+
 Investment cards show the available balance and maximum withdrawal in a compact layout. Withdrawal tables use **Date**, **Investment**, and **Amount**, with right-aligned negative amounts such as `-R20,000`. Investment-specific tables omit the Investment column. Mobile rows use the same signed amounts with vertically centred content. CSV statements use the same three columns and negative amounts. API withdrawal amounts remain positive; the presentation and statement export apply the debit sign.
 
 The **How withdrawals work** panel shows the withdrawal rules: retirement withdrawals require age greater than 65, withdrawals cannot exceed the available balance, and withdrawals cannot exceed 90% of the balance. Account status and pending totals are internal data; investor-facing lists focus on the date, investment, and deduction.

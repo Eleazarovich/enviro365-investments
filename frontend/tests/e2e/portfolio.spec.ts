@@ -221,6 +221,34 @@ test('withdrawal submission updates balances and history once', async ({ page, a
   await expect(page.getByText('R138,499.25', { exact: true }).first()).toBeAttached();
 });
 
+test('using the cash withdrawal maximum shows R0 and disables withdrawals without extra copy', async ({
+  page,
+  api,
+}) => {
+  const input = await openWithdrawal(page);
+  await input.fill('70000');
+  await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Withdrawal submitted successfully', exact: true })
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Done', exact: true }).click();
+
+  const summary = page.getByRole('region', { name: 'Cash Investment', exact: true });
+  for (let visit = 0; visit < 2; visit += 1) {
+    if (visit > 0) await page.reload();
+    await expect(summary.getByText('R0', { exact: true })).toBeVisible();
+    await expect(summary.getByRole('button', { name: 'Withdraw money', exact: true })).toBeDisabled();
+    // The retained 10% remains in the balance after the cumulative maximum is used.
+    await expect(summary.getByText('R10,000.00', { exact: true }).first()).toBeAttached();
+    await expect(page.getByText(/reached the withdrawal limit/)).toHaveCount(0);
+    await expectNoOverflow(page);
+  }
+  expect(api.submitCount).toBe(1);
+  await page.getByRole('link', { name: 'Back to portfolio', exact: true }).click();
+  await expect(page.getByText('R70,000.00', { exact: true }).first()).toBeAttached();
+  await expect(page.locator('a[href="/investment-detail?id=1"]')).toContainText('R0');
+});
+
 test('server failure keeps the entered amount for retry', async ({ page, api }) => {
   api.failSubmit = true;
   const input = await openWithdrawal(page);

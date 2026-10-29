@@ -49,12 +49,6 @@ export default function InvestmentSummary({ product, onWithdraw }: InvestmentSum
             </Button>
           </div>
         </div>
-        {cannotWithdraw && (
-          <p className="mt-5 border-t border-border pt-4 text-xs leading-relaxed text-muted-foreground">
-            You&apos;ve reached the withdrawal limit for this investment, so new withdrawals
-            aren&apos;t available right now.
-          </p>
-        )}
       </div>
     </section>
   );

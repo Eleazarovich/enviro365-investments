@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { History, SearchX } from 'lucide-react';
 import { api } from '@/lib/api';
 import { usePortfolio } from '@/lib/PortfolioProvider';
@@ -23,6 +23,8 @@ export default function WithdrawalHistoryView() {
   const [error, setError] = useState<string | null>(null);
   const [reloading, setReloading] = useState(false);
   const [toast, setToast] = useState<ToastMessage | null>(null);
+  const [loadedFilters, setLoadedFilters] = useState<WithdrawalFilters | null>(null);
+  const requestVersion = useRef(0);
 
   const apiFilters: WithdrawalFilters = useMemo(
     () => ({
@@ -39,26 +41,37 @@ export default function WithdrawalHistoryView() {
   );
 
   const load = useCallback(async () => {
-    if (invalidRange) return;
+    const version = ++requestVersion.current;
+    if (invalidRange) {
+      setReloading(false);
+      return;
+    }
     setError(null);
     setReloading(true);
     try {
       // Backend integration: GET /api/investors/1/withdrawal-notices?productId&fromDate&toDate
       const data = await api.getWithdrawals(apiFilters);
+      if (version !== requestVersion.current) return;
       setRows(data);
+      setLoadedFilters(apiFilters);
     } catch (e) {
+      if (version !== requestVersion.current) return;
       setError(
         e instanceof Error
           ? e.message
           : "We couldn't load your withdrawal history. Please try again."
       );
     } finally {
-      setReloading(false);
+      if (version === requestVersion.current) setReloading(false);
     }
   }, [apiFilters, invalidRange]);
 
   useEffect(() => {
     void load();
+    // Ignore older results, errors and loading changes after filters change or unmount.
+    return () => {
+      requestVersion.current += 1;
+    };
   }, [load, historyVersion]);
 
   const handleReset = () => setFilters(EMPTY_FILTERS);
@@ -68,7 +81,13 @@ export default function WithdrawalHistoryView() {
       <div className="mb-4 flex">
         <DownloadStatementButton
           filters={apiFilters}
-          disabled={rows === null || reloading || invalidRange || Boolean(error)}
+          disabled={
+            rows === null ||
+            loadedFilters !== apiFilters ||
+            reloading ||
+            invalidRange ||
+            Boolean(error)
+          }
           onResult={(m) => setToast({ id: Date.now(), ...m })}
         />
       </div>
@@ -102,7 +121,7 @@ export default function WithdrawalHistoryView() {
                 onRetry={load}
               />
             </div>
-          ) : rows === null ? (
+          ) : rows === null || loadedFilters !== apiFilters ? (
             <HistorySkeleton />
           ) : rows.length === 0 && hasActiveFilters ? (
             <EmptyState

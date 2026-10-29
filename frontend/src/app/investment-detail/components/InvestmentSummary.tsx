@@ -8,9 +8,14 @@ import BalanceAmount from '@/components/ui/BalanceAmount';
 interface InvestmentSummaryProps {
   product: InvestmentProduct;
   onWithdraw: () => void;
+  withdrawalDisabled?: boolean;
 }
 
-export default function InvestmentSummary({ product, onWithdraw }: InvestmentSummaryProps) {
+export default function InvestmentSummary({
+  product,
+  onWithdraw,
+  withdrawalDisabled = false,
+}: InvestmentSummaryProps) {
   const cannotWithdraw = product.maximumWithdrawable <= 0;
 
   return (
@@ -48,7 +53,11 @@ export default function InvestmentSummary({ product, onWithdraw }: InvestmentSum
                 )}
               </p>
             </div>
-            <Button variant="accent" onClick={onWithdraw} disabled={cannotWithdraw}>
+            <Button
+              variant="accent"
+              onClick={onWithdraw}
+              disabled={cannotWithdraw || withdrawalDisabled}
+            >
               Withdraw money <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </Button>
           </div>

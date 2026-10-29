@@ -93,8 +93,20 @@ export default function InvestmentDetailView() {
   return (
     <div className="space-y-6">
       <BackLink />
-      <InvestmentSummary product={product} onWithdraw={() => setDialogOpen(true)} />
-      <LimitMeter product={product} />
+      {error ? (
+        <ErrorState
+          title="We couldn't refresh your balance"
+          message="Your balance may be out of date. Try again before making another withdrawal."
+          onRetry={refresh}
+        />
+      ) : (
+        <InvestmentSummary
+          product={product}
+          onWithdraw={() => setDialogOpen(true)}
+          withdrawalDisabled={loading}
+        />
+      )}
+      {!error && <LimitMeter product={product} />}
       <InvestmentHistoryPreview
         rows={history}
         error={historyError}

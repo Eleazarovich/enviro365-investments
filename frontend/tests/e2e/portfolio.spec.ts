@@ -422,14 +422,25 @@ test('CSV download respects investment filters and handles export errors', async
 }) => {
   await page.goto('/withdrawal-history');
   await page.getByLabel('Investment', { exact: true }).selectOption('2');
+  await page.getByLabel('Start date', { exact: true }).fill('2026-09-12');
+  await page.getByLabel('End date', { exact: true }).fill('2026-09-12');
   const downloadButton = page.getByRole('button', { name: 'Download statement', exact: true });
   await expect(downloadButton).toBeEnabled();
   api.failExport = true;
   await downloadButton.click();
   await expect(page.getByRole('alert').filter({ hasText: 'Please try again.' })).toBeVisible();
   const downloadEvent = page.waitForEvent('download');
+  const exportRequest = page.waitForRequest((request) =>
+    new URL(request.url()).pathname.endsWith('/withdrawal-notices/export')
+  );
   await downloadButton.click();
   const download = await downloadEvent;
+  const query = new URL((await exportRequest).url()).searchParams;
+  expect(Object.fromEntries(query)).toEqual({
+    productId: '2',
+    fromDate: '2026-09-12',
+    toDate: '2026-09-12',
+  });
   expect(download.suggestedFilename()).toBe('withdrawal-statement.csv');
   const content = await readFile((await download.path())!, 'utf8');
   expect(content).toContain('Retirement Investment,-7500.50');
@@ -472,3 +483,95 @@ for (const width of [320, 768, 1024, 1280]) {
     }
   });
 }
+
+for (const outcome of ['success', 'error'] as const) {
+  test(`history ignores a late ${outcome} from an earlier investment filter`, async ({
+    page,
+    api,
+  }) => {
+    await page.goto('/withdrawal-history');
+    const results = page.getByRole('region', { name: 'Withdrawal history', exact: true });
+    const entries = results.locator('tbody tr, li').filter({ visible: true });
+    await expect(entries).toHaveCount(3);
+
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    await page.route('**/withdrawal-notices?productId=1', async (route) => {
+      await gate;
+      await route.fulfill(
+        outcome === 'error'
+          ? { status: 500, json: { message: 'An earlier request failed.' } }
+          : { json: api.notices.filter((notice) => notice.productId === 1) }
+      );
+    });
+    const earlierRequest = page.waitForRequest('**/withdrawal-notices?productId=1');
+    await page.getByLabel('Investment', { exact: true }).selectOption('1');
+    await earlierRequest;
+    await page.getByLabel('Investment', { exact: true }).selectOption('2');
+    await expect(entries).toHaveCount(1);
+    await expect(entries.first()).toContainText('Retirement Investment');
+
+    const earlierResponse = page.waitForResponse('**/withdrawal-notices?productId=1');
+    release();
+    await (await earlierResponse).finished();
+    // Let the late fetch settle before checking the table and export controls.
+    await page.evaluate(() => new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    }));
+
+    await expect(page.getByLabel('Investment', { exact: true })).toHaveValue('2');
+    await expect(entries).toHaveCount(1);
+    await expect(entries.first()).toContainText('Retirement Investment');
+    await expect(page.getByText('An earlier request failed.', { exact: true })).toHaveCount(0);
+    const downloadButton = page.getByRole('button', { name: 'Download statement', exact: true });
+    await expect(downloadButton).toBeEnabled();
+    const downloadEvent = page.waitForEvent('download');
+    await downloadButton.click();
+    const download = await downloadEvent;
+    const csv = await readFile((await download.path())!, 'utf8');
+    expect(csv).toContain('Retirement Investment,-7500.50');
+    expect(csv).not.toContain('Cash Investment');
+  });
+}
+
+test('a failed balance refresh preserves confirmation and recovers without resubmitting', async ({
+  page,
+  api,
+}) => {
+  const input = await openWithdrawal(page);
+  api.failPortfolio = true;
+  await input.fill('1000');
+  await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
+  await expect(
+    page.getByRole('heading', { name: 'Withdrawal submitted successfully', exact: true })
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Done', exact: true }).click();
+  await expect(
+    page.getByRole('heading', { name: "We couldn't refresh your balance", exact: true })
+  ).toBeVisible();
+  await expect(page.locator('main').getByText('R80,000.00', { exact: true })).toHaveCount(0);
+  await expect(page.locator('main').getByText('R72,000', { exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Withdraw money', exact: true })).toHaveCount(0);
+  await expect(
+    page.locator('main').getByText('-R1,000', { exact: true }).filter({ visible: true })
+  ).toBeVisible();
+
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => { release = resolve; });
+  await page.route('**/portfolio', async (route) => {
+    await gate;
+    await route.fallback();
+  });
+  const refreshRequest = page.waitForRequest('**/portfolio');
+  await page.getByRole('button', { name: 'Try again', exact: true }).click();
+  await refreshRequest;
+  await expect(page.getByRole('button', { name: 'Withdraw money', exact: true })).toBeDisabled();
+  release();
+  const summary = page.getByRole('region', { name: 'Cash Investment', exact: true });
+  await expect(summary.getByText('R79,000.00', { exact: true }).first()).toBeAttached();
+  await expect(summary.getByText('R71,100', { exact: true })).toBeVisible();
+  await expect(summary.getByRole('button', { name: 'Withdraw money', exact: true })).toBeEnabled();
+  expect(api.submitCount).toBe(1);
+  expect(api.notices.filter((notice) => notice.amount === 1000)).toHaveLength(1);
+  await expectNoOverflow(page);
+});

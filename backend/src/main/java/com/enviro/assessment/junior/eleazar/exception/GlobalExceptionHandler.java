@@ -1,0 +1,87 @@
+package com.enviro.assessment.junior.eleazar.exception;
+
+import com.enviro.assessment.junior.eleazar.dto.ErrorResponse;
+import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    ResponseEntity<ErrorResponse> notFound(ResourceNotFoundException ex) {
+        return error(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(WithdrawalRejectedException.class)
+    ResponseEntity<ErrorResponse> rejected(WithdrawalRejectedException ex) {
+        return error(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    ResponseEntity<ErrorResponse> invalid(InvalidRequestException ex) {
+        return error(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(BindException.class)
+    ResponseEntity<ErrorResponse> validation(BindException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(e -> e.isBindingFailure() ? "Use valid filters: productId and dates in YYYY-MM-DD format." : e.getDefaultMessage())
+                .sorted().findFirst().orElse("Check the values you entered.");
+        return error(HttpStatus.BAD_REQUEST, message);
+    }
+
+    @ExceptionHandler({HandlerMethodValidationException.class, ConstraintViolationException.class,
+            MethodArgumentTypeMismatchException.class})
+    ResponseEntity<ErrorResponse> invalidParameter(Exception ex) {
+        return error(HttpStatus.BAD_REQUEST, "Use positive identifiers and valid dates in YYYY-MM-DD format.");
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<ErrorResponse> malformedBody() {
+        return error(HttpStatus.BAD_REQUEST, "Provide JSON containing a numeric productId and amount only.");
+    }
+
+    @ExceptionHandler(PessimisticLockingFailureException.class)
+    ResponseEntity<ErrorResponse> lockConflict() {
+        return error(HttpStatus.CONFLICT, "This investment is being updated. Refresh your balance and try again.");
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    ResponseEntity<ErrorResponse> unknownEndpoint() {
+        return error(HttpStatus.NOT_FOUND, "We couldn't find that endpoint.");
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    ResponseEntity<ErrorResponse> unsupportedMethod(HttpRequestMethodNotSupportedException ex) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .allow(ex.getSupportedHttpMethods() == null ? new HttpMethod[0] : ex.getSupportedHttpMethods().toArray(HttpMethod[]::new))
+                .body(new ErrorResponse("This HTTP method is not supported for that endpoint."));
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    ResponseEntity<ErrorResponse> unsupportedMedia() {
+        return error(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Send the request as application/json.");
+    }
+
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<ErrorResponse> unexpected(Exception ex) {
+        log.error("Unexpected API failure", ex);
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, "Please try again. Your request could not be completed.");
+    }
+
+    private ResponseEntity<ErrorResponse> error(HttpStatus status, String message) {
+        return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(new ErrorResponse(message));
+    }
+}

@@ -38,3 +38,11 @@ turbo/
 .next-e2e/
 test-results/
 playwright-report/
+
+# Java build output and local H2 files
+backend/target/
+backend/data/
+*.mv.db
+*.trace.db
+frontend/.env.local
+.next-live/

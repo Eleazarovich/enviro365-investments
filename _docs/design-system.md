@@ -9,7 +9,7 @@ The existing portfolio and withdrawal workflows use the **Rosewood & Porcelain**
 - **Spacing:** use a 4px base, 20–24px between related panels, and 24–32px inside important surfaces. The desktop sidebar is 232px. Content is bounded on wide screens; screens below 1024px use the existing two-destination bottom navigation to leave room for financial information.
 - **Surfaces:** 16px corners, subtle borders, and minimal shadows. Group related controls and information: history filters and results share a single surface. The existing withdrawal-limit meter is the only data visualisation.
 - **Actions and fields:** primary actions use rosewood with white text; secondary actions use a neutral border. Inputs share `.field` and `.field-label`, with visible rosewood focus rings and explicit validation messages. Field boundaries use a dedicated input token with at least 3:1 contrast on white; text and action colours meet WCAG AA contrast expectations.
-- **States:** skeletons follow the eventual content shape. Errors offer the existing retry action. Withdrawal confirmation shows the recorded deduction and confirms the available balance has updated. Motion respects reduced-motion preferences.
+- **States:** skeletons follow the eventual content shape. Errors offer the existing retry action. Withdrawal confirmation uses **Withdrawal submitted successfully**, the investment name, the signed amount, and **Done**. Balance and history updates run in the background without explanatory success copy. Motion respects reduced-motion preferences.
 
 ## Implementation
 

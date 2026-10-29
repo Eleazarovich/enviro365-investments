@@ -242,10 +242,10 @@ Do not simply display "Invalid request".
 ### Success confirmation
 
 Title:
-"Withdrawal submitted"
+"Withdrawal submitted successfully"
 
-Message:
-"Your withdrawal request of R20,000 has been submitted. Your available balance has been updated."
+Show the investment name and signed withdrawal amount with a "Done" button.
+Update the balance and history in the background without a balance-update message.
 
 Do not claim the money has arrived in a bank account.
 

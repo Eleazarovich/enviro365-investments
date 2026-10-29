@@ -202,12 +202,12 @@ test('withdrawal submission updates balances and history once', async ({ page, a
   const input = await openWithdrawal(page);
   await input.fill('1,500.75');
   await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Recording…', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Submitting…', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(
-    page.getByRole('heading', { name: 'Withdrawal recorded', exact: true })
+    page.getByRole('heading', { name: 'Withdrawal submitted successfully', exact: true })
   ).toBeVisible();
   await expect(page.getByRole('dialog').getByText('-R1,500.75', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Done', exact: true }).click();
@@ -232,7 +232,7 @@ test('server failure keeps the entered amount for retry', async ({ page, api }) 
   await expect(input).toHaveValue('1000');
   await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
   await expect(
-    page.getByRole('heading', { name: 'Withdrawal recorded', exact: true })
+    page.getByRole('heading', { name: 'Withdrawal submitted successfully', exact: true })
   ).toBeVisible();
   expect(api.submitCount).toBe(2);
 });

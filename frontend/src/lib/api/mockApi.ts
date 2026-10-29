@@ -80,7 +80,7 @@ export const mockApi = {
       mockControls.failNextSubmit = false;
       throw new ApiError(
         'UNEXPECTED',
-        "We couldn't record your withdrawal. Please try again.",
+        "We couldn't submit your withdrawal. Please try again.",
         500
       );
     }

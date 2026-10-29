@@ -69,7 +69,7 @@ export default function WithdrawalDialog({
       await onSubmitted(notice);
     } catch (e) {
       const message =
-        e instanceof Error ? e.message : "We couldn't record your withdrawal. Please try again.";
+        e instanceof Error ? e.message : "We couldn't submit your withdrawal. Please try again.";
       const code = (e as { code?: string }).code;
       if (
         code === 'VALIDATION_ERROR' ||
@@ -94,7 +94,7 @@ export default function WithdrawalDialog({
 
   if (confirmed) {
     return (
-      <Dialog open={open} onClose={handleClose} title="Withdrawal recorded">
+      <Dialog open={open} onClose={handleClose} title="Withdrawal submitted successfully">
         <div className="flex flex-col items-center text-center">
           <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-success/10 text-success">
             <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
@@ -102,9 +102,6 @@ export default function WithdrawalDialog({
           <p className="text-xs text-muted-foreground">{product.name}</p>
           <p className="tabular mt-2 text-4xl font-medium tracking-tight">
             {formatRandPrecise(-confirmed.amount)}
-          </p>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Your available balance has been updated.
           </p>
           <Button className="mt-6 w-full" onClick={onClose} data-autofocus>
             Done
@@ -207,7 +204,7 @@ export default function WithdrawalDialog({
           <Button
             type="submit"
             loading={submitting}
-            loadingLabel="Recording…"
+            loadingLabel="Submitting…"
             className="sm:min-w-[11rem]"
           >
             Confirm withdrawal

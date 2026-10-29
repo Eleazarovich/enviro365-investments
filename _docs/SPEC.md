@@ -38,7 +38,7 @@ Create a premium, modern, minimalist financial application.
 
 - Light, neutral background with white or subtly elevated surfaces.
 - Dark, highly readable typography.
-- Restrained use of one sophisticated accent colour, such as deep blue, teal, or emerald.
+- Restrained rosewood accents with porcelain backgrounds and white surfaces, following the [design system](design-system.md).
 - Clear information hierarchy and generous, purposeful whitespace.
 - Beautiful but understated investment cards.
 - Subtle borders, restrained shadows, and consistent spacing.
@@ -47,7 +47,7 @@ Create a premium, modern, minimalist financial application.
 - Responsive desktop, tablet, and mobile layouts.
 - Appropriate loading, empty, error, and confirmation states.
 
-Use professional typography such as Inter or a similarly readable font.
+Use Geist typography and the existing Enviro365 brand mark.
 
 Avoid oversized headings, excessive gradients, glassmorphism, decorative charts, unnecessary animations, large stock illustrations, or generic AI-generated dashboard clutter.
 
@@ -61,19 +61,18 @@ Use simple, familiar terms throughout the interface.
 
 Preferred labels:
 
-- Your portfolio
-- Total available
+- Portfolio
+- Investment details
+- Withdrawals
+- Total available balance
 - Your investments
 - Available balance
 - Withdraw money
 - Amount
 - Maximum you can withdraw
-- Withdrawal history
 - Download statement
 - Date
 - Investment
-- Status
-- Submitted
 
 Avoid internal terminology such as:
 
@@ -94,7 +93,7 @@ Use a clean and minimal navigation system.
 Primary sections:
 
 - Portfolio
-- Withdrawal history
+- Withdrawals
 
 Individual investments should be accessible from the portfolio dashboard through their cards.
 
@@ -117,9 +116,9 @@ Give the investor an immediate understanding of their available portfolio balanc
 At the top:
 
 - Application identity: Enviro365 Investments.
-- Main heading: "Your portfolio".
+- Main heading: "Portfolio value".
 - A prominent total available balance across all investment products.
-- A short supporting label: "Total available across your investments".
+- Balance label: "Total available balance", without a repeated supporting explanation.
 
 Below:
 
@@ -131,7 +130,7 @@ Below:
 Each investment card should display:
 
 - Product name.
-- Product type, such as General investment or Retirement.
+- Product type, such as Standard investment or Retirement.
 - Current available balance.
 - A clear action: "View investment".
 
@@ -169,14 +168,17 @@ Show details of a selected investment and provide an easy way to withdraw money.
 - A section showing withdrawal history for this specific investment.
 
 Keep the layout simple, well spaced, and visually consistent with the dashboard.
+Use the investment name as the page heading without a separate "Your investment" label.
+Show the current maximum beside the withdrawal action; omit the separate withdrawal-limit meter.
 
 ### Withdrawal history preview
 
 Display existing withdrawal records for this investment, including:
 
 - Date.
-- Amount.
-- Status.
+- Amount, shown as a negative deduction with cents preserved.
+
+Keep notice status internal; investment-specific lists omit the Investment column.
 
 If no withdrawals exist, display:
 "You haven't made any withdrawals from this investment yet."
@@ -199,9 +201,12 @@ The form may be presented in a dedicated focused view, dialog, or side panel, de
 - Available balance.
 - Maximum permitted withdrawal.
 - Amount input.
-- Submit button: "Submit withdrawal".
+- Submit button: "Confirm withdrawal".
 
 The selected investment must already be known from the investment detail view.
+Format the amount with comma-separated thousands as the investor types, allow up to two
+decimal places, and complete the cents on blur (for example, `80000` becomes `80,000.00`).
+Preserve the caret during edits and reject invalid input without changing the requested amount.
 
 ### Validation
 
@@ -210,6 +215,7 @@ Validate that:
 - An amount is entered.
 - The amount is greater than zero.
 - The amount is a valid monetary amount with no more than two decimal places.
+- The amount meets the API-provided R100 minimum.
 - The amount does not exceed the available balance.
 - The amount does not exceed the maximum permitted withdrawal.
 - Retirement withdrawals are only available to eligible investors.
@@ -238,6 +244,7 @@ Do not simply display "Invalid request".
 - Send the request through the API service.
 - On success, show confirmation.
 - Refresh the investment balance and withdrawal history using the updated data.
+- If the balance refresh fails after an accepted request, preserve the success confirmation and updated history, replace outdated balance figures with a retry state, and prevent another withdrawal until the balance refresh succeeds. Retrying the balance must not resubmit the withdrawal.
 - On failure, retain the entered amount and show an understandable error.
 
 ### Success confirmation
@@ -262,14 +269,15 @@ Allow the investor to review withdrawals across their portfolio and download a f
 
 ### Layout
 
-Heading: "Withdrawal history".
+Heading: "Withdrawals", shown once in the top bar.
 
 Display a clean, readable table containing:
 
 - Date.
 - Investment.
-- Amount.
-- Status.
+- Amount, shown as a negative deduction with cents preserved.
+
+Keep status labels and pending totals out of the investor-facing table.
 
 Sort by most recent first.
 
@@ -283,11 +291,16 @@ Provide:
 - A clear way to reset filters.
 
 Filters should be easy to understand and should apply consistently to displayed results and CSV downloads.
+Only the latest filter request may update the results, error, or loading state.
+Hide results from previous filters while the current selection loads, and enable
+statement download only after results for that selection have loaded successfully.
 
 ### CSV download
 
 Provide a clearly visible button:
 "Download statement"
+
+Place the button above the withdrawal filters.
 
 When activated, request a CSV file using the current filters.
 
@@ -295,8 +308,10 @@ The downloaded statement should contain:
 
 - Date.
 - Investment.
-- Amount.
-- Status.
+- Amount, as a negative numeric deduction with two decimal places.
+
+The CSV uses the same three columns as the history table. API amounts remain positive
+and notice status remains internal.
 
 Use a descriptive filename, such as:
 `withdrawal-statement-2026-10-28.csv`
@@ -361,7 +376,7 @@ Use internally consistent fictional data, for example:
 **Retirement Investment**
 
 - Recorded investment balance: R60,000.
-- No existing submitted withdrawals.
+- No existing pending withdrawals; historical records remain available in history.
 - Available balance: R60,000.
 - Maximum withdrawal: R54,000.
 - After requesting R54,000: R6,000 available, with a new maximum of R5,400.

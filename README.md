@@ -20,6 +20,9 @@ Open http://localhost:4028. Mock mode is enabled unless
 `NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_USE_MOCK_API=false` in
 `frontend/.env.local`. Do not place secrets in public environment variables.
 
+The committed `frontend/package-lock.json` pins the existing dependency versions
+for `npm ci`. A clean installation, type check, lint and build have been verified.
+
 ## Withdrawal rules
 
 Both products allow up to 90% of the **remaining available balance per request**,
@@ -58,6 +61,9 @@ npm run test:e2e
 
 Playwright uses port 4029 and `.next-e2e`. It tests the browser with HTTP fixtures
 and tests the real mock adapter directly. It does not prove Spring Boot/H2 integration.
+
+See the [frontend verification report](_docs/frontend-verification.md) for the
+completed frontend requirements, regression checks and remaining lint warnings.
 
 ## Design previews and AI use
 

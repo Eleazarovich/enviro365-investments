@@ -1,5 +1,9 @@
 # Enviro365 Investments — Implementation & QA Checklist
 
+Frontend verification on 29 October 2026 uses the real mock adapter and intercepted
+HTTP responses. Checked frontend items below cover that phase; live integration and
+backend requirements remain unchecked. See the [frontend report](frontend-verification.md).
+
 ## A. Mandatory backend requirements
 
 ### MB-01 — Retrieve investor portfolio
@@ -31,30 +35,30 @@
 ## B. Mandatory frontend requirements
 
 ### MF-01 — Portfolio dashboard
-- [ ] Dashboard displays investor portfolio data.
-- [ ] Investment products are displayed.
-- [ ] Overall available balance is accurate.
-- [ ] Investor can open individual investment details.
+- [x] Dashboard displays investor portfolio data from the selected adapter.
+- [x] Investment products are displayed.
+- [x] Overall available balance is accurate in the verified mock and HTTP fixtures.
+- [x] Investor can open individual investment details.
 - [ ] Data is retrieved from the Spring Boot API in the integrated version.
 
 ### MF-02 — Withdrawal form
-- [ ] User can enter a withdrawal amount.
-- [ ] User can submit a request.
-- [ ] User receives clear feedback for invalid requests.
-- [ ] Successful submission updates the displayed balance.
+- [x] User can enter a withdrawal amount.
+- [x] User can submit a request through the selected adapter.
+- [x] User receives clear feedback for invalid requests.
+- [x] Successful submission refreshes the displayed balance; a failed refresh shows retry instead of outdated figures and does not resubmit the withdrawal.
 - [ ] Request is sent to the actual backend API.
 
 ### MF-03 — Withdrawal history table
-- [ ] History displays saved withdrawal records.
-- [ ] Each record shows the relevant investment, date, amount and status.
-- [ ] Newly submitted requests appear in the history.
-- [ ] Empty states are handled.
+- [x] History displays withdrawal records returned by the selected adapter.
+- [x] Lists show Date, Investment and signed Amount; investment-specific lists omit Investment. Notice status remains internal.
+- [x] Newly submitted requests appear in the history.
+- [x] Empty states are handled.
 
 ### MF-04 — CSV download button
-- [ ] Download button exists.
+- [x] Download button exists above the filters.
 - [ ] Button calls the backend export API.
-- [ ] Applied filters are respected.
-- [ ] Browser downloads a valid CSV file.
+- [x] Product and date filters are respected; superseded responses cannot change current results or enable an outdated download.
+- [x] Browser downloads a valid CSV file with Date, Investment and negative Amount columns.
 
 ## C. Mandatory business rules
 
@@ -111,11 +115,14 @@ suite. Backend verification remains pending. See [business rules](business-rules
 - [ ] Invalid withdrawal tests pass.
 
 ### ADV-05 — UI validation
-- [ ] Form validates user input.
-- [ ] Error messages appear near the relevant input.
-- [ ] Invalid submissions are prevented where possible.
+- [x] Form validates user input.
+- [x] Error messages appear near the relevant input.
+- [x] Invalid submissions are prevented where possible.
 - [ ] Backend errors are also displayed correctly.
-- [ ] Submitting state prevents duplicate clicks.
+- [x] Submitting state prevents duplicate clicks.
+
+HTTP error feedback and retry are verified with fixtures. The unchecked backend-error
+item still requires a live integration check.
 
 ## E. Technical and delivery guidelines
 
@@ -125,9 +132,9 @@ suite. Backend verification remains pending. See [business rules](business-rules
 - [ ] APIs follow REST best practices.
 - [ ] Frontend communicates with actual backend APIs.
 - [ ] GitHub repository includes backend and frontend.
-- [ ] README includes project setup.
+- [x] README includes frontend setup, verified with a clean `npm ci` installation.
 - [ ] README includes API documentation.
-- [ ] README includes screenshots.
-- [ ] README discloses AI tool usage.
+- [x] README includes current frontend screenshots.
+- [x] README discloses AI tool usage.
 - [ ] I can explain all AI-assisted code.
 - [ ] Application can be started and tested using README instructions.

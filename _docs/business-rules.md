@@ -54,8 +54,9 @@ it does not calculate an authoritative limit.
 
 A balance slightly above R100 can also be unavailable: 90% of R111.11 rounds down
 to R99.99, which is below the R100 minimum. Do not permit R100 in that case or
-silently clear the balance. The UI shows the actual balance, a maximum of R0, and
-a disabled action without an additional explanatory paragraph.
+silently clear the balance. The API returns a maximum of R0. The UI shows the
+actual balance, **Minimum you can withdraw: R100**, and a disabled action without
+an additional explanatory paragraph. Portfolio cards use the same minimum label.
 
 ## Verification
 

@@ -39,9 +39,13 @@ export default function InvestmentSummary({ product, onWithdraw }: InvestmentSum
           </div>
           <div className="flex flex-col gap-4 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-stretch lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
             <div>
-              <p className="text-xs text-muted-foreground">Maximum you can withdraw</p>
+              <p className="text-xs text-muted-foreground">
+                {cannotWithdraw ? 'Minimum you can withdraw' : 'Maximum you can withdraw'}
+              </p>
               <p className="tabular mt-1.5 text-2xl font-medium text-foreground">
-                {formatRandPrecise(product.maximumWithdrawable)}
+                {formatRandPrecise(
+                  cannotWithdraw ? product.minimumWithdrawable : product.maximumWithdrawable
+                )}
               </p>
             </div>
             <Button variant="accent" onClick={onWithdraw} disabled={cannotWithdraw}>

@@ -295,11 +295,16 @@ for (const productId of [1, 2]) {
     await expect(page.getByRole('dialog').getByText('-R100', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Done', exact: true }).click();
     await expect(summary.getByText('R11.12', { exact: true }).first()).toBeAttached();
+    await expect(summary.getByText('Minimum you can withdraw', { exact: true })).toBeVisible();
+    await expect(summary.getByText('R100', { exact: true })).toBeVisible();
+    await expect(summary.getByText('Maximum you can withdraw', { exact: true })).toHaveCount(0);
     await expect(
       summary.getByRole('button', { name: 'Withdraw money', exact: true })
     ).toBeDisabled();
     await page.reload();
-    await expect(summary.getByText('R0', { exact: true })).toBeVisible();
+    await expect(summary.getByText('Minimum you can withdraw', { exact: true })).toBeVisible();
+    await expect(summary.getByText('R100', { exact: true })).toBeVisible();
+    await expect(summary.getByText('R0', { exact: true })).toHaveCount(0);
     await expect(
       summary.getByRole('button', { name: 'Withdraw money', exact: true })
     ).toBeDisabled();
@@ -307,6 +312,11 @@ for (const productId of [1, 2]) {
     expect(api.submitCount).toBe(1);
     expect(product.availableBalance).toBe(11.12);
     await expectNoOverflow(page);
+    await page.getByRole('link', { name: 'Back to portfolio', exact: true }).click();
+    const card = page.locator(`a[href="/investment-detail?id=${productId}"]`);
+    await expect(card.getByText('Minimum you can withdraw', { exact: true })).toBeVisible();
+    await expect(card.getByText('R100', { exact: true })).toBeVisible();
+    await expect(card.getByText('Maximum you can withdraw', { exact: true })).toHaveCount(0);
   });
 }
 
@@ -317,6 +327,8 @@ test('zero balance disables withdrawals without extra copy', async ({ page, api 
   await page.goto('/investment-detail?id=1');
   const summary = page.getByRole('region', { name: 'Cash Investment', exact: true });
   await expect(summary.getByText('R0.00', { exact: true }).first()).toBeAttached();
+  await expect(summary.getByText('Minimum you can withdraw', { exact: true })).toBeVisible();
+  await expect(summary.getByText('R100', { exact: true })).toBeVisible();
   await expect(summary.getByRole('button', { name: 'Withdraw money', exact: true })).toBeDisabled();
   await expect(page.getByText(/reached the withdrawal limit/)).toHaveCount(0);
   expect(api.submitCount).toBe(0);

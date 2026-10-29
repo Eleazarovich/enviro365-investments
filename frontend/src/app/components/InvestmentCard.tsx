@@ -6,6 +6,7 @@ import { formatRandPrecise, productTypeLabel } from '@/lib/format';
 export default function InvestmentCard({ product }: { product: InvestmentProduct }) {
   const retirement = product.type === 'RETIREMENT';
   const ProductIcon = retirement ? Landmark : Wallet;
+  const cannotWithdraw = product.maximumWithdrawable <= 0;
 
   return (
     <Link
@@ -49,9 +50,13 @@ export default function InvestmentCard({ product }: { product: InvestmentProduct
       <div className="px-5 py-5 sm:px-6">
         <dl className="text-xs">
           <div className="flex items-baseline justify-between gap-4">
-            <dt className="leading-relaxed text-muted-foreground">Maximum you can withdraw</dt>
+            <dt className="leading-relaxed text-muted-foreground">
+              {cannotWithdraw ? 'Minimum you can withdraw' : 'Maximum you can withdraw'}
+            </dt>
             <dd className="tabular shrink-0 text-sm font-medium">
-              {formatRandPrecise(product.maximumWithdrawable)}
+              {formatRandPrecise(
+                cannotWithdraw ? product.minimumWithdrawable : product.maximumWithdrawable
+              )}
             </dd>
           </div>
         </dl>

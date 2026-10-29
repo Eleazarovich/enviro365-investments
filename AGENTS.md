@@ -77,19 +77,26 @@ and make regular local commits as work is completed.
 - Retirement withdrawals require **age greater than 65**; an investor aged exactly 65 is
   ineligible. Amounts must be positive, have at most two decimal places, and stay within
   both the available balance and the permitted 90% maximum.
-- Enforce a **cumulative 90% limit including active pending withdrawals**. Keep mock and
-  backend behaviour aligned using these calculations:
+- Apply the **90% limit to the remaining available balance on each request**, for both
+  cash and retirement products. Normal withdrawals have a **R100 minimum** and may include
+  cents. Pending notices reduce the available balance once; there is no cumulative cap
+  against the original balance. Keep mock and backend behaviour aligned:
 
   ```text
   available = recorded balance - pending
-  maximum = max(0, min(available, 0.9 * recorded balance - pending))
+  minimum = 100.00
+  percentageMaximum = floorToCents(max(0, available) * 0.9)
+  maximum = percentageMaximum >= minimum ? percentageMaximum : 0
   ```
 
+- Round the maximum **down** to cents. If the percentage maximum is below R100, disable
+  withdrawals and retain the actual balance. There is no final-cent or full-remainder
+  exception. A balance of R111.12 permits R100; R111.11 permits no withdrawal.
 - Use `BigDecimal` and suitable decimal storage for Java money calculations; handle cents
   deliberately across the API. Verify boundaries, fractional amounts, and repeated requests.
 - A valid request creates a notice and immediately reduces the available balance. Invalid
   requests must leave data unchanged. Persist the notice and balance effect atomically;
-  concurrent requests must not overdraw or bypass the cumulative limit.
+  concurrent requests must not overdraw or bypass the current per-request limit or minimum.
 - API withdrawal amounts remain positive and notices retain their internal `SUBMITTED`
   status. User-facing tables and CSV statements show deductions with a negative sign.
   A submitted notice does not mean a bank payment has completed.

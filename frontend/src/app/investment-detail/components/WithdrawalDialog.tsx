@@ -182,8 +182,7 @@ export default function WithdrawalDialog({
             className="mt-2.5 flex items-start gap-1.5 text-xs leading-relaxed text-muted-foreground"
           >
             <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            You can withdraw up to {formatRandPrecise(product.maximumWithdrawable)} from this
-            investment.
+            Minimum withdrawal is {formatRandPrecise(product.minimumWithdrawable)}.
           </p>
         )}
 

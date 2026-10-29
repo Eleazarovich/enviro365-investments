@@ -24,6 +24,9 @@ export function validateWithdrawalAmount(raw: string, ctx: ValidationContext): s
   if (amount > ctx.product.maximumWithdrawable) {
     return `You can withdraw up to ${formatRandPrecise(ctx.product.maximumWithdrawable)} from this investment.`;
   }
+  if (amount < ctx.product.minimumWithdrawable) {
+    return `Minimum withdrawal is ${formatRandPrecise(ctx.product.minimumWithdrawable)}.`;
+  }
   return true;
 }
 

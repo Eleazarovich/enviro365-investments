@@ -117,23 +117,25 @@ export const mockState = {
   nextId: 1002,
 };
 
-const MAX_RATIO = 0.9;
+const MINIMUM_WITHDRAWAL_CENTS = 10000;
 
 export function computeProduct(record: MockProductRecord): InvestmentProduct {
-  const pending = mockState.notices
+  // Sum cents rather than floating-point rands so repeated requests preserve the balance.
+  const pendingCents = mockState.notices
     .filter((n) => n.productId === record.id && n.pending)
-    .reduce((sum, n) => sum + n.amount, 0);
-  const available = record.recordedBalance - pending;
-  // Cumulative 90% rule including pending withdrawals
-  const maxTotal = record.recordedBalance * MAX_RATIO;
-  const maximumWithdrawable = Math.max(0, Math.min(available, maxTotal - pending));
+    .reduce((sum, n) => sum + Math.round(n.amount * 100), 0);
+  const availableCents = Math.max(0, Math.round(record.recordedBalance * 100) - pendingCents);
+  // Each request allows 90% of the remaining balance, rounded down to a whole cent.
+  const maximumCents = Math.floor((availableCents * 9) / 10);
   return {
     id: record.id,
     name: record.name,
     type: record.type,
-    availableBalance: round2(available),
-    maximumWithdrawable: round2(maximumWithdrawable),
-    pendingWithdrawals: round2(pending),
+    availableBalance: availableCents / 100,
+    minimumWithdrawable: MINIMUM_WITHDRAWAL_CENTS / 100,
+    // No amount is eligible when the percentage limit is below the R100 minimum.
+    maximumWithdrawable: maximumCents >= MINIMUM_WITHDRAWAL_CENTS ? maximumCents / 100 : 0,
+    pendingWithdrawals: pendingCents / 100,
   };
 }
 

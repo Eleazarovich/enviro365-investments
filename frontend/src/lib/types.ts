@@ -13,6 +13,7 @@ export interface InvestmentProduct {
   name: string;
   type: ProductType;
   availableBalance: number;
+  minimumWithdrawable: number;
   maximumWithdrawable: number;
   // Amount already committed to submitted withdrawals (display only)
   pendingWithdrawals: number;

@@ -1,4 +1,4 @@
-# Withdrawal business rule review
+# Withdrawal business rules
 
 ## Withdrawal rules
 
@@ -9,51 +9,63 @@
 | "Withdrawal must not exceed 90% of balance" | Both cash and retirement investments |
 | Provide proper error handling and user feedback. | Both products |
 
-The 90% limit applies to both cash and retirement products. A single request
-cannot withdraw the entire balance.
+## Confirmed project policy
 
-## Current project policy
+On 29 October 2026 the user selected:
 
-`AGENTS.md` explicitly selects a cumulative cap including active pending notices.
-The mock adapter implements that policy in
-[`computeProduct`](../frontend/src/lib/api/mockStore.ts):
+- Apply the 90% limit to the **remaining available balance on each request**, for
+  both cash and retirement products. Replace the former cumulative cap.
+- Require at least **R100** per request. Larger amounts can still include cents,
+  such as R1,500.75.
+- Keep the 90% rule and **disable withdrawals below the minimum**. Do not allow a
+  special final-cent payment or a full-remainder withdrawal. This supersedes the
+  earlier proposal to allow a final R0.01 request.
+- Preserve the actual remaining balance. An unavailable withdrawal is not a zero
+  investment balance, a fee, or money lost by the investor.
+
+Pending notices reduce the available balance once. Recalculating 90% of that
+available balance must not subtract pending amounts a second time. Round the
+percentage maximum **down** to cents so rounding never permits more than 90%.
 
 ```text
-available = recorded balance - pending
-maximum = max(0, min(available, 0.9 * recorded balance - pending))
+availableCents = max(0, recordedCents - pendingCents)
+minimumCents = 10000
+percentageMaximumCents = floor(availableCents * 9 / 10)
+maximumCents = percentageMaximumCents >= minimumCents ? percentageMaximumCents : 0
 ```
 
-The demo cash investment starts with R100,000 recorded, R20,000 already pending,
-R80,000 available, and a maximum additional request of R70,000. Requesting that
-R70,000 leaves R10,000 available and a maximum additional withdrawal of R0. The
-remaining balance still belongs to the investor. It is unavailable for another
-request under the selected pending-notice policy. The application has no notice-settlement workflow
-that releases pending amounts.
+The mock adapter uses integer cents in
+[`computeProduct`](../frontend/src/lib/api/mockStore.ts). The future Java backend
+must implement the same rule with `BigDecimal` and downward rounding, recheck the
+limits inside its transaction, and return the current `minimumWithdrawable` and
+`maximumWithdrawable` amounts. Frontend validation consumes those API amounts;
+it does not calculate an authoritative limit.
 
-## Alternative interpretation requiring a policy decision
+## Examples
 
-Under a limit of 90% of the current available balance **per request**, the next
-maximum would be recalculated after each accepted request, with pending amounts
-excluded from the available balance. For example, starting with an unencumbered
-R100,000:
-
-| State | Balance after submitted requests | Current cumulative policy: next maximum | Per-request interpretation: next maximum |
+| Available before a request | Maximum request | Available after that maximum | Next maximum |
 | --- | --- | --- | --- |
-| Before any request | R100,000 | R90,000 | R90,000 |
-| After requesting R90,000 | R10,000 | R0 | R9,000 |
+| R80,000 (demo cash, after R20,000 pending) | R72,000 | R8,000 | R7,200 |
+| R60,000 (demo retirement) | R54,000 | R6,000 | R5,400 |
+| R10,000 | R9,000 | R1,000 | R900 |
+| R111.12 | R100 | R11.12 | R0 |
+| R111.11 | R0 | R111.11 (no request permitted) | R0 |
+| R0 | R0 | R0 (no request permitted) | R0 |
 
-Under the per-request formula, the next maximum would be R9,000. The
-implemented cumulative policy returns R0 after the first maximum request.
+A balance slightly above R100 can also be unavailable: 90% of R111.11 rounds down
+to R99.99, which is below the R100 minimum. Do not permit R100 in that case or
+silently clear the balance. The UI shows the actual balance, a maximum of R0, and
+a disabled action without an additional explanatory paragraph.
 
 ## Verification
 
-The mock API was exercised directly during this review. Both product types accept
-their current cumulative maximum and reject one cent above it. After the maximum,
-cash has R10,000 remaining and retirement has R6,000 remaining, each with a next
-maximum of R0. Further requests are rejected without changing records or balances.
-Retirement requests are rejected at ages 64 and 65 and accepted at 66; the
-retirement age restriction does not apply to cash.
+[`mock-api.spec.ts`](../frontend/tests/e2e/mock-api.spec.ts) exercises the actual
+mock API: repeated maximum requests on both products, unchanged records after
+rejection, R99.99/R100 boundaries, fractional amounts, downward cent rounding,
+concurrent requests, and retirement ages 64/65/66. The browser suite checks the
+HTTP adapter contract, balance and history refresh, repeated withdrawals, the
+minimum hint and validation, and disabled actions below the minimum and at zero.
 
-This verifies the current mock implementation. Live Spring Boot/H2 persistence
-and concurrent database transactions are outside this check. No financial policy
-or application behaviour was changed as part of this review.
+These checks verify the frontend and mock implementation. They do not establish
+live Spring Boot/H2 persistence or concurrent database transaction correctness;
+that backend has not yet been implemented.

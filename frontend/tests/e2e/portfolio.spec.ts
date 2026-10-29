@@ -24,7 +24,8 @@ const test = base.extend<{ api: ApiFixture }>({
             name: 'Cash Investment',
             type: 'GENERAL',
             availableBalance: 80000,
-            maximumWithdrawable: 70000,
+            minimumWithdrawable: 100,
+            maximumWithdrawable: 72000,
             pendingWithdrawals: 20000,
           },
           {
@@ -32,6 +33,7 @@ const test = base.extend<{ api: ApiFixture }>({
             name: 'Retirement Investment',
             type: 'RETIREMENT',
             availableBalance: 60000,
+            minimumWithdrawable: 100,
             maximumWithdrawable: 54000,
             pendingWithdrawals: 0,
           },
@@ -98,17 +100,23 @@ const test = base.extend<{ api: ApiFixture }>({
         const { productId, amount } = request.postDataJSON();
         const product = state.portfolio.products.find((p) => p.id === productId)!;
         const notice: WithdrawalNotice = {
-          id: 1002,
+          id: Math.max(...state.notices.map((row) => row.id), 1001) + 1,
           productId,
           productName: product.name,
           amount,
           status: 'SUBMITTED',
           submittedAt: '2026-10-28T12:00:00Z',
         };
-        product.availableBalance -= amount;
-        product.maximumWithdrawable -= amount;
-        product.pendingWithdrawals += amount;
-        state.portfolio.totalAvailable -= amount;
+        const remainingCents =
+          Math.round(product.availableBalance * 100) - Math.round(amount * 100);
+        product.availableBalance = remainingCents / 100;
+        const percentageMaximum = Math.floor((remainingCents * 9) / 10) / 100;
+        product.maximumWithdrawable =
+          percentageMaximum >= product.minimumWithdrawable ? percentageMaximum : 0;
+        product.pendingWithdrawals =
+          (Math.round(product.pendingWithdrawals * 100) + Math.round(amount * 100)) / 100;
+        state.portfolio.totalAvailable =
+          (Math.round(state.portfolio.totalAvailable * 100) - Math.round(amount * 100)) / 100;
         state.notices.unshift(notice);
         await route.fulfill({ status: 201, json: notice });
         return;
@@ -174,7 +182,7 @@ test('portfolio preserves balances and investment navigation', async ({ page, ap
   await expect(page.getByText('R140,000.00', { exact: true }).first()).toBeAttached();
   await page.locator('a[href="/investment-detail?id=1"]').click();
   await expect(page.getByRole('heading', { name: 'Cash Investment', exact: true })).toBeVisible();
-  await expect(page.getByText('R70,000', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('R72,000', { exact: true }).first()).toBeVisible();
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '22');
   await expectNoOverflow(page);
 });
@@ -187,8 +195,9 @@ test('invalid amounts preserve the existing financial boundaries', async ({ page
     ['0', 'Enter an amount greater than R0.'],
     ['abc', 'Enter a valid amount, for example 1500.00.'],
     ['1.001', 'Enter an amount with no more than two decimal places.'],
+    ['99.99', 'Minimum withdrawal is R100.'],
     ['80001', 'Your available balance for this investment is R80,000.'],
-    ['70000.01', 'You can withdraw up to R70,000 from this investment.'],
+    ['72000.01', 'You can withdraw up to R72,000 from this investment.'],
   ]) {
     await input.fill(amount);
     await submit.click();
@@ -212,7 +221,7 @@ test('withdrawal submission updates balances and history once', async ({ page, a
   await expect(page.getByRole('dialog').getByText('-R1,500.75', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Done', exact: true }).click();
   await expect(page.getByText('R78,499.25', { exact: true }).first()).toBeAttached();
-  await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '24');
+  await expect(page.getByText('R70,649.32', { exact: true })).toBeVisible();
   await expect(
     page.locator('main').getByText('-R1,500.75', { exact: true }).filter({ visible: true })
   ).toBeVisible();
@@ -221,32 +230,96 @@ test('withdrawal submission updates balances and history once', async ({ page, a
   await expect(page.getByText('R138,499.25', { exact: true }).first()).toBeAttached();
 });
 
-test('using the cash withdrawal maximum shows R0 and disables withdrawals without extra copy', async ({
+test('cash withdrawals recalculate the next maximum from the remaining balance', async ({
   page,
   api,
 }) => {
-  const input = await openWithdrawal(page);
-  await input.fill('70000');
-  await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
-  await expect(
-    page.getByRole('heading', { name: 'Withdrawal submitted successfully', exact: true })
-  ).toBeVisible();
-  await page.getByRole('button', { name: 'Done', exact: true }).click();
-
   const summary = page.getByRole('region', { name: 'Cash Investment', exact: true });
-  for (let visit = 0; visit < 2; visit += 1) {
-    if (visit > 0) await page.reload();
-    await expect(summary.getByText('R0', { exact: true })).toBeVisible();
-    await expect(summary.getByRole('button', { name: 'Withdraw money', exact: true })).toBeDisabled();
-    // The retained 10% remains in the balance after the cumulative maximum is used.
-    await expect(summary.getByText('R10,000.00', { exact: true }).first()).toBeAttached();
+  for (const [amount, balance, maximum] of [
+    ['70000', 'R10,000.00', 'R9,000'],
+    ['9000', 'R1,000.00', 'R900'],
+  ]) {
+    const input = await openWithdrawal(page);
+    await input.fill(amount);
+    await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Withdrawal submitted successfully', exact: true })
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Done', exact: true }).click();
+    await expect(summary.getByText(balance, { exact: true }).first()).toBeAttached();
+    await expect(summary.getByText(maximum, { exact: true })).toBeVisible();
+    await expect(
+      summary.getByRole('button', { name: 'Withdraw money', exact: true })
+    ).toBeEnabled();
     await expect(page.getByText(/reached the withdrawal limit/)).toHaveCount(0);
     await expectNoOverflow(page);
   }
-  expect(api.submitCount).toBe(1);
+  expect(api.submitCount).toBe(2);
+  await page.reload();
+  await expect(summary.getByText('R900', { exact: true })).toBeVisible();
+  await expect(summary.getByRole('button', { name: 'Withdraw money', exact: true })).toBeEnabled();
   await page.getByRole('link', { name: 'Back to portfolio', exact: true }).click();
-  await expect(page.getByText('R70,000.00', { exact: true }).first()).toBeAttached();
-  await expect(page.locator('a[href="/investment-detail?id=1"]')).toContainText('R0');
+  await expect(page.getByText('R61,000.00', { exact: true }).first()).toBeAttached();
+  await expect(page.locator('a[href="/investment-detail?id=1"]')).toContainText('R900');
+});
+
+for (const productId of [1, 2]) {
+  test(`investment ${productId} accepts R100 at the limit and stops below the minimum`, async ({
+    page,
+    api,
+  }) => {
+    const product = api.portfolio.products.find((row) => row.id === productId)!;
+    api.portfolio.totalAvailable =
+      (Math.round(api.portfolio.totalAvailable * 100) -
+        Math.round(product.availableBalance * 100) +
+        11112) /
+      100;
+    product.availableBalance = 111.12;
+    product.maximumWithdrawable = 100;
+    const summary = page.getByRole('region', { name: product.name, exact: true });
+    const input = await openWithdrawal(page, productId);
+    await expect(
+      page.getByRole('dialog').getByText('Minimum withdrawal is R100.', { exact: true })
+    ).toBeVisible();
+    await input.fill('99.99');
+    await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
+    await expect(page.getByRole('dialog').getByRole('alert')).toHaveText(
+      'Minimum withdrawal is R100.'
+    );
+    expect(api.submitCount).toBe(0);
+    await input.fill('100');
+    await page.getByRole('button', { name: 'Confirm withdrawal', exact: true }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Withdrawal submitted successfully', exact: true })
+    ).toBeVisible();
+    await expect(page.getByRole('dialog').getByText('-R100', { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Done', exact: true }).click();
+    await expect(summary.getByText('R11.12', { exact: true }).first()).toBeAttached();
+    await expect(
+      summary.getByRole('button', { name: 'Withdraw money', exact: true })
+    ).toBeDisabled();
+    await page.reload();
+    await expect(summary.getByText('R0', { exact: true })).toBeVisible();
+    await expect(
+      summary.getByRole('button', { name: 'Withdraw money', exact: true })
+    ).toBeDisabled();
+    await expect(page.getByText(/reached the withdrawal limit/)).toHaveCount(0);
+    expect(api.submitCount).toBe(1);
+    expect(product.availableBalance).toBe(11.12);
+    await expectNoOverflow(page);
+  });
+}
+
+test('zero balance disables withdrawals without extra copy', async ({ page, api }) => {
+  api.portfolio.products[0].availableBalance = 0;
+  api.portfolio.products[0].maximumWithdrawable = 0;
+  api.portfolio.totalAvailable = 60000;
+  await page.goto('/investment-detail?id=1');
+  const summary = page.getByRole('region', { name: 'Cash Investment', exact: true });
+  await expect(summary.getByText('R0.00', { exact: true }).first()).toBeAttached();
+  await expect(summary.getByRole('button', { name: 'Withdraw money', exact: true })).toBeDisabled();
+  await expect(page.getByText(/reached the withdrawal limit/)).toHaveCount(0);
+  expect(api.submitCount).toBe(0);
 });
 
 test('server failure keeps the entered amount for retry', async ({ page, api }) => {

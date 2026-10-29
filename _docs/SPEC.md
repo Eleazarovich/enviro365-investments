@@ -224,7 +224,8 @@ Examples:
 
 - "Enter an amount to withdraw."
 - "Enter an amount greater than R0."
-- "You can withdraw up to R70,000 from this investment."
+- "You can withdraw up to R72,000 from this investment."
+- "Minimum withdrawal is R100."
 - "Retirement withdrawals are only available to investors older than 65."
 - "We couldn't submit your withdrawal. Please try again."
 
@@ -321,18 +322,20 @@ Do not add PDF downloads or complex reporting features.
 
 These rules reflect the selected implementation design and must remain consistent with the Spring Boot backend.
 
-Active submitted notices share a cumulative 90% cap per product. See
-[business rules](business-rules.md) for the calculations and worked examples.
+Apply 90% of the remaining available balance per request, with a R100 minimum
+and no final-balance exception. See [business rules](business-rules.md) for
+the calculations and worked examples.
 
 1. Each investment product has its own balance and withdrawal limits.
 2. A withdrawal must be greater than zero.
 3. The investor cannot withdraw more than their available balance.
-4. Active pending withdrawals count toward a cumulative 90% limit for each investment product.
+4. Each request is limited to 90% of the remaining available balance, rounded down to cents. Active pending notices have already reduced that balance and must not be subtracted again from the limit.
 5. Retirement-product withdrawals are permitted only if the investor is older than 65.
 6. A successful withdrawal request creates a notice with status `SUBMITTED`.
 7. The requested amount is immediately excluded from the investor's available balance.
 8. Submitting a withdrawal is not equivalent to completing a bank payment.
 9. Invalid submissions must not change the available balance or create successful notices.
+10. Withdrawals must be at least R100 and may include cents above that minimum. If the rounded percentage maximum is below R100, return a maximum of R0 and disable withdrawals. Keep the actual remaining balance visible; do not waive the 90% rule to clear it.
 
 The Spring Boot backend will enforce these rules. The frontend should display the server-provided available balance and maximum withdrawal amount instead of maintaining its own authoritative financial calculations.
 
@@ -351,7 +354,9 @@ Use internally consistent fictional data, for example:
 - Recorded investment balance: R100,000.
 - Existing submitted withdrawal: R20,000.
 - Available balance: R80,000.
-- Maximum additional withdrawal: R70,000 under the selected cumulative 90% rule.
+- Maximum additional withdrawal: R72,000 (90% of the R80,000 available balance).
+- After requesting R72,000: R8,000 available, with a new maximum of R7,200.
+- Minimum withdrawal: R100.
 
 **Retirement Investment**
 
@@ -359,6 +364,8 @@ Use internally consistent fictional data, for example:
 - No existing submitted withdrawals.
 - Available balance: R60,000.
 - Maximum withdrawal: R54,000.
+- After requesting R54,000: R6,000 available, with a new maximum of R5,400.
+- Minimum withdrawal: R100.
 - Demonstration investor age: above 65.
 
 **Portfolio**
@@ -397,7 +404,8 @@ Each product should expose:
 - name
 - type
 - availableBalance
-- maximumWithdrawable
+- minimumWithdrawable (R100 under the current policy)
+- maximumWithdrawable (90% of available balance, rounded down to cents; R0 when below the minimum)
 
 `GET /api/investors/1/withdrawal-notices`
 

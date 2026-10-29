@@ -124,6 +124,13 @@ export const mockApi = {
         422
       );
     }
+    if (amount < product.minimumWithdrawable) {
+      throw new ApiError(
+        'VALIDATION_ERROR',
+        `Minimum withdrawal is ${formatRandPrecise(product.minimumWithdrawable)}.`,
+        400
+      );
+    }
     const notice = {
       id: mockState.nextId++,
       productId: record.id,

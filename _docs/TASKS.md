@@ -71,6 +71,12 @@
 - [ ] Withdrawal above the applicable 90% limit is rejected.
 - [ ] Withdrawal at exactly the permitted maximum is accepted, assuming other rules pass.
 
+**Confirmed policy:** Apply 90% to the remaining available balance on each request,
+round down to cents, and require at least R100. Return a maximum of R0 when no
+request meets both limits; retain the actual balance. There is no closing exception.
+The frontend/mock implementation is verified by `mock-api.spec.ts` and the browser
+suite. Backend verification remains pending. See [business rules](business-rules.md).
+
 ### BR-04 — Error handling and user feedback
 - [ ] Invalid requests produce meaningful API errors.
 - [ ] Frontend displays clear and helpful error messages.

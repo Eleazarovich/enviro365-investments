@@ -13,7 +13,8 @@ The existing portfolio and withdrawal workflows use the **Rosewood & Porcelain**
 
 ## Implementation
 
-Colour tokens and shared styles live in `frontend/src/styles/tailwind.css`; `frontend/tailwind.config.js` maps those tokens to reusable utilities. Channel-based colours support Tailwind opacity modifiers consistently. The in-app vector mark inherits the surrounding theme colour. Shared components include `BalanceAmount`, `Button`, `Badge`, `Select`, `Dialog`, and `WithdrawalTable`.
+Colour tokens and shared styles live in `frontend/src/styles/tailwind.css`; `frontend/tailwind.config.js` maps those tokens to reusable utilities. Channel-based colours support Tailwind opacity modifiers consistently. The in-app vector mark inherits the surrounding theme colour. Its component accepts
+only size and class name; icons use direct Lucide imports. Shared components include `BalanceAmount`, `Button`, `Badge`, `Select`, `Dialog`, and `WithdrawalTable`.
 
 `BalanceAmount` displays actual decimal cents and exposes the complete amount to assistive technology. Investment cards and limits use the existing precise currency formatter. The modal supports initial focus, keyboard containment, Escape, focus restoration, and disabled dismissal during submission.
 

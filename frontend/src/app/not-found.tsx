@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import Icon from '@/components/ui/AppIcon';
+import { ArrowLeft, House } from 'lucide-react';
 
 export default function NotFound() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function NotFound() {
             onClick={handleGoBack}
             className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary-hover transition-colors duration-200"
           >
-            <Icon name="ArrowLeftIcon" size={16} />
+            <ArrowLeft size={16} aria-hidden="true" />
             Go Back
           </button>
 
@@ -44,7 +44,7 @@ export default function NotFound() {
             onClick={handleGoHome}
             className="inline-flex items-center justify-center gap-2 border border-border bg-background text-foreground px-6 py-3 rounded-lg font-medium hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
           >
-            <Icon name="HomeIcon" size={16} />
+            <House size={16} aria-hidden="true" />
             Back to Home
           </button>
         </div>

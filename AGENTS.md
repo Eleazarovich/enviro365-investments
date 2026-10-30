@@ -136,8 +136,8 @@ and make regular local commits as work is completed.
   `npm run test:e2e` from `frontend/`. If Chromium is missing, install it with
   `npx playwright install chromium`. Playwright uses port 4029 and `.next-e2e`;
   normal development uses `npm run dev` on port 4028.
-- A successful build alone is insufficient: Next.js is currently configured to skip
-  TypeScript and ESLint failures during builds, so run their separate checks.
+- Production builds enforce TypeScript and ESLint checks. Separate checks remain
+  useful for fast feedback.
 - The Playwright suite calls a disposable Spring Boot/H2 backend on port 8081.
   When integrating, test real API calls, stored records, errors, balance refresh, and filtered
   CSV downloads as well. Run backend tests with the checked-in wrapper once it exists

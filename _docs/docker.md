@@ -96,8 +96,7 @@ processing. Those existing application boundaries remain unchanged. Future
 Next.js features that require a server need a deployment review. Builds need
 network access to the container registries, npm, Maven Central and Google Fonts.
 Update pinned base-image digests deliberately to receive runtime security updates.
-Serve the production export through Spring Boot; `next start` (`npm run serve`)
-does not serve an exported build. `npm run dev` remains available for development.
+Serve the production export through Spring Boot; `next start` does not serve an exported build. `npm run dev` remains available for development.
 
 ## Verified on 30 October 2026
 

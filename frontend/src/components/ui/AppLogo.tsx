@@ -1,65 +1,26 @@
-'use client';
-
-import React, { memo, useMemo } from 'react';
-import AppIcon from './AppIcon';
-import AppImage from './AppImage';
-
 interface AppLogoProps {
-  src?: string; // Image source (optional)
-  iconName?: string; // Icon name when no image
-  size?: number; // Size for icon/image
-  className?: string; // Additional classes
-  onClick?: () => void; // Click handler
+  size?: number;
+  className?: string;
 }
 
-const AppLogo = memo(function AppLogo({
-  src = '/enviro365-mark.svg',
-  iconName = 'SparklesIcon',
-  size = 64,
-  className = '',
-  onClick,
-}: AppLogoProps) {
-  // Memoize className calculation
-  const containerClassName = useMemo(() => {
-    const classes = ['flex items-center'];
-    if (onClick) classes.push('cursor-pointer hover:opacity-80 transition-opacity');
-    if (className) classes.push(className);
-    return classes.join(' ');
-  }, [onClick, className]);
-
+export default function AppLogo({ size = 64, className = '' }: AppLogoProps) {
   return (
-    <div className={containerClassName} onClick={onClick}>
-      {src === '/enviro365-mark.svg' ? (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 40 40"
-          width={size}
-          height={size}
-          fill="currentColor"
-          role="img"
-          aria-label="Logo"
-          className="flex-shrink-0"
-        >
-          <path d="M22 15C22 6 28 3 36 4C35 12 31 16 24 16L31 9L22 15Z" />
-          <path d="M6 18C14 21 27 21 35 18V23C27 26 14 26 6 23V18Z" />
-          <path d="M6 26C14 29 27 29 35 26V31C27 34 14 34 6 31V26Z" fillOpacity="0.85" />
-          <path d="M6 34C14 37 27 37 35 34V37C27 40 14 40 6 37V34Z" fillOpacity="0.7" />
-        </svg>
-      ) : src ? (
-        <AppImage
-          src={src}
-          alt="Logo"
-          width={size}
-          height={size}
-          className="flex-shrink-0"
-          priority={true}
-          unoptimized={src.endsWith('.svg')}
-        />
-      ) : (
-        <AppIcon name={iconName} size={size} className="flex-shrink-0" />
-      )}
+    <div className={`flex items-center ${className}`}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 40 40"
+        width={size}
+        height={size}
+        fill="currentColor"
+        role="img"
+        aria-label="Logo"
+        className="flex-shrink-0"
+      >
+        <path d="M22 15C22 6 28 3 36 4C35 12 31 16 24 16L31 9L22 15Z" />
+        <path d="M6 18C14 21 27 21 35 18V23C27 26 14 26 6 23V18Z" />
+        <path d="M6 26C14 29 27 29 35 26V31C27 34 14 34 6 31V26Z" fillOpacity="0.85" />
+        <path d="M6 34C14 37 27 37 35 34V37C27 40 14 40 6 37V34Z" fillOpacity="0.7" />
+      </svg>
     </div>
   );
-});
-
-export default AppLogo;
+}

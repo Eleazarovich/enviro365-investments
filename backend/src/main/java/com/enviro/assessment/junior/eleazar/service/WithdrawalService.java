@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.*;
 import java.math.RoundingMode;
 import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,10 @@ public class WithdrawalService {
         // The active notice IS the reservation. A single insert makes both durable
         // together; there is no duplicate counter or balance update to drift.
         var notice = notices.saveAndFlush(new WithdrawalNotice(product,
-                request.amount().setScale(2, RoundingMode.UNNECESSARY), clock.instant(), true));
+                request.amount().setScale(2, RoundingMode.UNNECESSARY),
+                // H2 stores TIMESTAMP(6). Return the same precision that a later
+                // history query will read, rather than unpersisted nanoseconds.
+                clock.instant().truncatedTo(ChronoUnit.MICROS), true));
         return toResponse(notice);
     }
 

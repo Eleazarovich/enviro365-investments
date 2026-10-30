@@ -121,6 +121,20 @@ class WithdrawalIntegrationTest {
         assertThat(notices.sumActiveAmount(cash.getId())).isEqualByComparingTo("20000");
     }
 
+    @Test
+    void creationResponseTimestampEqualsStoredHistoryWithANanosecondClock() {
+        var nanosecondClock = Clock.fixed(Instant.parse("2026-10-29T12:00:00.123456789Z"), ZoneOffset.UTC);
+        var service = new WithdrawalService(investors, products, notices,
+                context.getBean(WithdrawalRules.class), nanosecondClock);
+        // Supply the same transaction boundary as the proxied production service.
+        var created = new TransactionTemplate(transactions).execute(status ->
+                service.create(investor.getId(), new CreateWithdrawalRequest(cash.getId(), money("1500.75"))));
+        var stored = withdrawals.history(investor.getId(), new WithdrawalFilters(null, null, null)).stream()
+                .filter(n -> n.id().equals(created.id())).findFirst().orElseThrow();
+        assertThat(created).isEqualTo(stored);
+        assertThat(created.submittedAt()).isAfter(Instant.parse("2026-10-29T12:00:00Z"));
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"{}", "{\"productId\":1}", "{\"amount\":100}", "null", "{", "{\"productId\":1,\"amount\":\"oops\"}",
             "{\"productId\":1,\"amount\":100,\"age\":66}", "{\"productId\":0,\"amount\":100}"})

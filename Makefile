@@ -3,7 +3,7 @@ SHELL := /bin/bash
 .ONESHELL:
 .DEFAULT_GOAL := help
 
-.PHONY: help setup run dev backend frontend test check build test-e2e test-live clean
+.PHONY: help setup run dev backend frontend test test-integration check build test-e2e test-live clean
 
 help:
 	@printf '%s\n' \
@@ -12,6 +12,7 @@ help:
 	  'make backend    Start only the Spring Boot backend' \
 	  'make frontend   Start only the Next.js frontend' \
 	  'make test       Run backend tests' \
+	  'make test-integration  Run isolated Docker Compose API integration tests' \
 	  'make check      Run frontend type checking and lint' \
 	  'make build      Package the backend and build the frontend' \
 	  'make test-e2e   Run frontend browser regression tests' \
@@ -54,6 +55,9 @@ frontend: setup
 
 test:
 	cd backend && ./mvnw test
+
+test-integration:
+	./scripts/test-integration.sh
 
 check: setup
 	cd frontend

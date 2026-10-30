@@ -380,7 +380,7 @@ Use internally consistent fictional data, for example:
 - No existing pending withdrawals; historical records remain available in history.
 - Available balance: R60,000.
 - Maximum withdrawal: R54,000.
-- After requesting R54,000: R6,000 available, with a new maximum of R5,400.
+- After requesting R54,000: R6,000 available, with a new maximum of R0 because the cumulative cap is exhausted.
 - Minimum withdrawal: R100.
 - Demonstration investor age: above 65.
 

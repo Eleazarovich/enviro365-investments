@@ -45,8 +45,19 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, message);
     }
 
-    @ExceptionHandler({HandlerMethodValidationException.class, ConstraintViolationException.class,
-            MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    ResponseEntity<ErrorResponse> methodValidation(HandlerMethodValidationException ex) {
+        if (ex.isForReturnValue()) return unexpected(ex);
+        // MVC method validation can include @Valid request-body field errors as
+        // well as path parameters. Preserve the DTO's useful financial messages.
+        String message = ex.getBeanResults().stream().flatMap(result -> result.getFieldErrors().stream())
+                .map(e -> e.isBindingFailure() ? "Use valid filters: productId and dates in YYYY-MM-DD format." : e.getDefaultMessage())
+                .filter(java.util.Objects::nonNull).sorted().findFirst()
+                .orElse("Use positive identifiers and valid dates in YYYY-MM-DD format.");
+        return error(HttpStatus.BAD_REQUEST, message);
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentTypeMismatchException.class})
     ResponseEntity<ErrorResponse> invalidParameter(Exception ex) {
         return error(HttpStatus.BAD_REQUEST, "Use positive identifiers and valid dates in YYYY-MM-DD format.");
     }

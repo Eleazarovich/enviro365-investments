@@ -1,0 +1,37 @@
+# Overlay for compose.yaml. Never use the development H2 volume or host port.
+# !override requires Docker Compose 2.24.4 or newer.
+services:
+  app:
+    image: ${COMPOSE_PROJECT_NAME:?Run scripts/test-integration.sh}:app
+    ports: !override
+      - "127.0.0.1::8080"
+    volumes: !override
+      - ./backend/src/test/resources/docker/seed.sql:/test/seed.sql:ro
+    # RAM-backed, container-private H2 files. No developer data or named volume.
+    tmpfs:
+      - /app/data:uid=10001,gid=10001,mode=0700
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        unzip -p /app/app.jar 'BOOT-INF/lib/h2-*.jar' > /tmp/h2.jar
+        test -s /tmp/h2.jar
+        exec java -jar /app/app.jar
+    environment:
+      SERVER_PORT: "8080"
+      TZ: UTC
+      # AUTO_SERVER allows the bundled H2 CLI to reset fixtures inside this
+      # container, while the real application keeps its embedded connection.
+      DB_URL: jdbc:h2:file:/app/data/integration;AUTO_SERVER=TRUE;LOCK_TIMEOUT=10000
+      SEED_ENABLED: "false"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+      SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: "true"
+      SPRING_SQL_INIT_MODE: always
+      SPRING_SQL_INIT_DATA_LOCATIONS: file:/test/seed.sql
+    restart: "no"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/api/investors/1/portfolio"]
+      interval: 1s
+      timeout: 3s
+      start_period: 5s
+      retries: 90

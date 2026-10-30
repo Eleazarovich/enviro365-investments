@@ -1,10 +1,10 @@
 # Enviro365 Investments — Implementation & QA Checklist
 
-Backend and live integration verified on 29 October 2026 with Java 21, Spring Boot,
-real H2, JUnit/Mockito and desktop/mobile Playwright. See the
-[backend verification report](backend-verification.md) and earlier
-[frontend report](frontend-verification.md). Remote publishing remains outside
-automated verification.
+The simplified workflow was verified on 30 October 2026: **58 backend tests** and
+**six real-backend Playwright tests** passed, along with frontend types, lint and
+production build. The older [backend report](backend-verification.md) and
+[frontend report](frontend-verification.md) are historical records. Remote publishing
+remains outside this verification.
 
 ## A. Mandatory backend requirements
 
@@ -168,3 +168,12 @@ restart-persistence test.
 The frontend always uses `httpApi`. Mock services, browser state, failure switches
 and the mock-mode environment flag have been removed. Spring Boot owns the rules
 and H2 owns stored notices. UI validation uses limits returned by the backend.
+
+## J. Financial rules and design
+
+- [x] Document the R100 minimum, cumulative cap and reservation calculations.
+- [x] Document the controller/service/repository flow and why a product lock is used.
+- [x] Retain the agreed financial behaviour and worked monetary examples.
+
+See [business rules](business-rules.md). The implementation still supplies all five
+advanced options: exception handling, DTOs, input validation, unit tests and UI validation.

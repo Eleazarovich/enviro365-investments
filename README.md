@@ -56,11 +56,13 @@ Retirement has R60,000 available and a R54,000 maximum. Nine existing notices pr
 filterable history. File-backed H2 in `backend/data/` retains notices across restarts.
 
 Active submitted notices share a **cumulative cap of 90% of the underlying product
-balance**, rounded down to cents. This follows the latest backend request and supersedes
-the earlier frontend policy. Reservations reduce available funds immediately and exactly
-once. Keep at least R100 per request; cents are allowed above the minimum. A zero maximum
-means no request fits; the actual balance remains visible. Retirement requires age
-**strictly greater than 65**. See [business-rule assumptions](_docs/business-rules.md).
+balance**, rounded down to cents. Reservations reduce available funds immediately
+and exactly once. Each request must be at least R100 and may include cents. A zero
+maximum means no request fits; the actual balance remains visible. Retirement
+requires age **strictly greater than 65**.
+
+See [business rules and the withdrawal walkthrough](_docs/business-rules.md) for
+worked examples and a short explanation of the transaction.
 
 ## API
 

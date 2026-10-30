@@ -1,8 +1,7 @@
 # Withdrawal business rules
 
-Updated on 29 October 2026 for backend implementation. The latest explicit backend
-request supersedes the earlier frontend decision to apply 90% separately to each
-remaining balance. API paths and response structures remain unchanged.
+Withdrawals use a cumulative per-product 90% cap and a R100 minimum. The backend
+validates each request and reserves the amount when it creates the notice.
 
 ## Withdrawal rules
 
@@ -11,6 +10,19 @@ remaining balance. API paths and response structures remain unchanged.
 - An amount cannot exceed the available product balance or the 90% restriction.
 - Notices persist; invalid requests leave balances and records unchanged.
 - Responses provide meaningful errors the frontend can display.
+
+## Policy and implementation
+
+| Topic | Policy | Implementation |
+| --- | --- | --- |
+| Retirement | Investor must be older than 65 | Calculate age from stored date of birth using UTC |
+| Available funds | Withdrawal cannot exceed the balance | Subtract active submitted notices from the recorded balance |
+| 90% limit | Withdrawal cannot exceed 90% of the balance | Share one cumulative cap across active notices per product |
+| Minimum amount | Each request must be at least R100 | Allow up to two decimal places |
+| Submission | Create a withdrawal notice with correct balances | Save one notice as the reservation; execute no payment |
+
+The cumulative cap leaves at least 10% of the recorded balance unreserved across
+repeated requests. The R100 minimum excludes small requests.
 
 ## Reservation calculations
 
@@ -63,3 +75,17 @@ Backend tests cover monetary boundaries, ages 64/65/66, birthdays, repeated requ
 rollback, ten concurrent transactions, filters, CSV and restart persistence. Browser
 tests cover actual cross-origin Spring Boot calls. See
 [backend verification](backend-verification.md) and [backend README](../backend/README.md).
+
+## Explaining one withdrawal
+
+1. The controller validates the request fields and identifies the investor/product.
+2. The service locks that product, reads existing reservations and checks the rules.
+3. A valid request inserts one notice in the same transaction. An invalid request
+   inserts nothing. The notice itself reserves the amount, so no second balance
+   update or stored reservation counter is needed.
+4. The frontend reloads the portfolio and history from the API. Available funds are
+   the recorded balance less active notices. History and CSV show negative deductions.
+
+For example, a product with R1,000 and no reservations allows a R900 request. After
+submission, R100 remains available and the cumulative cap allows no further request.
+The product lock prevents two simultaneous requests from both using the old limit.

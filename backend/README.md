@@ -141,11 +141,9 @@ Clients cannot supply investor age, product type, status or a replacement balanc
 
 ## Withdrawal policy and concurrency
 
-The latest backend request explicitly requires a **cumulative per-product 90% cap**.
-It supersedes the earlier frontend policy of repeatedly taking 90% of the remaining
-balance. Endpoint paths and DTO shapes are preserved; contract documentation,
-frontend validation and rule copy are aligned. The established **R100 minimum** is
-retained, with cents permitted above it.
+The implementation uses a **cumulative per-product 90% cap** and **R100 minimum**,
+with cents permitted.
+See the [business rules and walkthrough](../_docs/business-rules.md).
 
 For each product, with underlying recorded balance `B` and total active submitted
 reservations `R`:

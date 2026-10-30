@@ -2,7 +2,7 @@
 
 Java 21, Spring Boot 4.1.2, Spring MVC, Spring Data JPA, Jakarta Validation and H2.
 The package is `com.enviro.assessment.junior.eleazar`. Maven dependencies are managed
-by Spring Boot; JUnit Jupiter is explicitly pinned to **5.14.4**.
+by Spring Boot, including JUnit Jupiter **6.0.3**.
 There is no authentication, registration or payment execution.
 
 ## Start
@@ -184,18 +184,18 @@ From `backend/`:
 ./mvnw clean verify
 ```
 
-JUnit **5**, Mockito, Spring MVC Test, full Spring Boot application contexts and real
+JUnit Jupiter **6.0.3**, Mockito, Spring MVC Test, full Spring Boot application contexts and real
 H2 cover portfolio retrieval, valid/fractional withdrawals, invalid amounts, the minimum,
 available and cumulative limits, ages 64/65/66 and birthday boundaries, rollback after
 an inserted notice, repeated withdrawals, ten simultaneous database transactions,
 ownership, filters and UTC boundaries, CSV escaping, HTTP errors, CORS, idempotent seed,
 and file persistence across application restart.
 
-Spring Framework 7.0.10's `SpringExtension` invokes a JUnit 6 API. To preserve the
-required JUnit 5 runtime, integration tests explicitly start/close Boot contexts with
-`SpringApplicationBuilder` and bind `MockMvc` to the actual web application context.
-This tests real MVC, validation, advice, repositories, locking and transactions.
-The Mockito Java agent is configured for Java 21 in Surefire.
+Integration tests use `@SpringBootTest`, `@AutoConfigureMockMvc` and a test
+profile. Spring manages context startup, dependency injection and cleanup. Only the
+file-persistence test explicitly restarts application contexts to verify that data
+survives a restart. The Mockito Java agent is configured for Java 21 in Surefire.
+See [Spring Boot testing](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html).
 
 From `frontend/`:
 

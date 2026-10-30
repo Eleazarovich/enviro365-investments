@@ -10,13 +10,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.context.annotation.*;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import java.math.BigDecimal;
@@ -28,17 +28,19 @@ import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-// Spring 7's SpringExtension requires JUnit 6. Start the same full Boot context
-// explicitly to run the integration tests with JUnit 5.
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Import(WithdrawalIntegrationTest.FixedClock.class)
+@DirtiesContext
 class WithdrawalIntegrationTest {
     @TestConfiguration
     static class FixedClock {
         @Bean @Primary Clock fixedClock() { return Clock.fixed(Instant.parse("2026-10-29T12:00:00Z"), ZoneOffset.UTC); }
     }
 
-    private ConfigurableApplicationContext context;
-    MockMvc mvc;
+    @Autowired MockMvc mvc;
+    @Autowired WithdrawalRules rules;
     @Autowired InvestorRepository investors;
     @Autowired PortfolioRepository portfolios;
     @Autowired InvestmentProductRepository products;
@@ -50,17 +52,6 @@ class WithdrawalIntegrationTest {
     Portfolio portfolio;
     InvestmentProduct cash;
     InvestmentProduct retirement;
-
-    @BeforeAll
-    void startApplication() {
-        context = new SpringApplicationBuilder(Enviro365Application.class, FixedClock.class)
-                .profiles("test").run("--server.port=0");
-        context.getAutowireCapableBeanFactory().autowireBean(this);
-        mvc = MockMvcBuilders.webAppContextSetup((WebApplicationContext) context).build();
-    }
-
-    @AfterAll
-    void stopApplication() { if (context != null) context.close(); }
 
     @BeforeEach
     void setUp() {
@@ -125,7 +116,7 @@ class WithdrawalIntegrationTest {
     void creationResponseTimestampEqualsStoredHistoryWithANanosecondClock() {
         var nanosecondClock = Clock.fixed(Instant.parse("2026-10-29T12:00:00.123456789Z"), ZoneOffset.UTC);
         var service = new WithdrawalService(investors, products, notices,
-                context.getBean(WithdrawalRules.class), nanosecondClock);
+                rules, nanosecondClock);
         // Supply the same transaction boundary as the proxied production service.
         var created = new TransactionTemplate(transactions).execute(status ->
                 service.create(investor.getId(), new CreateWithdrawalRequest(cash.getId(), money("1500.75"))));

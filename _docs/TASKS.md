@@ -1,7 +1,7 @@
 # Enviro365 Investments — Implementation & QA Checklist
 
 Backend and live integration verified on 29 October 2026 with Java 21, Spring Boot,
-real H2, JUnit 5/Mockito and desktop/mobile Playwright. See the
+real H2, JUnit/Mockito and desktop/mobile Playwright. See the
 [backend verification report](backend-verification.md) and earlier
 [frontend report](frontend-verification.md). Remote publishing remains outside
 automated verification.
@@ -156,3 +156,9 @@ one six-test Playwright suite. All six passed on 30 October 2026, along with
 frontend types, lint and production build. Run `make test-e2e`; see the root README.
 Backend tests retain age boundaries, precision, cumulative caps, concurrent writes,
 rollback, filtering, CSV and restart persistence coverage.
+
+## H. Managed backend test stack
+
+JUnit Jupiter uses Spring Boot 4.1.2's managed version (6.0.3). Integration and seed
+tests use standard Spring annotations; manual context startup is reserved for the
+restart-persistence test.

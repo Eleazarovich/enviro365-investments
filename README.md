@@ -95,10 +95,11 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-JUnit 5, Mockito and full Boot/H2 integration tests cover rules, concurrency, rollback,
-errors, filtering, CSV and restart persistence. OpenAPI remains documentation; tests
-use direct assertions rather than a custom schema validator. Spring 7's test extension requires JUnit
-6, so JUnit 5 integration tests start Boot contexts explicitly.
+Spring Boot manages JUnit Jupiter **6.0.3** and Mockito. Standard
+`@SpringBootTest` / `@AutoConfigureMockMvc` tests use real H2 and cover rules,
+concurrency, rollback, errors, filtering and CSV. The restart test deliberately
+starts two application contexts to check file persistence. OpenAPI remains API
+documentation; tests use direct response assertions.
 
 One Playwright suite runs six tests against a disposable Spring Boot/H2 server on
 **8081** and Next.js on **4029** (`.next-e2e`). It covers portfolio loading, valid

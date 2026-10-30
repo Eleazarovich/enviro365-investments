@@ -7,30 +7,21 @@ import com.enviro.assessment.junior.eleazar.service.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.DefaultApplicationArguments;
-import org.springframework.boot.WebApplicationType;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import static org.assertj.core.api.Assertions.*;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = {
+        "spring.datasource.url=jdbc:h2:mem:seed-test;DB_CLOSE_DELAY=-1",
+        "spring.jpa.hibernate.ddl-auto=create-drop", "app.seed-enabled=true"
+})
+@DirtiesContext
 class DemoDataSeederTest {
-    private ConfigurableApplicationContext context;
     @Autowired DemoDataSeeder seeder;
     @Autowired InvestorRepository investors;
     @Autowired WithdrawalNoticeRepository notices;
     @Autowired PortfolioService portfolios;
     @Autowired WithdrawalService withdrawals;
-
-    @BeforeAll
-    void startApplication() {
-        context = new SpringApplicationBuilder(Enviro365Application.class).web(WebApplicationType.NONE).run(
-                "--spring.datasource.url=jdbc:h2:mem:seed-test;DB_CLOSE_DELAY=-1",
-                "--spring.jpa.hibernate.ddl-auto=create-drop", "--app.seed-enabled=true");
-        context.getAutowireCapableBeanFactory().autowireBean(this);
-    }
-
-    @AfterAll
-    void stopApplication() { if (context != null) context.close(); }
 
     @Test
     void seedsRealisticPortfolioOnceAndDoesNotResetExistingData() {

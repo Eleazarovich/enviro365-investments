@@ -158,3 +158,23 @@ at the user's request.
 - [x] Pass all 71 Docker API tests, 58 backend tests and 56 existing browser regression tests.
 - [x] Repeat all 71 Docker tests with another shuffled order; cached workflow completes in 105 seconds.
 - [x] Correct creation/history timestamp precision and misleading request-body validation messages.
+
+## G. Docker browser end-to-end verification
+
+Verified on 30 October 2026. Run `make test-e2e-docker`; see
+[`e2e/testing.md`](../e2e/testing.md) for setup, fixtures, reports and limitations.
+README changes remain deferred at the user's request.
+
+- [x] Use TypeScript Playwright tests in root `e2e/` against the real Compose application, Spring Boot and H2.
+- [x] Verify portfolio totals/cards, investment details and back navigation.
+- [x] Submit a fractional withdrawal; verify backend balances, reservations, cumulative cap, history and page refresh persistence.
+- [x] Reject zero, negative, below-minimum, over-cap and over-balance amounts without changing backend state.
+- [x] Display a real backend 422 when another client reserves the available cap after the form opens.
+- [x] Verify isolated retirement investors aged 64 and exactly 65, with no age input or product changes.
+- [x] Verify exact history records, product and inclusive date filters, and cleared selections.
+- [x] Capture and read CSV downloads for product, date and combined filters; verify headers, dates, names, signed cents and exact records.
+- [x] Complete a withdrawal and portfolio/history navigation in mobile Chromium.
+- [x] Reset private H2 fixtures before every test; use accessible selectors and observable readiness instead of fixed sleeps.
+- [x] Capture failure screenshots, traces and browser/application logs; verify both successful and failing workflows clean up Docker resources.
+- [x] Pass all 15 Docker browser tests with zero failures or skips; pass standalone E2E TypeScript checks.
+- [x] Preserve all 56 existing desktop/mobile frontend browser regressions.

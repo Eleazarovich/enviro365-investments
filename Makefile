@@ -3,7 +3,7 @@ SHELL := /bin/bash
 .ONESHELL:
 .DEFAULT_GOAL := help
 
-.PHONY: help setup run dev backend frontend test test-integration check build test-e2e test-live clean
+.PHONY: help setup run dev backend frontend test test-integration check build test-e2e test-e2e-docker test-live clean
 
 help:
 	@printf '%s\n' \
@@ -16,6 +16,7 @@ help:
 	  'make check      Run frontend type checking and lint' \
 	  'make build      Package the backend and build the frontend' \
 	  'make test-e2e   Run frontend browser regression tests' \
+	  'make test-e2e-docker  Run isolated full-stack Playwright tests through Docker Compose' \
 	  'make test-live  Run browser tests against real Spring Boot/H2' \
 	  'make clean      Remove build output; preserve H2 data and local configuration'
 
@@ -70,6 +71,12 @@ build: setup
 
 test-e2e: setup
 	cd frontend && npm run test:e2e
+
+e2e/node_modules/.package-lock.json: e2e/package.json e2e/package-lock.json
+	cd e2e && npm ci
+
+test-e2e-docker: e2e/node_modules/.package-lock.json
+	./e2e/run.sh
 
 test-live: setup
 	cd frontend && npx playwright test --config=playwright.live.config.ts

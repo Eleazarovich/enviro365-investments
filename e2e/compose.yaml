@@ -1,0 +1,6 @@
+# Third overlay: reuse the existing test container, private H2 and readiness check.
+# Compose resolves bind paths relative to the root compose.yaml.
+services:
+  app:
+    volumes: !override
+      - ./e2e/seed.sql:/test/seed.sql:ro

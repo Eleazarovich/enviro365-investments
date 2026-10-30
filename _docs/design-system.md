@@ -46,16 +46,10 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The Playwright suite runs desktop and mobile browser projects against the existing HTTP adapter, with isolated responses matching its contract. It covers balance refresh after a fractional withdrawal, financial validation boundaries, retirement eligibility, exhausted limits, request failure and retry, loading controls, keyboard focus, history filters, date validation, empty results, CSV export and export errors, recovery from loading errors, and page overflow at 320, 768, 1024, and 1280px.
-
-Browser fixtures do not contact a live investment backend or submit real withdrawal requests. The normal development server continues to use the existing API environment configuration; the test server uses port 4029 and a separate build directory.
-
-The same suite also exercises the real mock adapter directly in `mock-api.spec.ts`, covering repeated requests on both products, the R100 minimum, cent rounding, retained balances below the minimum, concurrent requests, and retirement age boundaries. These checks do not prove Spring Boot/H2 integration.
-
-The [frontend verification report](frontend-verification.md) records the completed
-checks, including late filter responses, combined product/date exports, balance
-refresh recovery, and a clean installation from the committed lockfile.
-
+The current Playwright suite uses the real HTTP adapter and Spring Boot/H2. Six
+focused tests cover the required portfolio, withdrawal, history, CSV and mobile flows.
+Backend tests cover detailed financial boundaries. Earlier fixture and mock-adapter
+browser suites have been retired; their verification reports are historical records.
 
 ## Previews
 

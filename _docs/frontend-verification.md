@@ -1,3 +1,6 @@
+> Historical verification record. Browser commands and test counts below describe
+> earlier suites; use the root README for the current consolidated workflow.
+
 # Frontend verification — 29 October 2026
 
 The frontend implements four UI features: portfolio

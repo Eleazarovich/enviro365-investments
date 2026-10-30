@@ -138,7 +138,7 @@ and make regular local commits as work is completed.
   normal development uses `npm run dev` on port 4028.
 - A successful build alone is insufficient: Next.js is currently configured to skip
   TypeScript and ESLint failures during builds, so run their separate checks.
-- Browser tests intercept the HTTP adapter; they do not prove live Spring Boot/H2 integration.
+- The Playwright suite calls a disposable Spring Boot/H2 backend on port 8081.
   When integrating, test real API calls, stored records, errors, balance refresh, and filtered
   CSV downloads as well. Run backend tests with the checked-in wrapper once it exists
   (for Maven, `./mvnw test` from `backend/`).

@@ -204,15 +204,12 @@ npm run type-check
 npm run lint
 npm run build
 npm run test:e2e
-npx playwright test --config=playwright.live.config.ts
 ```
 
-The existing suite covers mocks and HTTP fixtures. The separate live suite starts
-Spring Boot/H2 on **8081** and Next.js on **4030** with `.next-live` output. It uses
-actual cross-origin requests, persists notices, checks refresh/reload and failed
-requests, downloads a filtered CSV, and displays a real backend business-rule error.
-It uses an isolated in-memory database. Chromium must be installed with
-`npx playwright install chromium` before browser tests.
+One six-test browser suite starts Spring Boot/H2 on **8081** and Next.js on
+**4029** with `.next-e2e` output. It exercises actual HTTP calls, withdrawals,
+refresh/reload, validation, filtered CSV downloads and mobile navigation against
+fresh in-memory data. Install Chromium with `npx playwright install chromium`.
 
 ## AI-assisted implementation
 

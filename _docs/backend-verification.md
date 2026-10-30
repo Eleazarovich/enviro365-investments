@@ -1,3 +1,6 @@
+> Historical verification record. Browser commands and test counts below describe
+> earlier suites; use the root README for the current consolidated workflow.
+
 # Backend and live integration verification
 
 Verified locally on **29 October 2026** in

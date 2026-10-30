@@ -1,3 +1,6 @@
+> Historical verification record. Browser commands and test counts below describe
+> earlier suites; use the root README for the current consolidated workflow.
+
 # Docker deployment
 
 ## Architecture
@@ -82,20 +85,8 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Run the container browser suite against a **disposable seeded database**; it creates
-withdrawals and consumes the retirement withdrawal cap. It uses the real API and
-browser downloads, without intercepting requests:
-
-```sh
-docker run -d --name enviro365-test -p 8082:8080 \
-  --mount source=enviro365-test-data,target=/app/data enviro365:local
-# Wait for the container to become healthy: docker inspect enviro365-test
-cd frontend
-DOCKER_BASE_URL=http://127.0.0.1:8082 npx playwright test --config=playwright.docker.config.ts
-```
-
-After inspecting logs, remove that test container with `docker rm -f enviro365-test`
-and its disposable volume with `docker volume rm enviro365-test-data`.
+The current browser suite starts disposable Spring Boot/H2 and Next.js servers
+itself. No separate container browser configuration or Docker fixture reset is needed.
 
 ## Deployment limits
 

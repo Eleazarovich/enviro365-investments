@@ -21,7 +21,7 @@ so ports 4028 and 8080 are available.
 
 Run `make help` for all commands. `make backend` and `make frontend` start services
 separately; `make test` runs backend tests, `make check` checks frontend types and lint,
-`make build` builds both applications, and `make test-live` runs the live browser suite.
+`make build` builds both applications, and `make test-e2e` runs the browser suite against Spring Boot/H2.
 `make clean` removes build output while retaining H2 data and local configuration.
 Browser targets require Chromium (`cd frontend && npx playwright install chromium`).
 
@@ -93,18 +93,17 @@ npm run lint
 npm run build
 npx playwright install chromium
 npm run test:e2e
-npx playwright test --config=playwright.live.config.ts
 ```
 
 JUnit 5, Mockito and full Boot/H2 integration tests cover rules, concurrency, rollback,
 errors, filtering, CSV and restart persistence. Spring 7's test extension requires JUnit
 6, so JUnit 5 integration tests start Boot contexts explicitly.
 
-The normal Playwright suite uses HTTP fixtures and the real mock adapter on port
-4029 with `.next-e2e`. The live suite starts Spring Boot/H2 on **8081** and Next.js
-on **4030** with `.next-live`, uses actual browser HTTP calls and downloads CSVs.
-See the [backend and integration verification report](_docs/backend-verification.md)
-and earlier [frontend report](_docs/frontend-verification.md).
+One Playwright suite runs six tests against a disposable Spring Boot/H2 server on
+**8081** and Next.js on **4029** (`.next-e2e`). It covers portfolio loading, valid
+and invalid withdrawals, refreshed balances/history, filtered CSV downloads, real
+backend error feedback and mobile navigation. No Docker or database-reset scripts
+are needed. Each run starts with fresh in-memory data and leaves local H2 data alone.
 
 ## Design previews and AI use
 

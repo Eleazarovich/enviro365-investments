@@ -49,7 +49,7 @@ export default function InvestmentDetailView() {
   const handleSubmitted = useCallback(
     async (notice: WithdrawalNotice) => {
       setHighlightId(notice.id);
-      // Refresh balances and history after the API accepts the withdrawal.
+      // Refresh balances and history after the backend accepts the withdrawal.
       await refresh();
       bumpHistory();
     },

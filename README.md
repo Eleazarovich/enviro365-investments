@@ -40,10 +40,9 @@ npm run dev
 ```
 
 Open http://localhost:4028. The frontend defaults to HTTP at http://localhost:8080.
-Configure `NEXT_PUBLIC_API_BASE_URL` (without `/api`) and
-`NEXT_PUBLIC_USE_MOCK_API=false` in `.env.local`; restart Next.js after changing them.
-The optional mock requires `NEXT_PUBLIC_USE_MOCK_API=true`. Do not place secrets in
-public environment variables.
+Configure `NEXT_PUBLIC_API_BASE_URL` (without `/api`) in `.env.local`; restart
+Next.js after changing it. The frontend always calls Spring Boot; there is no
+separate browser database or mock mode. Do not place secrets in public variables.
 
 The [backend README](backend/README.md) covers structure, configuration, H2 inspection,
 seed data, endpoints, locking and assumptions. The Maven Wrapper pins Maven 3.9.16;

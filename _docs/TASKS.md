@@ -37,9 +37,9 @@ automated verification.
 ## B. Mandatory frontend requirements
 
 ### MF-01 — Portfolio dashboard
-- [x] Dashboard displays investor portfolio data from the selected adapter.
+- [x] Dashboard displays investor portfolio data from the real HTTP adapter.
 - [x] Investment products are displayed.
-- [x] Overall available balance is accurate in the verified mock and HTTP fixtures.
+- [x] Overall available balance is accurate against the real backend.
 - [x] Investor can open individual investment details.
 - [x] Data is retrieved from the Spring Boot API in the integrated version.
 
@@ -81,7 +81,7 @@ automated verification.
 underlying balance per product, rounded down to cents. Retain the R100 minimum and
 return a maximum of R0 when no request fits, keeping the actual balance visible.
 This follows the latest backend instructions and supersedes the earlier frontend
-policy. Backend/H2, mock and browser checks verify it. See [business rules](business-rules.md).
+policy. Backend/H2 and browser checks verify it. See [business rules](business-rules.md).
 
 ### BR-04 — Error handling and user feedback
 - [x] Invalid requests produce meaningful API errors.
@@ -162,3 +162,9 @@ rollback, filtering, CSV and restart persistence coverage.
 JUnit Jupiter uses Spring Boot 4.1.2's managed version (6.0.3). Integration and seed
 tests use standard Spring annotations; manual context startup is reserved for the
 restart-persistence test.
+
+## I. One source for financial calculations
+
+The frontend always uses `httpApi`. Mock services, browser state, failure switches
+and the mock-mode environment flag have been removed. Spring Boot owns the rules
+and H2 owns stored notices. UI validation uses limits returned by the backend.

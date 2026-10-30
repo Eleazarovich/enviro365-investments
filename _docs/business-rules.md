@@ -34,8 +34,8 @@ candidateMaximum = max(0, min(available, remainingCap))
 maximumWithdrawable = candidateMaximum >= 100.00 ? candidateMaximum : 0.00
 ```
 
-Java uses `BigDecimal` and decimal database columns; the optional mock uses integer
-cents. The frontend validates against API-provided minimum and maximum amounts.
+Java uses `BigDecimal` and decimal database columns. The frontend validates against
+API-provided minimum and maximum amounts; it has no separate balance/cap calculator.
 
 ## Examples
 
@@ -61,5 +61,5 @@ requests and rollbacks leave both history and derived available funds unchanged.
 
 Backend tests cover monetary boundaries, ages 64/65/66, birthdays, repeated requests,
 rollback, ten concurrent transactions, filters, CSV and restart persistence. Browser
-suites cover mock/HTTP fixtures and actual cross-origin Spring Boot calls. See
+tests cover actual cross-origin Spring Boot calls. See
 [backend verification](backend-verification.md) and [backend README](../backend/README.md).

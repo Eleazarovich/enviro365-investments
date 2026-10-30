@@ -25,10 +25,9 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:4028. HTTP is the default adapter. The example sets
-`NEXT_PUBLIC_USE_MOCK_API=false` and `NEXT_PUBLIC_API_BASE_URL=http://localhost:8080`
-(the base URL must **not** include `/api`). Restart Next.js after changing these
-variables. Set `NEXT_PUBLIC_USE_MOCK_API=true` only for the optional browser mock.
+Open http://localhost:4028. The frontend calls the real backend. The example sets
+`NEXT_PUBLIC_API_BASE_URL=http://localhost:8080` (without `/api`). Restart Next.js
+after changing this variable.
 
 To build and run the packaged backend:
 
@@ -145,7 +144,7 @@ Clients cannot supply investor age, product type, status or a replacement balanc
 The latest backend request explicitly requires a **cumulative per-product 90% cap**.
 It supersedes the earlier frontend policy of repeatedly taking 90% of the remaining
 balance. Endpoint paths and DTO shapes are preserved; contract documentation,
-mock calculations and rule copy are aligned. The established **R100 minimum** is
+frontend validation and rule copy are aligned. The established **R100 minimum** is
 retained, with cents permitted above it.
 
 For each product, with underlying recorded balance `B` and total active submitted

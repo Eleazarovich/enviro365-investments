@@ -25,8 +25,7 @@ and make regular local commits as work is completed.
   and UI validation. Cover all five where practical and record what is actually verified.
 - Keep the implementation understandable enough for the user to review and explain.
   Explain significant design assumptions and add useful comments around non-obvious logic.
-- Stay within the requested phase. Frontend work can use the existing mock adapter; build
-  and integrate the backend when requested. Do not add login, deposits, fees, interest,
+- The frontend calls the Spring Boot backend. Do not add login, deposits, fees, interest,
   investment performance, payment processing, or unrelated infrastructure without a task
   that calls for it.
 
@@ -36,7 +35,7 @@ and make regular local commits as work is completed.
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Backend language       | **Java 21 LTS.** Target Java 21 for compilation, runtime, CI, and containers. Use stable Java 21 updates; do not raise the major version or enable preview features.                                             |
 | Backend framework      | **Spring Boot 4.x**, version **4.1.2 or a newer stable 4.x release** compatible with Java 21. Use REST APIs and keep business rules in a service layer. **Do not use Spring Boot 3.x.**                          |
-| Database               | **H2**. Persist notices in the backend; the browser mock store is for demonstration only.                                                                                                                        |
+| Database               | **H2**. Persist notices in the backend; the frontend always calls the real HTTP API.                                                                                                                        |
 | Java packages          | Follow `com.enviro.assessment.junior.yourname`, replacing `yourname` with the developer's name when scaffolding.                                                                                                 |
 | Frontend               | Continue the existing **Next.js App Router, React, and TypeScript** application in `frontend/`.                                                                                                                  |
 | Styling and components | **Tailwind CSS**, existing shared UI components, and **Lucide** icons. Use shadcn/ui where suitable; reuse existing controls before adding a library.                                                            |
@@ -58,11 +57,10 @@ and make regular local commits as work is completed.
   checklists, and design references in `_docs/`. Inspect the backend build configuration
   before assuming a runnable backend or build wrapper exists.
 - UI code uses the adapter exported by `frontend/src/lib/api/index.ts`. Keep HTTP calls,
-  endpoint construction, and mock behaviour in `frontend/src/lib/api/`; share data contracts
-  through `frontend/src/lib/types.ts`.
-- Configure integration with `NEXT_PUBLIC_API_BASE_URL` and
-  `NEXT_PUBLIC_USE_MOCK_API=false`. Keep API URLs out of visual components. Never put
-  secrets in `NEXT_PUBLIC_*` variables or commits.
+  endpoint construction, and HTTP error handling in `frontend/src/lib/api/`; share data
+  contracts through `frontend/src/lib/types.ts`.
+- Configure integration with `NEXT_PUBLIC_API_BASE_URL`. Keep API URLs out of visual
+  components. Never put secrets in `NEXT_PUBLIC_*` variables or commits.
 - Preserve the proposed `/api/investors/{investorId}/portfolio` and
   `/api/investors/{investorId}/withdrawal-notices` contracts, including POST creation and
   `/withdrawal-notices/export`. History and CSV use the same `productId`, `fromDate`, and
@@ -79,8 +77,8 @@ and make regular local commits as work is completed.
   both the available balance and the permitted 90% maximum.
 - Apply the **cumulative per-product 90% cap** requested during backend implementation,
   superseding the earlier per-request policy, for both cash and retirement products.
-  Normal withdrawals have a **R100 minimum** and may include cents. Keep mock and
-  backend behaviour aligned:
+  Normal withdrawals have a **R100 minimum** and may include cents. Use the
+  backend-provided limits in the frontend:
 
   ```text
   available = max(0, recorded balance - active submitted reservations)

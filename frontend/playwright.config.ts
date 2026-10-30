@@ -44,7 +44,6 @@ export default defineConfig({
       command: 'npx next dev -p 4029',
       url: 'http://127.0.0.1:4029',
       env: {
-        NEXT_PUBLIC_USE_MOCK_API: 'false',
         NEXT_PUBLIC_API_BASE_URL: 'http://127.0.0.1:8081',
         DIST_DIR: '.next-e2e',
       },

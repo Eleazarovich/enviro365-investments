@@ -9,7 +9,7 @@ import CurrencyInput from '@/components/ui/CurrencyInput';
 import { api } from '@/lib/api';
 import { formatRandPrecise } from '@/lib/format';
 import { parseAmount, validateWithdrawalAmount } from '@/lib/withdrawalValidation';
-import type { InvestmentProduct, WithdrawalNotice } from '@/lib/types';
+import { ApiError, type InvestmentProduct, type WithdrawalNotice } from '@/lib/types';
 
 interface FormValues {
   amount: string;
@@ -71,13 +71,7 @@ export default function WithdrawalDialog({
     } catch (e) {
       const message =
         e instanceof Error ? e.message : "We couldn't submit your withdrawal. Please try again.";
-      const code = (e as { code?: string }).code;
-      if (
-        code === 'VALIDATION_ERROR' ||
-        code === 'LIMIT_EXCEEDED' ||
-        code === 'INSUFFICIENT_BALANCE' ||
-        code === 'NOT_ELIGIBLE'
-      ) {
+      if (e instanceof ApiError && e.code === 'VALIDATION_ERROR') {
         setError('amount', { type: 'server', message });
       } else {
         setServerError(message);

@@ -26,7 +26,8 @@ The application must feel like polished, production-quality financial software: 
 - Modular, reusable components.
 - A separate API service layer to support later integration with a Java Spring Boot REST backend.
 
-Use mock data initially, but structure the application so that mock services can be replaced with real REST API calls without rewriting the UI.
+The frontend calls the Java Spring Boot REST API through a small HTTP service layer.
+The earlier browser mock has been retired.
 
 The frontend phase is complete. The backend implementation phase uses Java 21,
 Spring Boot 4.1 and H2 in `backend/`; see its [README](../backend/README.md).
@@ -390,19 +391,10 @@ Use internally consistent fictional data, for example:
 
 These are demonstration figures, not financial information from a real investor.
 
-In mock mode, interactions must actually work:
-
-- Portfolio and product data must remain synchronized.
-- Valid requests create history records.
-- Available balances update correctly.
-- Invalid requests do not modify data.
-- Filters change the displayed records.
-- CSV downloads contain the filtered mock records.
-- Navigation and responsive views work.
-
-Keep the mock implementation separate from the visual components. Make it replaceable by the real API service.
-
-Do not present mock actions as genuine bank transactions.
+The integrated frontend reads demonstration data from Spring Boot/H2. Valid
+requests create persisted notices and refresh balances and history. Invalid
+requests leave data unchanged. Filters and CSV exports use the same backend criteria.
+This application records withdrawal notices; it does not execute bank payments.
 
 ---
 
@@ -478,7 +470,7 @@ Do not hardcode API URLs into UI components.
 
 ## Deliverable
 
-Produce a functional, polished React frontend with realistic mock data, working interactions, reusable components, and a clean API integration layer.
+Produce a functional, polished React frontend with real Spring Boot/H2 data, working interactions, reusable components, and a clean HTTP service layer.
 
 Prioritize usability, correctness, consistency, restrained visual design, and maintainability over unnecessary features.
 

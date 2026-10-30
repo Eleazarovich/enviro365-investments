@@ -7,8 +7,7 @@ RUN npm ci --no-audit --no-fund
 COPY frontend/ ./
 # These are build-time values. Always use the real, same-origin Spring Boot API.
 ENV NEXT_TELEMETRY_DISABLED=1 \
-    NEXT_PUBLIC_API_BASE_URL="" \
-    NEXT_PUBLIC_USE_MOCK_API=false
+    NEXT_PUBLIC_API_BASE_URL=""
 RUN npm run type-check && npm run lint && npm run build \
     && test -s out/index.html \
     && test -s out/investment-detail.html \

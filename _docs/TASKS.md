@@ -141,23 +141,13 @@ from the live Spring Boot backend after another client reserves the available li
 - [ ] Review and understand all AI-assisted code.
 - [x] Application can be started and tested using README instructions.
 
-## F. Docker API integration verification
+## F. Backend test simplification
 
-Verified on 30 October 2026. Run `make test-integration`; see the
-[Docker integration test guide](docker-integration-tests.md) for prerequisites,
-isolation, reports, cleanup and the verification record. README changes are deferred
-at the user's request.
-
-- [x] Test the actual application built and started with the existing Docker configuration.
-- [x] Separate JUnit 5 HTTP integration tests from the original backend tests.
-- [x] Reset deterministic fixture data between cases in a private RAM-backed H2 database.
-- [x] Verify portfolio retrieval, reservation creation, amount/age boundaries, cumulative caps and concurrent requests.
-- [x] Verify history, inclusive UTC filters, parseable filtered CSV, OpenAPI response contracts and safe errors.
-- [x] Verify real database failure rollback and subsequent successful requests without a reset API.
-- [x] Use readiness checks and clean up containers, networks, temporary data and the unique test image.
-- [x] Pass all 71 Docker API tests, 58 backend tests and 56 existing browser regression tests.
-- [x] Repeat all 71 Docker tests with another shuffled order; cached workflow completes in 105 seconds.
-- [x] Correct creation/history timestamp precision and misleading request-body validation messages.
+The duplicate Docker HTTP suite, custom OpenAPI validator, container inspections,
+external SQL resets and Maven Failsafe profile have been retired. Standard backend
+JUnit/MockMvc/H2 tests directly assert the required API responses and financial rules.
+`openapi.yaml` remains the API documentation. Run `make test` or `./mvnw clean verify`
+from `backend/`.
 
 ## G. Browser test consolidation
 

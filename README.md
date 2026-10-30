@@ -96,7 +96,8 @@ npm run test:e2e
 ```
 
 JUnit 5, Mockito and full Boot/H2 integration tests cover rules, concurrency, rollback,
-errors, filtering, CSV and restart persistence. Spring 7's test extension requires JUnit
+errors, filtering, CSV and restart persistence. OpenAPI remains documentation; tests
+use direct assertions rather than a custom schema validator. Spring 7's test extension requires JUnit
 6, so JUnit 5 integration tests start Boot contexts explicitly.
 
 One Playwright suite runs six tests against a disposable Spring Boot/H2 server on

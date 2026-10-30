@@ -40,12 +40,6 @@
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>1.14.1</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -63,31 +57,4 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>docker-it</id>
-            <properties>
-                <it.orderSeed>365</it.orderSeed>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <failIfNoTests>true</failIfNoTests>
-                            <systemPropertyVariables>
-                                <it.baseUrl>${it.baseUrl}</it.baseUrl>
-                                <it.composeProject>${it.composeProject}</it.composeProject>
-                                <it.repository>${project.basedir}/..</it.repository>
-                                <junit.jupiter.execution.parallel.enabled>false</junit.jupiter.execution.parallel.enabled>
-                                <junit.jupiter.testmethod.order.default>org.junit.jupiter.api.MethodOrderer$Random</junit.jupiter.testmethod.order.default>
-                                <junit.jupiter.execution.order.random.seed>${it.orderSeed}</junit.jupiter.execution.order.random.seed>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

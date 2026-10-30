@@ -2,6 +2,7 @@ package com.enviro.assessment.junior.eleazar.config;
 
 import org.springframework.context.annotation.*;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.MapperFeature;
@@ -21,6 +22,18 @@ public class WebConfiguration implements WebMvcConfigurer {
     JsonMapperBuilderCustomizer strictNumericJson() {
         return builder -> builder.disable(MapperFeature.ALLOW_COERCION_OF_SCALARS)
                 .disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT);
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // Next.js exports one HTML file per route. Forward only known page URLs,
+        // preserving query strings and leaving /api/** and asset requests alone.
+        for (String route : new String[]{"investment-detail", "withdrawal-history", "portfolio-dashboard"}) {
+            registry.addViewController("/" + route).setViewName("forward:/" + route + ".html");
+            // Match Next.js's canonical URLs so usePathname hydrates consistently.
+            registry.addRedirectViewController("/" + route + "/", "/" + route)
+                    .setStatusCode(HttpStatus.PERMANENT_REDIRECT).setKeepQueryParams(true);
+        }
     }
 
     @Override

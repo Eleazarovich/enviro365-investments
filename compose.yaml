@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    image: enviro365:local
+    ports:
+      - "${PORT:-8080}:${SERVER_PORT:-8080}"
+    environment:
+      SERVER_PORT: ${SERVER_PORT:-8080}
+    volumes:
+      - h2-data:/app/data
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+volumes:
+  h2-data:

@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import type { Portfolio, WithdrawalNotice } from '../../src/lib/types';
 import { formatRandPrecise } from '../../src/lib/format';
 
-const backend = 'http://127.0.0.1:8081/api/investors/1';
+const backend = `${process.env.LIVE_API_BASE_URL ?? 'http://127.0.0.1:8081'}/api/investors/1`;
 
 test('live Java/H2 withdrawal, refresh, validation, history filters and CSV download', async ({
   page,

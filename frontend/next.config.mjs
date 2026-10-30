@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   outputFileTracingRoot: fileURLToPath(new URL('.', import.meta.url)),
   devIndicators: false,
   productionBrowserSourceMaps: true,
@@ -14,6 +15,8 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    // The exported site has no Next.js image server; serve the original assets.
+    unoptimized: true,
     remotePatterns: imageHosts,
     minimumCacheTTL: 60,
     qualities: [75, 85, 100],

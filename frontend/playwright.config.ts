@@ -8,7 +8,9 @@ export default defineConfig({
   forbidOnly: true,
   timeout: 60_000,
   expect: { timeout: 15_000 },
-  reporter: 'list',
+  reporter: process.env.CI
+    ? [['list'], ['github'], ['html', { open: 'never' }]]
+    : 'list',
   use: {
     baseURL: 'http://127.0.0.1:4029',
     trace: 'retain-on-failure',

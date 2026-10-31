@@ -6,7 +6,7 @@ notices and reservations, with no authentication or payment processing.
 
 ## Run locally
 
-Install a Java **21 JDK**, Node.js/npm, GNU Make and Bash **4.3+** (Linux or WSL).
+Install a Java **21 JDK**, Node.js **24**/npm, GNU Make and Bash **4.3+** (Linux or WSL).
 From the project root:
 
 ```sh
@@ -83,18 +83,22 @@ CSV columns are `Date,Investment,Amount`. Configure local CORS through
 From `backend/`:
 
 ```sh
-./mvnw clean verify
+./mvnw -B -ntp clean verify
 ```
 
 From `frontend/`:
 
 ```sh
+npm ci
 npm run type-check
 npm run lint
 npm run build
-npx playwright install chromium
+npx playwright install --with-deps chromium
 npm run test:e2e
 ```
+
+On Linux, `--with-deps` requires permission to install system packages. If the
+libraries are already installed, `npx playwright install chromium` is sufficient.
 
 Spring Boot manages JUnit Jupiter **6.0.3** and Mockito. Standard
 `@SpringBootTest` / `@AutoConfigureMockMvc` tests use real H2 and cover rules,
@@ -107,6 +111,96 @@ One Playwright suite runs six tests against a disposable Spring Boot/H2 server o
 and invalid withdrawals, refreshed balances/history, filtered CSV downloads, real
 backend error feedback and mobile navigation. No Docker or database-reset scripts
 are needed. Each run starts with fresh in-memory data and leaves local H2 data alone.
+
+## Continuous integration and Render
+
+[CI](.github/workflows/ci.yml) runs on pull requests targeting `main`, pushes to
+`main`, and **Actions → CI → Run workflow**. Independent jobs run concurrently on
+Ubuntu 24.04 with Java 21 and Node 24 (matching the Dockerfile's major versions).
+Maven and npm downloads are cached; `npm ci` uses the checked-in lockfile.
+Superseded runs for the same PR/branch and event are cancelled. Manual runs do not
+cancel push checks needed by Render.
+
+| Job | Checks | When |
+| --- | --- | --- |
+| Backend tests and packaging | `./mvnw -B -ntp clean verify` | Every CI run |
+| Frontend types, lint, and build | `npm ci`, types, ESLint, static export | Every CI run |
+| E2E with Spring Boot and H2 | Chromium and system dependencies, `npm run test:e2e` | Every CI run |
+| Docker deployable image | Existing multi-stage Docker build, including its checks | Pushes to `main` only |
+
+The local commands above reproduce the first three jobs. Set `CI=true` when running
+Playwright to also generate GitHub annotations and an HTML report. Ports **8081** and
+**4029** must be free; Playwright starts both servers itself and uses one worker for
+the shared disposable H2 database. Only Chromium is installed. From the repository
+root, verify deployment packaging with Docker running:
+
+```sh
+docker build --progress=plain --tag enviro365:ci .
+```
+
+The existing suites cover the portfolio workflows and financial rules:
+
+| Feature area | Existing coverage |
+| --- | --- |
+| Portfolio and DTO responses | `PortfolioServiceTest`, `WithdrawalIntegrationTest`, dashboard/detail browser test |
+| Notices, balances, age >65, 90% restriction, invalid amounts | `WithdrawalRulesTest`, `WithdrawalIntegrationTest`, valid/invalid/stale-balance browser tests |
+| Persistence and atomicity | `FilePersistenceTest`, integration rollback and concurrent-request tests |
+| History, product/date filters and CSV | Integration tests and browser download/content assertions |
+| Five advanced options | Exception-handler tests, DTO response assertions, backend validation/unit tests, browser form validation |
+
+To diagnose a failure, open **GitHub → Actions → CI → failed run**, select the red
+job and expand its failed step. Each command has a separate step; Maven and
+Playwright logs name the failing test and show the actual error. Compilation/build
+steps identify packaging failures. Backend test failures also upload
+`backend-test-reports` (Surefire text/XML). Playwright failures upload
+`playwright-failure-artifacts`, including the HTML report, retained traces and
+screenshots, under the run summary's **Artifacts** section for **7 days**. Download
+and unzip it, then from `frontend/`:
+
+```sh
+npx playwright show-report /path/to/unzipped/playwright-report
+npx playwright show-trace /path/to/unzipped/test-results/<failed-test>/trace.zip
+```
+
+Startup failures may have no trace or screenshot; inspect the E2E step's server logs.
+Checks retain their failing exit codes; there are no automatic retries against the
+mutating browser database.
+
+`render.yaml` requests `autoDeployTrigger: checksPass`. Render's native
+[After CI Checks Pass](https://render.com/docs/deploys#integrating-with-ci) integration
+waits for the linked `main` commit's checks before building the existing Dockerfile.
+A failed check prevents automatic deployment. This requires a connected GitHub
+repository; a service created from a public repository URL alone cannot auto-deploy.
+Render treats `neutral` and `skipped` as passing, so all four jobs actually run on a
+`main` push. No hooks, deployment tokens or scripts are needed.
+
+Required setup and hosted verification:
+
+1. In GitHub **Settings → Actions → General**, enable GitHub Actions and allow the
+   official `actions/*` actions used here. The workflow requests only `contents: read`.
+   After the first run, protect `main` via **Settings → Rules → Rulesets** (or
+   **Branches → Branch protection**) by requiring PRs and the three always-running
+   job names above. Do not require the Docker job on PRs, where it is skipped.
+2. In Render, open **enviro365-investments → Settings → Build & Deploy**. Confirm
+   the connected GitHub repo is `Eleazarovich/enviro365-investments`, branch `main`,
+   runtime Docker. Before pushing to `main`, set
+   **Auto-Deploy → After CI Checks Pass → Save** if needed.
+   For a Blueprint-managed service, sync the updated `render.yaml` from its
+   **Blueprint → Manual Sync** page if automatic sync has not applied it, then
+   confirm the service setting. Editing YAML alone does not update an unmanaged service.
+3. Verify a `main` push runs all four jobs. Match the commit SHA in GitHub and
+   Render Events/Deploys: a failed main check must leave the previous version live;
+   a subsequent passing commit must trigger Render's Docker build only after all
+   checks finish. Record both observations before calling the gate verified.
+   Manual Render deploys bypass this automatic gate.
+
+**Live deployment gating is not yet enabled or verified.** A read-only Render check
+on 31 October 2026 confirmed this service still uses `commit` (On Commit). Its CLI
+does not expose the `checksPass` option, so apply the dashboard setting above before
+pushing to `main`. Hosted CI runs and failed/successful deployment observations remain
+pending. GitHub Actions is already enabled for this repository.
+The existing free Render service keeps its current environment and ephemeral H2
+storage; demo data still resets when Render replaces the instance.
 
 ## Design previews and AI use
 

@@ -8,7 +8,7 @@ services:
     region: frankfurt
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    autoDeployTrigger: commit
+    autoDeployTrigger: checksPass
     healthCheckPath: /api/investors/1/portfolio
     envVars:
       - key: SERVER_PORT

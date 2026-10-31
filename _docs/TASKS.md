@@ -177,3 +177,25 @@ and H2 owns stored notices. UI validation uses limits returned by the backend.
 
 See [business rules](business-rules.md). The implementation still supplies all five
 advanced options: exception handling, DTOs, input validation, unit tests and UI validation.
+
+## K. CI/CD verification
+
+Local verification on 31 October 2026 (Ubuntu 24.04, Java 21, Node 24):
+
+- [x] Existing coverage reviewed against mandatory requirements and all five advanced options; financial assumptions retained.
+- [x] `./mvnw -B -ntp clean verify`: 58 backend tests passed, none skipped; executable JAR packaged.
+- [x] `npm ci`, `npm run type-check`, `npm run lint`, `npm run build` passed.
+- [x] `CI=true npm run test:e2e`: six real Spring Boot/H2 browser tests passed; HTML report generated.
+- [x] Existing multi-stage `docker build --progress=plain --tag enviro365:ci .` passed, including its tests.
+- [x] GitHub Actions workflow validated with actionlint 1.7.12; referenced official action tags resolve.
+- [x] `render blueprints validate render.yaml --output json` returned `valid: true`.
+- [x] README documents job coverage, local commands, failure artifacts, and GitHub/Render settings.
+- [ ] Push workflow and confirm hosted PR and main runs, including failure artifact upload and required PR checks.
+- [ ] Apply Render **After CI Checks Pass** and verify failed main checks block deployment, then passing main checks trigger a build for the same SHA.
+
+`render.yaml` requests `checksPass`; a read-only live check still showed `commit`.
+GitHub Actions is enabled. The Render dashboard change and deployment observations
+remain pending; no push or deployment was performed. Local system-dependency
+installation required an unavailable sudo password; Chromium installation and the
+browser suite passed using existing libraries. CI retains `--with-deps` on GitHub's
+hosted runner. See the root [README](../README.md#continuous-integration-and-render).

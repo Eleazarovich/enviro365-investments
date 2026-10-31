@@ -55,11 +55,11 @@ browser suites have been retired; their verification reports are historical reco
 
 ## Previews
 
-Captured from the earlier frontend in mock mode on 29 October 2026. Desktop previews
-use 1440px width; mobile previews use a 390 × 844px viewport. These show the current
-R72,000 cash maximum, signed deductions, three-column statements, and simplified
-investment details.
+Current README previews were captured on 31 October 2026 using the real Spring
+Boot/H2 API and fresh seed data. Desktop previews use 1440px width; mobile uses a
+390 × 844px viewport. Cash has R80,000 available and a R70,000 withdrawal maximum.
 
-[Desktop portfolio](previews/rosewood-porcelain/portfolio-desktop.png) · [Investment details](previews/rosewood-porcelain/investment-details-desktop.png) · [Withdrawal form](previews/rosewood-porcelain/withdrawal-desktop.png) · [Withdrawal history](previews/rosewood-porcelain/history-desktop.png)
+[Desktop portfolio](previews/current/portfolio-desktop.png) · [Investment details](previews/current/investment-details-desktop.png) · [Withdrawal form](previews/current/withdrawal-desktop.png) · [Withdrawal history](previews/current/history-desktop.png) · [Mobile portfolio](previews/current/portfolio-mobile.png)
 
-[Mobile portfolio](previews/rosewood-porcelain/portfolio-mobile.png) · [Mobile investment details](previews/rosewood-porcelain/investment-details-mobile.png) · [Mobile withdrawal form](previews/rosewood-porcelain/withdrawal-mobile.png) · [Mobile withdrawal history](previews/rosewood-porcelain/history-mobile.png)
+Earlier mock-mode previews remain in `previews/rosewood-porcelain/` as historical
+design references. Their R72,000 cash maximum predates the cumulative cap.

@@ -1,243 +1,150 @@
 # Enviro365 Investments
 
-An investor portfolio and withdrawal application with a Next.js/React frontend and
-**Java 21 / Spring Boot 4.1.2 / Spring Data JPA / H2** backend. It records withdrawal
-notices and reservations, with no authentication or payment processing.
+A full-stack application for investors to view their portfolios, submit withdrawal
+notices, review withdrawal history, and download filtered CSV statements. Withdrawal
+rules are enforced by the backend, and accepted requests immediately reduce the
+available balance.
 
 [Live demo](https://enviro365-investments.onrender.com) ·
-[Demo deployment](https://github.com/Eleazarovich/enviro365-investments/deployments/activity_log?environments_filter=demo)
+[Frontend setup](frontend/README.md) · [Backend setup](backend/README.md) ·
+[API contract](openapi.yaml)
 
-The free Render demo may take a moment to wake up. It uses shared fictional data;
-notices reset when Render replaces the instance. Local H2 data persists across restarts.
+The demo uses shared fictional data and may take a moment to wake up. Hosted data
+resets when Render replaces the instance; local H2 data persists across restarts.
+The application records withdrawal notices and does not execute bank payments.
+
+## Features
+
+- Portfolio dashboard with investor details, investment products, and available balances.
+- Investment details and a withdrawal form with validation and confirmation.
+- Persisted withdrawal history with investment and date filters.
+- **Download statement** exports the same filtered records as CSV.
+- Responsive desktop and mobile layouts with loading, empty, error, and retry states.
+
+## Technology and structure
+
+| Component | Technology | Location |
+| --- | --- | --- |
+| Frontend | Next.js App Router, React, TypeScript, Tailwind CSS, Lucide | [frontend/](frontend/README.md) |
+| Backend | Java 21, Spring Boot 4.1.2, Spring Data JPA, Jakarta Validation | [backend/](backend/README.md) |
+| Database | H2, file-backed for local development | `backend/data/` |
+| Tests | JUnit, Mockito, Spring MVC Test, Playwright | `backend/src/test/`, `frontend/tests/e2e/` |
+
+The browser calls Spring Boot through a shared HTTP adapter. Controllers use DTOs,
+business rules live in services, and repositories persist records in H2. The
+implementation includes global exception handling, DTOs, server-side input
+validation, unit tests, and UI validation.
 
 ## Run locally
 
-Install a Java **21 JDK**, Node.js **24**/npm, GNU Make and Bash **4.3+** (Linux or WSL).
-From the project root:
+Install a **Java 21 JDK**, **Node.js 24 with npm**, **GNU Make**, and **Bash 4.3+**
+(Linux or WSL). First-time setup requires network access for dependencies and fonts.
 
 ```sh
+git clone https://github.com/Eleazarovich/enviro365-investments.git
+cd enviro365-investments
 make run
 ```
 
-This installs frontend dependencies when needed, creates `frontend/.env.local` if
-missing, and starts both services. Open http://localhost:4028; press **Ctrl+C** to
-stop both. If either service exits, the other is stopped too. Existing local
-configuration is preserved. Stop any separately running development servers first
-so ports 4028 and 8080 are available.
+Open [http://localhost:4028](http://localhost:4028). The API runs at
+[http://localhost:8080](http://localhost:8080). Keep both ports free; **Ctrl+C** stops
+both services. `make run` installs frontend dependencies when needed and creates
+missing local configuration without overwriting existing settings.
 
-Run `make help` for all commands. `make backend` and `make frontend` start services
-separately; `make test` runs backend tests, `make check` checks frontend types and lint,
-`make build` builds both applications, and `make test-e2e` runs the browser suite against Spring Boot/H2.
-`make clean` removes build output while retaining H2 data and local configuration.
-Browser targets require Chromium (`cd frontend && npx playwright install chromium`).
+The frontend uses `NEXT_PUBLIC_API_BASE_URL=http://localhost:8080`, without `/api`.
+See the component READMEs for manual startup and configuration. Run `make help`
+for the available development commands.
 
-To start services manually, from `backend/`:
+A fresh database contains investor **1**, two investments, and nine withdrawal
+notices. Cash starts with **R80,000.00 available** and a **R70,000.00 maximum**;
+retirement has **R60,000.00 available** and a **R54,000.00 maximum**. The total
+available balance is **R140,000.00**.
 
-```sh
-./mvnw spring-boot:run
-```
+## Withdrawal rules
 
-In a second terminal, from `frontend/`:
+- Each request must be positive, at least **R100**, and have at most two decimal places.
+- Withdrawals cannot exceed the available balance or the remaining **cumulative 90% cap per investment**, rounded down to cents.
+- Retirement withdrawals require age **greater than 65**; exactly 65 is ineligible.
+- Accepted notices reserve funds atomically. Invalid requests leave balances and records unchanged; concurrent requests cannot bypass the limits.
+- If the remaining limit is below R100, withdrawals are disabled and the actual balance remains visible. There is no remainder exception.
 
-```sh
-npm ci
-cp .env.example .env.local
-npm run dev
-```
-
-Open http://localhost:4028. The frontend defaults to HTTP at http://localhost:8080.
-Configure `NEXT_PUBLIC_API_BASE_URL` (without `/api`) in `.env.local`; restart
-Next.js after changing it. The frontend always calls Spring Boot; there is no
-separate browser database or mock mode. Do not place secrets in public variables.
-
-The [backend README](backend/README.md) covers structure, configuration, H2 inspection,
-seed data, endpoints, locking and assumptions. The Maven Wrapper pins Maven 3.9.16;
-npm dependencies use the existing lockfile.
-
-## Data and withdrawal rules
-
-A fresh database seeds investor **1**, fictional **Eleazarovich**, and two investments.
-Cash has R100,000 underlying, R20,000 reserved, R80,000 available and a R70,000 maximum.
-Retirement has R60,000 available and a R54,000 maximum. Nine existing notices provide
-filterable history. File-backed H2 in `backend/data/` retains notices across restarts.
-
-Active submitted notices share a **cumulative cap of 90% of the underlying product
-balance**, rounded down to cents. Reservations reduce available funds immediately
-and exactly once. Each request must be at least R100 and may include cents. A zero
-maximum means no request fits; the actual balance remains visible. Retirement
-requires age **strictly greater than 65**.
-
-See [business rules and the withdrawal walkthrough](_docs/business-rules.md) for
-worked examples and a short explanation of the transaction.
+API amounts remain positive and notices retain `SUBMITTED` status. The UI and CSV
+show negative deductions; CSV columns are `Date,Investment,Amount`.
+See [business rules and worked examples](_docs/business-rules.md) for the reservation
+model and calculations. Authentication, deposits, fees, interest, and payment
+processing are outside the application scope.
 
 ## API
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
-| GET | `/api/investors/{investorId}/portfolio` | Investor and products with current balances and limits |
-| POST | `/api/investors/{investorId}/withdrawal-notices` | Create a notice with `{ "productId": 1, "amount": 1500.75 }` |
-| GET | `/api/investors/{investorId}/withdrawal-notices` | History with optional `productId`, `fromDate`, `toDate` filters |
-| GET | `/api/investors/{investorId}/withdrawal-notices/export` | CSV with the same filters |
+| GET | `/api/investors/{investorId}/portfolio` | Investor, products, balances, and withdrawal limits |
+| POST | `/api/investors/{investorId}/withdrawal-notices` | Create a notice; returns HTTP 201 |
+| GET | `/api/investors/{investorId}/withdrawal-notices` | Withdrawal history, newest first |
+| GET | `/api/investors/{investorId}/withdrawal-notices/export` | Download a CSV statement |
 
-See [openapi.yaml](openapi.yaml) for complete schemas, inclusive UTC date filters and
-errors. JSON withdrawal amounts are positive; the UI and CSV show negative deductions.
-CSV columns are `Date,Investment,Amount`. Configure local CORS through
-`CORS_ALLOWED_ORIGINS`; the backend exposes `Content-Disposition` to the browser.
+POST accepts `{ "productId": 1, "amount": 1500.75 }`. History and export accept
+the same optional `productId`, `fromDate`, and `toDate` filters. Dates use
+`YYYY-MM-DD` and include both boundary dates in UTC.
+
+See the [backend API examples and errors](backend/README.md#api) and
+[OpenAPI contract](openapi.yaml) for request and response details.
 
 ## Verification
 
-From `backend/`:
+From the repository root:
 
 ```sh
-./mvnw -B -ntp clean verify
-```
-
-From `frontend/`:
-
-```sh
-npm ci
-npm run type-check
-npm run lint
-npm run build
-npx playwright install --with-deps chromium
+make test                  # Backend tests
+make check                 # Frontend TypeScript and lint
+make build                 # Package backend and build frontend
+cd frontend
+npx playwright install chromium
 npm run test:e2e
 ```
 
-On Linux, `--with-deps` requires permission to install system packages. If the
-libraries are already installed, `npx playwright install chromium` is sufficient.
+The browser suite starts disposable Spring Boot/H2 on **8081** and Next.js on
+**4029**; keep these ports free. It uses real API calls and leaves local H2 data
+untouched. Chromium also requires its Linux system libraries; CI installs these
+with `npx playwright install --with-deps chromium`.
 
-Spring Boot manages JUnit Jupiter **6.0.3** and Mockito. Standard
-`@SpringBootTest` / `@AutoConfigureMockMvc` tests use real H2 and cover rules,
-concurrency, rollback, errors, filtering and CSV. The restart test deliberately
-starts two application contexts to check file persistence. OpenAPI remains API
-documentation; tests use direct response assertions.
+[Recorded verification on 31 October 2026](_docs/TASKS.md#k-cicd-verification)
+includes **58 backend tests**, **six browser tests**, frontend type checking, lint,
+production build, and Docker build. Coverage includes financial boundaries,
+concurrency, rollback, restart persistence, backend errors, balance refresh,
+filtered CSV downloads, and mobile navigation.
 
-One Playwright suite runs six tests against a disposable Spring Boot/H2 server on
-**8081** and Next.js on **4029** (`.next-e2e`). It covers portfolio loading, valid
-and invalid withdrawals, refreshed balances/history, filtered CSV downloads, real
-backend error feedback and mobile navigation. No Docker or database-reset scripts
-are needed. Each run starts with fresh in-memory data and leaves local H2 data alone.
+## Screenshots
+
+Captured on 31 October 2026 using the real Spring Boot/H2 API and fresh demo data.
+
+![Portfolio dashboard on desktop](_docs/previews/current/portfolio-desktop.png)
+
+[Investment details](_docs/previews/current/investment-details-desktop.png) ·
+[Withdrawal form](_docs/previews/current/withdrawal-desktop.png) ·
+[Withdrawal history](_docs/previews/current/history-desktop.png) ·
+[Mobile portfolio](_docs/previews/current/portfolio-mobile.png)
 
 ## Continuous integration and Render
 
-[Portfolio checks](.github/workflows/ci.yml) runs on pull requests targeting `main`,
-pushes to `main`, and **Actions → Portfolio checks → Run workflow**. The first two
-jobs run in parallel. Each later stage waits for the preceding checks to pass:
+[GitHub Actions](.github/workflows/ci.yml) checks pull requests and pushes to `main`,
+and supports manual runs. Backend and frontend checks run in parallel, followed by
+the browser suite. Successful `main` pushes also build the Docker image; Render is
+configured to deploy after the checks pass. Failed checks block automatic deployment.
+Failure reports are available as workflow artifacts for seven days.
 
-```mermaid
-flowchart LR
-  rules[Check investment rules] --> journey[Test the investor journey]
-  screens[Check portfolio screens] --> journey
-  journey --> image[Build the demo image]
-  image --> demo[Publish demo on Render]
-```
+The [Dockerfile](Dockerfile) packages the frontend export into Spring Boot so both
+share one origin. [render.yaml](render.yaml) defines the demo service. See
+[Docker setup](_docs/docker.md#build-and-run) for container startup and persistent storage.
 
-The image build and Render deployment apply to pushes to `main`. A failed or
-cancelled stage prevents the remaining stages from running. Nothing runs on a timer.
-Jobs use Ubuntu 24.04 with Java 21 and Node 24 (matching the Dockerfile's major versions).
-Maven and npm downloads are cached; `npm ci` uses the checked-in lockfile.
-Superseded runs for the same PR/branch and event are cancelled. Manual runs do not
-cancel push checks needed by Render.
+## AI use
 
-| Job | Checks | When |
-| --- | --- | --- |
-| Check investment rules | Java tests for balances, age eligibility, withdrawal limits, persistence, errors and CSV; package the backend | Starts immediately |
-| Check portfolio screens | Install locked dependencies, check TypeScript and lint, build the frontend export | Starts alongside investment rules |
-| Test the investor journey | Browser tests against real Spring Boot/H2: portfolio, withdrawals, filters, statements and mobile navigation | After both initial jobs pass |
-| Build the demo image | Existing multi-stage Docker build, including its checks | After the investor journey passes; pushes to `main` only |
-| Publish demo on Render | Render builds and publishes the checked commit | After all GitHub checks pass; handled by Render |
+Rocket.new generated the initial frontend scaffold. I used **OpenAI Codex** to refine
+the UI and assist with the Java backend, financial calculations, API integration,
+tests, documentation, and CI/CD configuration. I provided the requirements and
+design direction. Verification results and the remaining review of AI-assisted
+code are recorded in the
+[implementation checklist](_docs/TASKS.md#e-technical-and-delivery-guidelines).
 
-The local commands above reproduce the first three jobs. Set `CI=true` when running
-Playwright to also generate GitHub annotations and an HTML report. Ports **8081** and
-**4029** must be free; Playwright starts both servers itself and uses one worker for
-the shared disposable H2 database. Only Chromium is installed. From the repository
-root, verify deployment packaging with Docker running:
-
-```sh
-docker build --progress=plain --tag enviro365:ci .
-```
-
-The existing suites cover the portfolio workflows and financial rules:
-
-| Feature area | Existing coverage |
-| --- | --- |
-| Portfolio and DTO responses | `PortfolioServiceTest`, `WithdrawalIntegrationTest`, dashboard/detail browser test |
-| Notices, balances, age >65, 90% restriction, invalid amounts | `WithdrawalRulesTest`, `WithdrawalIntegrationTest`, valid/invalid/stale-balance browser tests |
-| Persistence and atomicity | `FilePersistenceTest`, integration rollback and concurrent-request tests |
-| History, product/date filters and CSV | Integration tests and browser download/content assertions |
-| Five advanced options | Exception-handler tests, DTO response assertions, backend validation/unit tests, browser form validation |
-
-To diagnose a failure, open **GitHub → Actions → Portfolio checks → failed run**, select the red
-job and expand its failed step. Each command has a separate step; Maven and
-Playwright logs name the failing test and show the actual error. Compilation/build
-steps identify packaging failures. Backend test failures also upload
-`backend-test-reports` (Surefire text/XML). Playwright failures upload
-`playwright-failure-artifacts`, including the HTML report, retained traces and
-screenshots, under the run summary's **Artifacts** section for **7 days**. Download
-and unzip it, then from `frontend/`:
-
-```sh
-npx playwright show-report /path/to/unzipped/playwright-report
-npx playwright show-trace /path/to/unzipped/test-results/<failed-test>/trace.zip
-```
-
-Startup failures may have no trace or screenshot; inspect the E2E step's server logs.
-Checks retain their failing exit codes; there are no automatic retries against the
-mutating browser database.
-
-`render.yaml` requests `autoDeployTrigger: checksPass`. Render's native
-[After CI Checks Pass](https://render.com/docs/deploys#integrating-with-ci) integration
-waits for the linked `main` commit's checks before building the existing Dockerfile.
-A failed check prevents automatic deployment. This requires a connected GitHub
-repository; a service created from a public repository URL alone cannot auto-deploy.
-Render treats `neutral` and `skipped` as passing, so all four jobs run on a successful
-`main` push. A failed prerequisite leaves a failed check alongside any skipped jobs,
-which blocks deployment. No hooks, deployment tokens or scripts are needed.
-
-Deployment setup:
-
-1. In GitHub **Settings → Actions → General**, enable GitHub Actions and allow the
-   official `actions/*` actions used here. The workflow requests only `contents: read`.
-   After the first run, protect `main` via **Settings → Rules → Rulesets** (or
-   **Branches → Branch protection**) by requiring PRs and the three always-running
-   job names above. Do not require the Docker job on PRs, where it is skipped.
-2. In Render, open **enviro365-investments → Settings → Build & Deploy**. Confirm
-   the connected GitHub repo is `Eleazarovich/enviro365-investments`, branch `main`,
-   runtime Docker. Before pushing to `main`, set
-   **Auto-Deploy → After CI Checks Pass → Save** if needed.
-   For a Blueprint-managed service, sync the updated `render.yaml` from its
-   **Blueprint → Manual Sync** page if automatic sync has not applied it, then
-   confirm the service setting. Editing YAML alone does not update an unmanaged service.
-3. A `main` push runs all four GitHub jobs. Match the commit SHA in GitHub and
-   Render Deploys to confirm that publishing starts after checks finish.
-   Manual Render deploys bypass the automatic gate.
-
-The live Render service was configured to **After CI Checks Pass** on 31 October
-2026 and the API confirmed `autoDeployTrigger: checksPass`. The
-[ordered hosted run](https://github.com/Eleazarovich/enviro365-investments/actions/runs/41186360558)
-for `97fde28` passed all four jobs: 58 backend tests, six browser tests, frontend
-checks and the Docker build. Job timestamps confirm each stage waited for its
-prerequisites. Render began deploying the same SHA three seconds after the image
-check passed and marked it live at **09:00:33 UTC**. The live website and portfolio
-API both passed a read-only smoke check. A deliberately failing main deployment
-has not been tested.
-
-GitHub's deployment environment is named **`demo`** and links to the live app.
-Its green status records a Render deployment verified as live; it is not an uptime
-monitor. Render's native integration does not update this environment automatically.
-When publishing later changes, verify the deployed SHA in Render and record its
-deployment status in GitHub before treating the sidebar entry as current.
-The free service retains ephemeral H2 storage; data resets when Render replaces it.
-
-## Design previews and AI use
-
-[Desktop portfolio](_docs/previews/rosewood-porcelain/portfolio-desktop.png) ·
-[Mobile portfolio](_docs/previews/rosewood-porcelain/portfolio-mobile.png) ·
-[Design system and other previews](_docs/design-system.md)
-
-Existing screenshots document the earlier frontend phase and its previous numerical
-limits. The live application uses the current cumulative cap.
-
-OpenAI Codex assisted with frontend and backend implementation, financial calculations,
-tests and documentation. Assumptions and verification are recorded so the developer can
-review and explain the AI-assisted work.
+Further documentation: [Specification](_docs/SPEC.md) ·
+[Design system](_docs/design-system.md) · [Implementation checklist](_docs/TASKS.md).

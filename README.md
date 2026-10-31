@@ -78,35 +78,6 @@ errors. JSON withdrawal amounts are positive; the UI and CSV show negative deduc
 CSV columns are `Date,Investment,Amount`. Configure local CORS through
 `CORS_ALLOWED_ORIGINS`; the backend exposes `Content-Disposition` to the browser.
 
-## Render portfolio demo
-
-[render.yaml](render.yaml) describes **enviro365-investments**, one free Docker web
-service in Frankfurt. The Docker build exports the Next.js frontend into the
-Spring Boot JAR, so pages and `/api` share one origin. The build runs frontend
-type checking, lint, production export and backend tests. The API portfolio
-endpoint is the deployment health check. Java uses a 256 MB maximum heap to
-leave room for the rest of the JVM on the free instance.
-
-To recreate the service with an authenticated Render CLI:
-
-```sh
-render blueprints validate render.yaml --output json
-render services create --name enviro365-investments --type web_service \
-  --runtime docker --plan free --region frankfurt \
-  --repo https://github.com/Eleazarovich/enviro365-investments --branch main \
-  --health-check-path /api/investors/1/portfolio \
-  --env-var SERVER_PORT=10000 \
-  --env-var 'JAVA_TOOL_OPTIONS=-Xms64m -Xmx256m -XX:+UseSerialGC' \
-  --output json --confirm
-```
-
-This is a shared demonstration using fictional seed data. **Render's free tier
-has no persistent disk:** H2 notices survive requests while an instance is running,
-but reset to seed data when Render replaces it on sleep, restart or redeploy.
-The service sleeps after 15 minutes without traffic; the next visit takes time
-to wake it. These [free-tier limits](https://render.com/docs/free) apply to the
-hosted demo; local file-backed H2 retains data as described above.
-
 ## Verification
 
 From `backend/`:

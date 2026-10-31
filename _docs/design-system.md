@@ -23,7 +23,8 @@ Investment details use the investment name as the heading without an extra eyebr
 The routes, eligibility rule, filters, and CSV export remain in place. Active submitted withdrawals share a cumulative cap of 90% of the underlying investment balance, rounded down to cents, with a R100 minimum. This follows the latest backend request. The API supplies both `minimumWithdrawable` and `maximumWithdrawable`; visual components do not calculate the limits. The decorative leaf outlines are original CSS and SVG, with no third-party imagery or chart data.
 
 History displays results for the current filter selection only, and keeps statement
-download unavailable until those results load. Late responses cannot replace newer
+download unavailable until those results load. The download button is right-aligned
+above the filters and remains full-width on mobile. Late responses cannot replace newer
 results or errors. If a balance refresh fails after a submitted withdrawal, preserve
 the success confirmation and refreshed history, replace outdated balance figures
 with a retry state, and require a successful balance refresh before another request.

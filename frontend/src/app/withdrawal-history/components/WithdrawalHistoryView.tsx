@@ -78,7 +78,7 @@ export default function WithdrawalHistoryView() {
 
   return (
     <>
-      <div className="mb-4 flex">
+      <div className="mb-4 flex justify-end">
         <DownloadStatementButton
           filters={apiFilters}
           disabled={

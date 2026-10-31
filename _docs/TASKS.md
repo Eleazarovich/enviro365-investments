@@ -193,13 +193,20 @@ Local verification on 31 October 2026 (Ubuntu 24.04, Java 21, Node 24):
 - [x] Pipeline names describe this project's checks; backend and frontend start together, browser tests require both, and the demo image requires passing browser tests. Validated with actionlint 1.7.12.
 - [x] GitHub environment `demo` created; README includes the live demo link and explains deployment status.
 - [x] Live Render service set to `autoDeployTrigger: checksPass`, confirmed through the API on 31 October 2026.
-- [ ] Push workflow and confirm hosted PR and main runs, including failure artifact upload and required PR checks.
-- [ ] Verify failed main checks block deployment, then passing main checks trigger a build for the same SHA.
+- [x] Hosted main run `41186360558` for `97fde28` passed all four named jobs: 58 backend tests, six browser tests, frontend checks and Docker. Timestamps confirm the parallel first stage and ordered later stages.
+- [x] Render published `97fde28` after all checks passed; the live frontend and portfolio API responded successfully. GitHub's green `demo` deployment records the same SHA and links to the app.
+- [ ] Confirm hosted PR runs, failure artifact upload and required PR checks.
+- [ ] Verify deliberately failed main checks leave the previous Render release live.
 
-`render.yaml` and the live Render service now use `checksPass`. The hosted main run
-for `8cb2392` passed all four checks before the stage ordering change. The updated
-order and successful gated deployment still need hosted verification; a deliberately
-failing main deployment and hosted PR failure artifacts have not been tested.
+`render.yaml` and the live Render service now use `checksPass`. For `97fde28`, the
+last GitHub check finished at **08:57:51 UTC** and Render deployment
+`dep-dbiqr4navr4c73bc9k3g` started at **08:57:54 UTC**. Render waited for all four
+checks before deploying the same SHA. It became **live at 09:00:33 UTC** and both
+the website and portfolio API passed read-only smoke checks. GitHub deployment
+`7456586491` records that release under
+`demo`. A deliberately failing main deployment and hosted PR failure artifacts have
+not been tested. Future Render releases require a verified GitHub deployment entry
+to refresh the sidebar status; the native integration does not synchronize it.
 There is no scheduled workflow. Local system-dependency
 installation required an unavailable sudo password; Chromium installation and the
 browser suite passed using existing libraries. CI retains `--with-deps` on GitHub's

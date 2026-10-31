@@ -190,8 +190,9 @@ mutating browser database.
 waits for the linked `main` commit's checks before building the existing Dockerfile.
 A failed check prevents automatic deployment. This requires a connected GitHub
 repository; a service created from a public repository URL alone cannot auto-deploy.
-Render treats `neutral` and `skipped` as passing, so all four jobs actually run on a
-`main` push. No hooks, deployment tokens or scripts are needed.
+Render treats `neutral` and `skipped` as passing, so all four jobs run on a successful
+`main` push. A failed prerequisite leaves a failed check alongside any skipped jobs,
+which blocks deployment. No hooks, deployment tokens or scripts are needed.
 
 Deployment setup:
 
@@ -212,9 +213,14 @@ Deployment setup:
    Manual Render deploys bypass the automatic gate.
 
 The live Render service was configured to **After CI Checks Pass** on 31 October
-2026 and the API confirmed `autoDeployTrigger: checksPass`. The successful hosted
-CI run for `8cb2392` predates the stage ordering change. Hosted verification of the
-updated order is pending; a deliberately failing main deployment has not been tested.
+2026 and the API confirmed `autoDeployTrigger: checksPass`. The
+[ordered hosted run](https://github.com/Eleazarovich/enviro365-investments/actions/runs/41186360558)
+for `97fde28` passed all four jobs: 58 backend tests, six browser tests, frontend
+checks and the Docker build. Job timestamps confirm each stage waited for its
+prerequisites. Render began deploying the same SHA three seconds after the image
+check passed and marked it live at **09:00:33 UTC**. The live website and portfolio
+API both passed a read-only smoke check. A deliberately failing main deployment
+has not been tested.
 
 GitHub's deployment environment is named **`demo`** and links to the live app.
 Its green status records a Render deployment verified as live; it is not an uptime

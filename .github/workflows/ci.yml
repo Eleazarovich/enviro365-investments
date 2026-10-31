@@ -1,4 +1,4 @@
-name: CI
+name: Portfolio checks
 
 on:
   pull_request:
@@ -20,7 +20,7 @@ env:
 
 jobs:
   backend:
-    name: Backend tests and packaging
+    name: Check investment rules
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
@@ -46,7 +46,7 @@ jobs:
           retention-days: 7
 
   frontend:
-    name: Frontend types, lint, and build
+    name: Check portfolio screens
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
@@ -70,7 +70,8 @@ jobs:
         run: npm run build
 
   e2e:
-    name: E2E with Spring Boot and H2
+    name: Test the investor journey
+    needs: [backend, frontend]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
@@ -108,7 +109,8 @@ jobs:
           retention-days: 7
 
   docker:
-    name: Docker deployable image
+    name: Build the demo image
+    needs: e2e
     # Render deploys main; PRs and manual runs use the three checks above.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

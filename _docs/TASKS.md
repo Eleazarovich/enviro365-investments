@@ -190,12 +190,17 @@ Local verification on 31 October 2026 (Ubuntu 24.04, Java 21, Node 24):
 - [x] GitHub Actions workflow validated with actionlint 1.7.12; referenced official action tags resolve.
 - [x] `render blueprints validate render.yaml --output json` returned `valid: true`.
 - [x] README documents job coverage, local commands, failure artifacts, and GitHub/Render settings.
+- [x] Pipeline names describe this project's checks; backend and frontend start together, browser tests require both, and the demo image requires passing browser tests. Validated with actionlint 1.7.12.
+- [x] GitHub environment `demo` created; README includes the live demo link and explains deployment status.
+- [x] Live Render service set to `autoDeployTrigger: checksPass`, confirmed through the API on 31 October 2026.
 - [ ] Push workflow and confirm hosted PR and main runs, including failure artifact upload and required PR checks.
-- [ ] Apply Render **After CI Checks Pass** and verify failed main checks block deployment, then passing main checks trigger a build for the same SHA.
+- [ ] Verify failed main checks block deployment, then passing main checks trigger a build for the same SHA.
 
-`render.yaml` requests `checksPass`; a read-only live check still showed `commit`.
-GitHub Actions is enabled. The Render dashboard change and deployment observations
-remain pending; no push or deployment was performed. Local system-dependency
+`render.yaml` and the live Render service now use `checksPass`. The hosted main run
+for `8cb2392` passed all four checks before the stage ordering change. The updated
+order and successful gated deployment still need hosted verification; a deliberately
+failing main deployment and hosted PR failure artifacts have not been tested.
+There is no scheduled workflow. Local system-dependency
 installation required an unavailable sudo password; Chromium installation and the
 browser suite passed using existing libraries. CI retains `--with-deps` on GitHub's
 hosted runner. See the root [README](../README.md#continuous-integration-and-render).

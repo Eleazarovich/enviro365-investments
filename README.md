@@ -4,6 +4,12 @@ An investor portfolio and withdrawal application with a Next.js/React frontend a
 **Java 21 / Spring Boot 4.1.2 / Spring Data JPA / H2** backend. It records withdrawal
 notices and reservations, with no authentication or payment processing.
 
+[Live demo](https://enviro365-investments.onrender.com) ·
+[Demo deployment](https://github.com/Eleazarovich/enviro365-investments/deployments/activity_log?environments_filter=demo)
+
+The free Render demo may take a moment to wake up. It uses shared fictional data;
+notices reset when Render replaces the instance. Local H2 data persists across restarts.
+
 ## Run locally
 
 Install a Java **21 JDK**, Node.js **24**/npm, GNU Make and Bash **4.3+** (Linux or WSL).
@@ -114,19 +120,32 @@ are needed. Each run starts with fresh in-memory data and leaves local H2 data a
 
 ## Continuous integration and Render
 
-[CI](.github/workflows/ci.yml) runs on pull requests targeting `main`, pushes to
-`main`, and **Actions → CI → Run workflow**. Independent jobs run concurrently on
-Ubuntu 24.04 with Java 21 and Node 24 (matching the Dockerfile's major versions).
+[Portfolio checks](.github/workflows/ci.yml) runs on pull requests targeting `main`,
+pushes to `main`, and **Actions → Portfolio checks → Run workflow**. The first two
+jobs run in parallel. Each later stage waits for the preceding checks to pass:
+
+```mermaid
+flowchart LR
+  rules[Check investment rules] --> journey[Test the investor journey]
+  screens[Check portfolio screens] --> journey
+  journey --> image[Build the demo image]
+  image --> demo[Publish demo on Render]
+```
+
+The image build and Render deployment apply to pushes to `main`. A failed or
+cancelled stage prevents the remaining stages from running. Nothing runs on a timer.
+Jobs use Ubuntu 24.04 with Java 21 and Node 24 (matching the Dockerfile's major versions).
 Maven and npm downloads are cached; `npm ci` uses the checked-in lockfile.
 Superseded runs for the same PR/branch and event are cancelled. Manual runs do not
 cancel push checks needed by Render.
 
 | Job | Checks | When |
 | --- | --- | --- |
-| Backend tests and packaging | `./mvnw -B -ntp clean verify` | Every CI run |
-| Frontend types, lint, and build | `npm ci`, types, ESLint, static export | Every CI run |
-| E2E with Spring Boot and H2 | Chromium and system dependencies, `npm run test:e2e` | Every CI run |
-| Docker deployable image | Existing multi-stage Docker build, including its checks | Pushes to `main` only |
+| Check investment rules | Java tests for balances, age eligibility, withdrawal limits, persistence, errors and CSV; package the backend | Starts immediately |
+| Check portfolio screens | Install locked dependencies, check TypeScript and lint, build the frontend export | Starts alongside investment rules |
+| Test the investor journey | Browser tests against real Spring Boot/H2: portfolio, withdrawals, filters, statements and mobile navigation | After both initial jobs pass |
+| Build the demo image | Existing multi-stage Docker build, including its checks | After the investor journey passes; pushes to `main` only |
+| Publish demo on Render | Render builds and publishes the checked commit | After all GitHub checks pass; handled by Render |
 
 The local commands above reproduce the first three jobs. Set `CI=true` when running
 Playwright to also generate GitHub annotations and an HTML report. Ports **8081** and
@@ -148,7 +167,7 @@ The existing suites cover the portfolio workflows and financial rules:
 | History, product/date filters and CSV | Integration tests and browser download/content assertions |
 | Five advanced options | Exception-handler tests, DTO response assertions, backend validation/unit tests, browser form validation |
 
-To diagnose a failure, open **GitHub → Actions → CI → failed run**, select the red
+To diagnose a failure, open **GitHub → Actions → Portfolio checks → failed run**, select the red
 job and expand its failed step. Each command has a separate step; Maven and
 Playwright logs name the failing test and show the actual error. Compilation/build
 steps identify packaging failures. Backend test failures also upload
@@ -174,7 +193,7 @@ repository; a service created from a public repository URL alone cannot auto-dep
 Render treats `neutral` and `skipped` as passing, so all four jobs actually run on a
 `main` push. No hooks, deployment tokens or scripts are needed.
 
-Required setup and hosted verification:
+Deployment setup:
 
 1. In GitHub **Settings → Actions → General**, enable GitHub Actions and allow the
    official `actions/*` actions used here. The workflow requests only `contents: read`.
@@ -188,19 +207,21 @@ Required setup and hosted verification:
    For a Blueprint-managed service, sync the updated `render.yaml` from its
    **Blueprint → Manual Sync** page if automatic sync has not applied it, then
    confirm the service setting. Editing YAML alone does not update an unmanaged service.
-3. Verify a `main` push runs all four jobs. Match the commit SHA in GitHub and
-   Render Events/Deploys: a failed main check must leave the previous version live;
-   a subsequent passing commit must trigger Render's Docker build only after all
-   checks finish. Record both observations before calling the gate verified.
-   Manual Render deploys bypass this automatic gate.
+3. A `main` push runs all four GitHub jobs. Match the commit SHA in GitHub and
+   Render Deploys to confirm that publishing starts after checks finish.
+   Manual Render deploys bypass the automatic gate.
 
-**Live deployment gating is not yet enabled or verified.** A read-only Render check
-on 31 October 2026 confirmed this service still uses `commit` (On Commit). Its CLI
-does not expose the `checksPass` option, so apply the dashboard setting above before
-pushing to `main`. Hosted CI runs and failed/successful deployment observations remain
-pending. GitHub Actions is already enabled for this repository.
-The existing free Render service keeps its current environment and ephemeral H2
-storage; demo data still resets when Render replaces the instance.
+The live Render service was configured to **After CI Checks Pass** on 31 October
+2026 and the API confirmed `autoDeployTrigger: checksPass`. The successful hosted
+CI run for `8cb2392` predates the stage ordering change. Hosted verification of the
+updated order is pending; a deliberately failing main deployment has not been tested.
+
+GitHub's deployment environment is named **`demo`** and links to the live app.
+Its green status records a Render deployment verified as live; it is not an uptime
+monitor. Render's native integration does not update this environment automatically.
+When publishing later changes, verify the deployed SHA in Render and record its
+deployment status in GitHub before treating the sidebar entry as current.
+The free service retains ephemeral H2 storage; data resets when Render replaces it.
 
 ## Design previews and AI use
 

@@ -75,8 +75,7 @@ and make regular local commits as work is completed.
 - Retirement withdrawals require **age greater than 65**; an investor aged exactly 65 is
   ineligible. Amounts must be positive, have at most two decimal places, and stay within
   both the available balance and the permitted 90% maximum.
-- Apply the **cumulative per-product 90% cap** requested during backend implementation,
-  superseding the earlier per-request policy, for both cash and retirement products.
+- Apply the **cumulative per-product 90% cap** for both cash and retirement products.
   Normal withdrawals have a **R100 minimum** and may include cents. Use the
   backend-provided limits in the frontend:
 
@@ -157,6 +156,9 @@ and make regular local commits as work is completed.
 - Use short, descriptive commit messages matching the existing history. Include relevant
   documentation and test changes together. Never claim failing or unrun checks passed;
   report blockers and any deliberately committed work in progress clearly.
+- State project behaviour and requirements directly in documentation and commit messages.
+  Describe the change itself without attributing requirements to external correspondence
+  or source documents. Keep the AI-use disclosure accurate.
 - Local commits are authorized by this working agreement. Push or publish only when the
   user has requested it or existing session authorization covers it. Avoid history rewrites
   unless specifically authorized.

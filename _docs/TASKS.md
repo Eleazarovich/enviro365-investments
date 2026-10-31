@@ -80,8 +80,7 @@ remains outside this verification.
 **Current policy:** Active submitted notices share a cumulative cap of 90% of the
 underlying balance per product, rounded down to cents. Retain the R100 minimum and
 return a maximum of R0 when no request fits, keeping the actual balance visible.
-This follows the latest backend instructions and supersedes the earlier frontend
-policy. Backend/H2 and browser checks verify it. See [business rules](business-rules.md).
+Backend/H2 and browser checks verify it. See [business rules](business-rules.md).
 
 ### BR-04 — Error handling and user feedback
 - [x] Invalid requests produce meaningful API errors.

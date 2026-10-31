@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: enviro365-investments
+    runtime: docker
+    repo: https://github.com/Eleazarovich/enviro365-investments
+    branch: main
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeployTrigger: commit
+    healthCheckPath: /api/investors/1/portfolio
+    envVars:
+      - key: SERVER_PORT
+        value: "10000"
+      - key: JAVA_TOOL_OPTIONS
+        value: "-Xms64m -Xmx256m -XX:+UseSerialGC"
+    # Free services have no persistent disk. H2 demo data resets on replacement.

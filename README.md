@@ -18,24 +18,27 @@ and download filtered CSV statements.
 ## Architecture
 
 ```mermaid
-flowchart LR
-  subgraph frontend["Frontend · Next.js"]
-    screens["Portfolio, investments<br/>and withdrawals"] --> client["API client"]
-  end
-  subgraph backend["Backend · Java 21 / Spring Boot 4.1.2"]
-    controllers["REST controllers<br/>Request validation"]
-    services["Services<br/>Withdrawal rules and statements"]
-    repositories["JPA repositories<br/>Data storage and product locking"]
-    controllers --> services --> repositories
-  end
-  client -->|REST · JSON / CSV| controllers
-  repositories --> database[("H2<br/>Investors, investments, withdrawal notices")]
+architecture-beta
+  group browser(internet)[Investor browser]
+  group backend(server)[Spring Boot application]
+
+  service frontend(internet)[Next.js frontend] in browser
+  service statements(disk)[CSV statements] in browser
+  service api(server)[Portfolio and withdrawal API] in backend
+  service database(database)[H2 database] in backend
+  service storage(disk)[Database file] in backend
+
+  frontend:R <--> L:api
+  api:R <--> L:database
+  frontend:L --> R:statements
+  database:R <--> L:storage
 ```
 
-The frontend uses one API client. Spring Boot services enforce the withdrawal
-rules; JPA repositories store investors, products, and notices in H2. A notice
-reserves funds in the same transaction that creates it. Product locking prevents
-concurrent requests from using the same available funds.
+The browser calls the Spring Boot API for portfolios, withdrawals, and CSV
+statements. Services enforce withdrawal rules; JPA repositories store records in
+H2, backed by a local database file. A notice reserves funds in the same transaction
+that creates it. Product locking prevents concurrent requests from using the same
+available funds.
 
 ## Run locally
 

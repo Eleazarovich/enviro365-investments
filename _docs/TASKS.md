@@ -144,7 +144,10 @@ README screenshots were refreshed on 1 November 2026 against disposable Spring
 Boot/H2 with fresh seed data. Four desktop captures show Portfolio, Investment
 details, Withdraw money, and Withdrawals. The sidebar was checked against the
 viewport; all nine notices and balances remained unchanged. The README includes
-a Mermaid architecture diagram and a concise requirements-coverage table.
+a grouped Mermaid architecture diagram showing the investor browser, Spring Boot
+API, H2 database, database file, and CSV statements, alongside a concise
+requirements-coverage table.
+Architecture syntax and rendering were checked with Mermaid 12.2.0 and Chromium.
 Documentation review confirmed setup, API usage, financial rules, all five advanced
 requirements, screenshots, and AI-use disclosure across the three READMEs.
 

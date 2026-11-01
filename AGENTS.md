@@ -107,9 +107,9 @@ and make regular local commits as work is completed.
 - Use plain investor language: **Portfolio**, **Investment details**, **Withdrawals**, and
   **Download statement**. Avoid repeated headings, redundant explanatory text, internal
   terminology, and excessive whitespace. Keep layouts usable on desktop, tablet, and mobile.
-- Write READMEs for external reviewers, focused on project requirements. Use a Mermaid
-  architecture diagram, four core desktop screenshots with investor-friendly labels, and
-  consolidated documentation links. Keep personal review reminders in the working checklist.
+- Write READMEs for external reviewers, focused on project requirements. Use a grouped
+  Mermaid `architecture-beta` diagram, four core desktop screenshots with investor-friendly
+  labels, and consolidated documentation links. Keep personal review reminders in the working checklist.
 - Withdrawal lists and CSV use **Date, Investment, Amount**, with signed deductions; omit
   Investment in investment-specific lists. Keep status labels and pending totals out of the
   investor-facing lists while retaining the internal data needed for correctness.

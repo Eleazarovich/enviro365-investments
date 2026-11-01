@@ -24,8 +24,9 @@ config:
   look: classic
   layout: dagre
   markdownAutoWrap: false
+  htmlLabels: false
+  fontFamily: Arial, sans-serif
   themeVariables:
-    fontFamily: 'ui-sans-serif, system-ui, sans-serif'
     fontSize: 17px
     primaryColor: '#F8F5F0'
     primaryTextColor: '#26252B'
@@ -45,13 +46,19 @@ flowchart TB
   accDescr: An investor uses the Next.js frontend to call Spring Boot REST controllers. Application services retrieve portfolios, create withdrawal notices, return history and generate filtered CSV. Spring Data JPA persists records in H2. Withdrawal creation locks the product, validates backend rules and saves the notice as a reservation in one transaction.
 
   investor["Investor"]
-  frontend["<b>Next.js frontend</b>"]
-  api["<b>Spring Boot API</b>"]
-  services["<b>Application services</b><br/>Portfolio · Withdrawals · History<br/>Filtered CSV export"]
-  repositories["<b>JPA repositories</b>"]
-  database[("<b>H2 database</b><br/>Investments · Withdrawal notices")]
-  safeguards["<b>Withdrawal safeguards</b><br/>R100 min · Retirement age &gt; 65<br/>Balance check · Cumulative 90% per investment<br/>Product locking · Atomic reservation"]
-  statement["<b>CSV statement</b>"]
+  frontend["`**Next.js frontend**`"]
+  api["`**Spring Boot API**`"]
+  services["`**Application services**
+Portfolio · Withdrawals · History
+Filtered CSV export`"]
+  repositories["`**JPA repositories**`"]
+  database[("`**H2 database**
+Investments · Withdrawal notices`")]
+  safeguards["`**Withdrawal safeguards**
+R100 min · Retirement age &gt; 65
+Balance check · Cumulative 90% per investment
+Product locking · Atomic reservation`"]
+  statement["`**CSV statement**`"]
 
   investor --> frontend
   frontend -->|HTTP| api

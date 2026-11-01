@@ -144,7 +144,7 @@ README screenshots were refreshed on 1 November 2026 against disposable Spring
 Boot/H2 with fresh seed data. Five viewport captures cover portfolio, investment
 details, withdrawal entry, filtered history, and mobile. Desktop sidebar and mobile
 navigation bounds were checked against the viewport; all nine notices and balances
-remained unchanged. The README includes an SVG architecture diagram and a concise
+remained unchanged. The README includes a Mermaid architecture diagram and a concise
 requirements-coverage table.
 
 ## F. Backend test simplification

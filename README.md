@@ -17,7 +17,20 @@ and download filtered CSV statements.
 
 ## Architecture
 
-![Application architecture](_docs/architecture.svg)
+```mermaid
+flowchart LR
+  subgraph frontend["Frontend · Next.js"]
+    screens["React screens"] --> client["HTTP adapter"]
+  end
+  subgraph backend["Backend · Java 21 / Spring Boot 4.1.2"]
+    controllers["Controllers<br/>DTO validation"]
+    services["Services<br/>Rules, transactions, CSV"]
+    repositories["JPA repositories<br/>Product locking"]
+    controllers --> services --> repositories
+  end
+  client -->|REST · JSON / CSV| controllers
+  repositories --> database[("H2<br/>Investors, products, notices")]
+```
 
 The frontend uses one HTTP adapter. Spring Boot services enforce the financial
 rules; JPA repositories store investors, products, and notices in H2. A notice

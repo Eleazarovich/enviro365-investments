@@ -55,9 +55,10 @@ browser suites have been retired; their verification reports are historical reco
 
 ## Previews
 
-Current README previews were captured on 31 October 2026 using the real Spring
-Boot/H2 API and fresh seed data. Desktop previews use 1440px width; mobile uses a
-390 × 844px viewport. Cash has R80,000 available and a R70,000 withdrawal maximum.
+Current README previews were captured on 1 November 2026 using the real Spring
+Boot/H2 API and fresh seed data. Desktop previews use a 1440 × 1120px viewport;
+mobile uses 390 × 844px. Captures use the visible viewport so fixed navigation
+reaches the image edge. Cash has R80,000 available and a R70,000 withdrawal maximum.
 
 [Desktop portfolio](previews/current/portfolio-desktop.png) · [Investment details](previews/current/investment-details-desktop.png) · [Withdrawal form](previews/current/withdrawal-desktop.png) · [Withdrawal history](previews/current/history-desktop.png) · [Mobile portfolio](previews/current/portfolio-mobile.png)
 

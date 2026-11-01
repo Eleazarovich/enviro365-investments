@@ -1,44 +1,33 @@
 # Enviro365 Investments
 
-A full-stack application for investors to view their portfolios, submit withdrawal
-notices, review withdrawal history, and download filtered CSV statements. Withdrawal
-rules are enforced by the backend, and accepted requests immediately reduce the
-available balance.
+An investor portfolio and withdrawal application built with Next.js, Java 21,
+Spring Boot 4.1.2, and H2. Investors can view balances, submit withdrawal notices,
+and download filtered CSV statements.
 
-[Live demo](https://enviro365-investments.onrender.com) ·
-[Frontend setup](frontend/README.md) · [Backend setup](backend/README.md) ·
-[API contract](openapi.yaml)
+## Requirements coverage
 
-The demo uses shared fictional data and may take a moment to wake up. Hosted data
-resets when Render replaces the instance; local H2 data persists across restarts.
-The application records withdrawal notices and does not execute bank payments.
-
-## Features
-
-- Portfolio dashboard with investor details, investment products, and available balances.
-- Investment details and a withdrawal form with validation and confirmation.
-- Persisted withdrawal history with investment and date filters.
-- **Download statement** exports the same filtered records as CSV.
-- Responsive desktop and mobile layouts with loading, empty, error, and retry states.
-
-## Technology and structure
-
-| Component | Technology | Location |
+| Requirement | Implementation | Status |
 | --- | --- | --- |
-| Frontend | Next.js App Router, React, TypeScript, Tailwind CSS, Lucide | [frontend/](frontend/README.md) |
-| Backend | Java 21, Spring Boot 4.1.2, Spring Data JPA, Jakarta Validation | [backend/](backend/README.md) |
-| Database | H2, file-backed for local development | `backend/data/` |
-| Tests | JUnit, Mockito, Spring MVC Test, Playwright | `backend/src/test/`, `frontend/tests/e2e/` |
+| Portfolio retrieval | Investor details, investment products, available balances, and withdrawal limits | Implemented |
+| Withdrawal notices | Persisted submissions, immediate balance reservations, and transaction locking | Implemented |
+| Withdrawal history and CSV | Shared investment/date filters; `Date,Investment,Amount` columns | Implemented |
+| Connected frontend | Portfolio, investment details, withdrawal form, history, and download action use the real REST API | Implemented |
+| Financial rules | Retirement age >65, available-balance checks, and cumulative 90% cap per investment | Implemented |
+| Advanced requirements | Global exception handling, DTOs, input validation, unit tests, and UI validation | All five implemented |
 
-The browser calls Spring Boot through a shared HTTP adapter. Controllers use DTOs,
-business rules live in services, and repositories persist records in H2. The
-implementation includes global exception handling, DTOs, server-side input
-validation, unit tests, and UI validation.
+## Architecture
+
+![Application architecture](_docs/architecture.svg)
+
+The frontend uses one HTTP adapter. Spring Boot services enforce the financial
+rules; JPA repositories store investors, products, and notices in H2. A notice
+reserves funds in the same transaction that creates it. Product locking prevents
+concurrent requests from using the same available funds.
 
 ## Run locally
 
-Install a **Java 21 JDK**, **Node.js 24 with npm**, **GNU Make**, and **Bash 4.3+**
-(Linux or WSL). First-time setup requires network access for dependencies and fonts.
+Requirements: **Java 21 JDK**, **Node.js 24/npm**, **GNU Make**, and **Bash 4.3+**
+(Linux or WSL).
 
 ```sh
 git clone https://github.com/Eleazarovich/enviro365-investments.git
@@ -46,105 +35,88 @@ cd enviro365-investments
 make run
 ```
 
-Open [http://localhost:4028](http://localhost:4028). The API runs at
-[http://localhost:8080](http://localhost:8080). Keep both ports free; **Ctrl+C** stops
-both services. `make run` installs frontend dependencies when needed and creates
-missing local configuration without overwriting existing settings.
-
-The frontend uses `NEXT_PUBLIC_API_BASE_URL=http://localhost:8080`, without `/api`.
-See the component READMEs for manual startup and configuration. Run `make help`
-for the available development commands.
-
-A fresh database contains investor **1**, two investments, and nine withdrawal
-notices. Cash starts with **R80,000.00 available** and a **R70,000.00 maximum**;
-retirement has **R60,000.00 available** and a **R54,000.00 maximum**. The total
-available balance is **R140,000.00**.
+Open `http://localhost:4028`; the backend runs on `http://localhost:8080`.
+`make run` installs dependencies and creates missing local configuration.
+**Ctrl+C** stops both services. H2 data persists in `backend/data/`.
 
 ## Withdrawal rules
 
-- Each request must be positive, at least **R100**, and have at most two decimal places.
-- Withdrawals cannot exceed the available balance or the remaining **cumulative 90% cap per investment**, rounded down to cents.
-- Retirement withdrawals require age **greater than 65**; exactly 65 is ineligible.
-- Accepted notices reserve funds atomically. Invalid requests leave balances and records unchanged; concurrent requests cannot bypass the limits.
-- If the remaining limit is below R100, withdrawals are disabled and the actual balance remains visible. There is no remainder exception.
+- Minimum **R100**, with at most two decimal places.
+- Requests must fit the available balance and the remaining cumulative **90% cap**, rounded down to cents.
+- Retirement withdrawals require age **greater than 65**; age 65 is ineligible.
+- Accepted notices immediately reserve funds. Rejected requests leave data unchanged.
+- If the remaining limit is below R100, withdrawals are disabled; the actual balance remains visible.
 
-API amounts remain positive and notices retain `SUBMITTED` status. The UI and CSV
-show negative deductions; CSV columns are `Date,Investment,Amount`.
-See [business rules and worked examples](_docs/business-rules.md) for the reservation
-model and calculations. Authentication, deposits, fees, interest, and payment
-processing are outside the application scope.
+The backend supplies the minimum and maximum amounts to the UI. JSON notice amounts
+are positive; tables and CSV show negative deductions. A submitted notice records
+a request, not a completed bank payment.
 
 ## API
 
-| Method | Endpoint | Purpose |
+All paths start with `/api/investors/{investorId}`.
+
+| Method | Path | Result |
 | --- | --- | --- |
-| GET | `/api/investors/{investorId}/portfolio` | Investor, products, balances, and withdrawal limits |
-| POST | `/api/investors/{investorId}/withdrawal-notices` | Create a notice; returns HTTP 201 |
-| GET | `/api/investors/{investorId}/withdrawal-notices` | Withdrawal history, newest first |
-| GET | `/api/investors/{investorId}/withdrawal-notices/export` | Download a CSV statement |
+| GET | `/portfolio` | Investor, products, balances, and limits |
+| POST | `/withdrawal-notices` | Create a notice; HTTP 201 |
+| GET | `/withdrawal-notices` | History, newest first |
+| GET | `/withdrawal-notices/export` | CSV statement |
 
-POST accepts `{ "productId": 1, "amount": 1500.75 }`. History and export accept
-the same optional `productId`, `fromDate`, and `toDate` filters. Dates use
-`YYYY-MM-DD` and include both boundary dates in UTC.
-
-See the [backend API examples and errors](backend/README.md#api) and
-[OpenAPI contract](openapi.yaml) for request and response details.
+POST body: `{ "productId": 1, "amount": 1500.75 }`.
+History and export share optional `productId`, `fromDate`, and `toDate` filters.
+Dates use `YYYY-MM-DD`, inclusive in UTC. The default investor ID is **1**.
 
 ## Verification
 
-From the repository root:
-
 ```sh
-make test                  # Backend tests
-make check                 # Frontend TypeScript and lint
-make build                 # Package backend and build frontend
+make test
+make check
+make build
 cd frontend
 npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite starts disposable Spring Boot/H2 on **8081** and Next.js on
-**4029**; keep these ports free. It uses real API calls and leaves local H2 data
-untouched. Chromium also requires its Linux system libraries; CI installs these
-with `npx playwright install --with-deps chromium`.
+Recorded verification on **31 October 2026**: **58 backend tests**, **six real-API
+browser tests**, TypeScript, lint, production build, and Docker build passed.
+Coverage includes age and money boundaries, cumulative limits, concurrency,
+rollback, persistence, errors, filtered CSV downloads, and mobile navigation.
+Playwright starts isolated servers on **8081** and **4029**; keep these ports free.
 
-[Recorded verification on 31 October 2026](_docs/TASKS.md#k-cicd-verification)
-includes **58 backend tests**, **six browser tests**, frontend type checking, lint,
-production build, and Docker build. Coverage includes financial boundaries,
-concurrency, rollback, restart persistence, backend errors, balance refresh,
-filtered CSV downloads, and mobile navigation.
+GitHub Actions runs backend and frontend checks before browser tests. Successful
+`main` pushes also build the container; Render deploys after the checks pass.
 
 ## Screenshots
 
-Captured on 31 October 2026 using the real Spring Boot/H2 API and fresh demo data.
+| Portfolio | Investment details |
+| --- | --- |
+| ![Portfolio dashboard](_docs/previews/current/portfolio-desktop.png) | ![Investment details](_docs/previews/current/investment-details-desktop.png) |
 
-![Portfolio dashboard on desktop](_docs/previews/current/portfolio-desktop.png)
+| Withdrawal form | Filtered history |
+| --- | --- |
+| ![Withdrawal amount entry](_docs/previews/current/withdrawal-desktop.png) | ![History filters and statement download](_docs/previews/current/history-desktop.png) |
 
-[Investment details](_docs/previews/current/investment-details-desktop.png) ·
-[Withdrawal form](_docs/previews/current/withdrawal-desktop.png) ·
-[Withdrawal history](_docs/previews/current/history-desktop.png) ·
-[Mobile portfolio](_docs/previews/current/portfolio-mobile.png)
+<details>
+<summary>Mobile portfolio</summary>
 
-## Continuous integration and Render
+![Mobile portfolio](_docs/previews/current/portfolio-mobile.png)
 
-[GitHub Actions](.github/workflows/ci.yml) checks pull requests and pushes to `main`,
-and supports manual runs. Backend and frontend checks run in parallel, followed by
-the browser suite. Successful `main` pushes also build the Docker image; Render is
-configured to deploy after the checks pass. Failed checks block automatic deployment.
-Failure reports are available as workflow artifacts for seven days.
-
-The [Dockerfile](Dockerfile) packages the frontend export into Spring Boot so both
-share one origin. [render.yaml](render.yaml) defines the demo service. See
-[Docker setup](_docs/docker.md#build-and-run) for container startup and persistent storage.
+</details>
 
 ## AI use
 
-Rocket.new generated the initial frontend scaffold. I used **OpenAI Codex** to refine
-the UI and assist with the Java backend, financial calculations, API integration,
-tests, documentation, and CI/CD configuration. I provided the requirements and
-design direction. Verification results and the remaining review of AI-assisted
-code are recorded in the
-[implementation checklist](_docs/TASKS.md#e-technical-and-delivery-guidelines).
+Rocket.new generated the initial frontend scaffold. I used OpenAI Codex for UI
+refinement, backend implementation, financial calculations, API integration,
+tests, documentation, and CI/CD configuration. I supplied the requirements and
+design direction. The implementation checklist records verification and the
+remaining developer review of AI-assisted code.
 
-Further documentation: [Specification](_docs/SPEC.md) ·
-[Design system](_docs/design-system.md) · [Implementation checklist](_docs/TASKS.md).
+## Documentation
+
+| Reference | Contents |
+| --- | --- |
+| [Frontend README](frontend/README.md) | Frontend setup, configuration, and checks |
+| [Backend README](backend/README.md) | Backend setup, persistence, validation, and errors |
+| [API contract](openapi.yaml) | Complete request and response schemas |
+| [Implementation checklist](_docs/TASKS.md) | Requirement-by-requirement verification and outstanding review |
+| [Business rules](_docs/business-rules.md) | Financial calculations and worked examples |

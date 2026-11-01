@@ -140,9 +140,12 @@ from the live Spring Boot backend after another client reserves the available li
 - [ ] Review and understand all AI-assisted code.
 - [x] Application can be started and tested using README instructions.
 
-README screenshots were refreshed on 31 October 2026 against disposable Spring
-Boot/H2 with fresh seed data. Desktop and mobile previews show the current
-balances and cumulative withdrawal limits; capture left all nine notices unchanged.
+README screenshots were refreshed on 1 November 2026 against disposable Spring
+Boot/H2 with fresh seed data. Five viewport captures cover portfolio, investment
+details, withdrawal entry, filtered history, and mobile. Desktop sidebar and mobile
+navigation bounds were checked against the viewport; all nine notices and balances
+remained unchanged. The README includes an SVG architecture diagram and a concise
+requirements-coverage table.
 
 ## F. Backend test simplification
 
@@ -213,4 +216,4 @@ to refresh the sidebar status; the native integration does not synchronize it.
 There is no scheduled workflow. Local system-dependency
 installation required an unavailable sudo password; Chromium installation and the
 browser suite passed using existing libraries. CI retains `--with-deps` on GitHub's
-hosted runner. See the root [README](../README.md#continuous-integration-and-render).
+hosted runner. See the root [README](../README.md#verification).

@@ -56,11 +56,11 @@ browser suites have been retired; their verification reports are historical reco
 ## Previews
 
 Current README previews were captured on 1 November 2026 using the real Spring
-Boot/H2 API and fresh seed data. Desktop previews use a 1440 × 1120px viewport;
-mobile uses 390 × 844px. Captures use the visible viewport so fixed navigation
-reaches the image edge. Cash has R80,000 available and a R70,000 withdrawal maximum.
+Boot/H2 API and fresh seed data. The four desktop previews use a 1440 × 1120px
+viewport so fixed navigation reaches the image edge. Cash has R80,000 available
+and a R70,000 withdrawal maximum.
 
-[Desktop portfolio](previews/current/portfolio-desktop.png) · [Investment details](previews/current/investment-details-desktop.png) · [Withdrawal form](previews/current/withdrawal-desktop.png) · [Withdrawal history](previews/current/history-desktop.png) · [Mobile portfolio](previews/current/portfolio-mobile.png)
+[Portfolio](previews/current/portfolio-desktop.png) · [Investment details](previews/current/investment-details-desktop.png) · [Withdraw money](previews/current/withdrawal-desktop.png) · [Withdrawals](previews/current/history-desktop.png)
 
 Earlier mock-mode previews remain in `previews/rosewood-porcelain/` as historical
 design references. Their R72,000 cash maximum predates the cumulative cap.

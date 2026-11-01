@@ -20,19 +20,19 @@ and download filtered CSV statements.
 ```mermaid
 flowchart LR
   subgraph frontend["Frontend · Next.js"]
-    screens["React screens"] --> client["HTTP adapter"]
+    screens["Portfolio, investments<br/>and withdrawals"] --> client["API client"]
   end
   subgraph backend["Backend · Java 21 / Spring Boot 4.1.2"]
-    controllers["Controllers<br/>DTO validation"]
-    services["Services<br/>Rules, transactions, CSV"]
-    repositories["JPA repositories<br/>Product locking"]
+    controllers["REST controllers<br/>Request validation"]
+    services["Services<br/>Withdrawal rules and statements"]
+    repositories["JPA repositories<br/>Data storage and product locking"]
     controllers --> services --> repositories
   end
   client -->|REST · JSON / CSV| controllers
-  repositories --> database[("H2<br/>Investors, products, notices")]
+  repositories --> database[("H2<br/>Investors, investments, withdrawal notices")]
 ```
 
-The frontend uses one HTTP adapter. Spring Boot services enforce the financial
+The frontend uses one API client. Spring Boot services enforce the withdrawal
 rules; JPA repositories store investors, products, and notices in H2. A notice
 reserves funds in the same transaction that creates it. Product locking prevents
 concurrent requests from using the same available funds.
@@ -105,24 +105,16 @@ GitHub Actions runs backend and frontend checks before browser tests. Successful
 | --- | --- |
 | ![Portfolio dashboard](_docs/previews/current/portfolio-desktop.png) | ![Investment details](_docs/previews/current/investment-details-desktop.png) |
 
-| Withdrawal form | Filtered history |
+| Withdraw money | Withdrawals |
 | --- | --- |
-| ![Withdrawal amount entry](_docs/previews/current/withdrawal-desktop.png) | ![History filters and statement download](_docs/previews/current/history-desktop.png) |
-
-<details>
-<summary>Mobile portfolio</summary>
-
-![Mobile portfolio](_docs/previews/current/portfolio-mobile.png)
-
-</details>
+| ![Withdraw money](_docs/previews/current/withdrawal-desktop.png) | ![Withdrawals and statement download](_docs/previews/current/history-desktop.png) |
 
 ## AI use
 
 Rocket.new generated the initial frontend scaffold. I used OpenAI Codex for UI
 refinement, backend implementation, financial calculations, API integration,
 tests, documentation, and CI/CD configuration. I supplied the requirements and
-design direction. The implementation checklist records verification and the
-remaining developer review of AI-assisted code.
+design direction.
 
 ## Documentation
 
@@ -131,5 +123,5 @@ remaining developer review of AI-assisted code.
 | [Frontend README](frontend/README.md) | Frontend setup, configuration, and checks |
 | [Backend README](backend/README.md) | Backend setup, persistence, validation, and errors |
 | [API contract](openapi.yaml) | Complete request and response schemas |
-| [Implementation checklist](_docs/TASKS.md) | Requirement-by-requirement verification and outstanding review |
+| [Implementation checklist](_docs/TASKS.md) | Requirements and verification results |
 | [Business rules](_docs/business-rules.md) | Financial calculations and worked examples |

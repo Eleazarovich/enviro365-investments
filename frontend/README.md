@@ -2,7 +2,7 @@
 
 Next.js 15.5.28 App Router, React 19.0.9, TypeScript, Tailwind CSS, and Lucide.
 The interface provides portfolio balances, investment details, withdrawal
-submission, filtered history, and CSV downloads through the Spring Boot API.
+submission, withdrawal history, and CSV statements through the Spring Boot API.
 
 ## Setup
 

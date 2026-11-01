@@ -141,11 +141,12 @@ from the live Spring Boot backend after another client reserves the available li
 - [x] Application can be started and tested using README instructions.
 
 README screenshots were refreshed on 1 November 2026 against disposable Spring
-Boot/H2 with fresh seed data. Five viewport captures cover portfolio, investment
-details, withdrawal entry, filtered history, and mobile. Desktop sidebar and mobile
-navigation bounds were checked against the viewport; all nine notices and balances
-remained unchanged. The README includes a Mermaid architecture diagram and a concise
-requirements-coverage table.
+Boot/H2 with fresh seed data. Four desktop captures show Portfolio, Investment
+details, Withdraw money, and Withdrawals. The sidebar was checked against the
+viewport; all nine notices and balances remained unchanged. The README includes
+a Mermaid architecture diagram and a concise requirements-coverage table.
+Documentation review confirmed setup, API usage, financial rules, all five advanced
+requirements, screenshots, and AI-use disclosure across the three READMEs.
 
 ## F. Backend test simplification
 

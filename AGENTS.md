@@ -107,6 +107,9 @@ and make regular local commits as work is completed.
 - Use plain investor language: **Portfolio**, **Investment details**, **Withdrawals**, and
   **Download statement**. Avoid repeated headings, redundant explanatory text, internal
   terminology, and excessive whitespace. Keep layouts usable on desktop, tablet, and mobile.
+- Write READMEs for external reviewers, focused on project requirements. Use a Mermaid
+  architecture diagram, four core desktop screenshots with investor-friendly labels, and
+  consolidated documentation links. Keep personal review reminders in the working checklist.
 - Withdrawal lists and CSV use **Date, Investment, Amount**, with signed deductions; omit
   Investment in investment-specific lists. Keep status labels and pending totals out of the
   investor-facing lists while retaining the internal data needed for correctness.
@@ -153,8 +156,9 @@ and make regular local commits as work is completed.
 - Inspect the working tree and staged diff first. Stage only changes belonging to the
   current task; preserve unrelated or concurrent work. Avoid `git add .` in a dirty tree.
   Never revert someone else's changes to make checks pass.
-- Use short, descriptive commit messages matching the existing history. Include relevant
-  documentation and test changes together. Never claim failing or unrun checks passed;
+- Use short, descriptive commit messages in plain project language, such as
+  `Update project README`. Include relevant documentation and test changes together.
+  Never claim failing or unrun checks passed;
   report blockers and any deliberately committed work in progress clearly.
 - State project behaviour and requirements directly in documentation and commit messages.
   Describe the change itself without attributing requirements to external correspondence

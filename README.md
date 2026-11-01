@@ -18,21 +18,61 @@ and download filtered CSV statements.
 ## Architecture
 
 ```mermaid
-architecture-beta
-  group browser(internet)[Investor browser]
-  group backend(server)[Spring Boot application]
+---
+config:
+  theme: base
+  look: classic
+  layout: dagre
+  markdownAutoWrap: false
+  themeVariables:
+    fontFamily: 'ui-sans-serif, system-ui, sans-serif'
+    fontSize: 17px
+    primaryColor: '#F8F5F0'
+    primaryTextColor: '#26252B'
+    primaryBorderColor: '#987280'
+    lineColor: '#6A6364'
+    edgeLabelBackground: '#FFFFFF'
+  flowchart:
+    wrappingWidth: 450
+    curve: basis
+    nodeSpacing: 60
+    rankSpacing: 45
+    padding: 18
+    diagramPadding: 24
+---
+flowchart TB
+  accTitle: Enviro365 application architecture
+  accDescr: An investor uses the Next.js frontend to call Spring Boot REST controllers. Application services retrieve portfolios, create withdrawal notices, return history and generate filtered CSV. Spring Data JPA persists records in H2. Withdrawal creation locks the product, validates backend rules and saves the notice as a reservation in one transaction.
 
-  service frontend(internet)[Next.js frontend] in browser
-  service statements(disk)[CSV statements] in browser
-  service api(server)[Portfolio and withdrawal API] in backend
-  service database(database)[H2 database] in backend
-  service storage(disk)[Database file] in backend
+  investor["Investor"]
+  frontend["<b>Next.js frontend</b>"]
+  api["<b>Spring Boot API</b>"]
+  services["<b>Application services</b><br/>Portfolio · Withdrawals · History<br/>Filtered CSV export"]
+  repositories["<b>JPA repositories</b>"]
+  database[("<b>H2 database</b><br/>Investments · Withdrawal notices")]
+  safeguards["<b>Withdrawal safeguards</b><br/>R100 min · Retirement age &gt; 65<br/>Balance check · Cumulative 90% per investment<br/>Product locking · Atomic reservation"]
+  statement["<b>CSV statement</b>"]
 
-  frontend:R <--> L:api
-  api:R <--> L:database
-  frontend:L --> R:statements
-  database:R <--> L:storage
+  investor --> frontend
+  frontend -->|HTTP| api
+  api -->|JSON / CSV| frontend
+  frontend --> statement
+  api --> services
+  services --> repositories
+  repositories --> database
+  services -.->|Withdrawal creation| safeguards
+
+  classDef component fill:#F8F5F0,stroke:#987280,color:#26252B,stroke-width:1.2px
+  classDef accent fill:#663344,stroke:#663344,color:#FFFFFF,stroke-width:1.2px
+  classDef detail fill:#EADDE2,stroke:#987280,color:#26252B,stroke-width:1.2px
+  class investor,frontend,api,services,repositories component
+  class database accent
+  class safeguards,statement detail
 ```
+
+| Local | Render |
+| --- | --- |
+| Next.js and Spring Boot run separately. | Static frontend and Spring Boot in one Docker container. |
 
 The browser calls the Spring Boot API for portfolios, withdrawals, and CSV
 statements. Services enforce withdrawal rules; JPA repositories store records in
